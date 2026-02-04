@@ -4,6 +4,9 @@ dist/
 .env
 .env.*
 
+.md
+!README.md
+
 .agent/
 .agents/
 .claude/
