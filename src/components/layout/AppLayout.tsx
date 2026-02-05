@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { Home, Library, GitBranch, BookOpen, Github } from 'lucide-react'
+import { Home, Library, GitBranch, BookOpen, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -58,12 +58,12 @@ export function AppLayout() {
                         <ThemeToggle />
                         <Button variant="outline" size="sm" asChild>
                             <a
-                                href="https://github.com/HaroldZhong/Research-Atlas"
+                                href="https://docs.google.com/forms/d/e/1FAIpQLSenxH7AT7kKffyO3u2TSBpqJejdkYDQfMtRP6cCVC1Sbi1pzA/viewform?usp=publish-editor"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label="Contribute on GitHub"
+                                aria-label="Contribute via Google Form"
                             >
-                                <Github className="mr-2 h-4 w-4" aria-hidden="true" />
+                                <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
                                 <span className="hidden sm:inline-block">Contribute</span>
                             </a>
                         </Button>
