@@ -4,8 +4,10 @@ dist/
 .env
 .env.*
 
-.md
+*.md
 !README.md
+
+*.py
 
 .agent/
 .agents/

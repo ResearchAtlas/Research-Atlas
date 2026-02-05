@@ -1,5 +1,5 @@
 import { PROMPTS, StaticPrompt } from '@/data/prompts'
-import type { WorkbenchDraft } from '@/store/workbench'
+
 
 export type { StaticPrompt }
 
@@ -21,26 +21,3 @@ export async function fetchPromptById(promptId: string): Promise<StaticPrompt | 
 // But we can simulate a "My Drafts" features using localStorage beyond the zustand store if needed.
 // For now, the Workbench store handles the current draft.
 // We can add a helper to export to JSON/Markdown here.
-
-export function generatePromptMarkdown(draft: WorkbenchDraft): string {
-    return `---
-title: ${draft.title}
-description: ${draft.description}
-stage: ${draft.stage}
-tags: ${JSON.stringify(draft.tags)}
-author: Your Name
----
-
-# Goal
-${draft.content.goal}
-
-# Context
-${draft.content.context}
-
-# Instructions
-${draft.content.instructions}
-
-# Output Requirements
-${draft.content.outputRequirements}
-`
-}

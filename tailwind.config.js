@@ -16,6 +16,10 @@ export default {
 				heading: ['Poppins', 'system-ui', 'sans-serif'],
 			},
 			colors: {
+				slate: {
+					750: '#2d3b4e',
+					850: '#151e2e',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
