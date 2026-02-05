@@ -108,9 +108,6 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
                         No related workflows
                     </div>
                 )}
-                <div className="text-xs text-muted-foreground pt-6 mt-6 border-t border-border text-center">
-                    Built by <span className="text-foreground">Harold Zhong</span> <span className="text-primary cursor-pointer hover:underline">Open Source for Science.</span>
-                </div>
             </div>
         </aside>
     )
