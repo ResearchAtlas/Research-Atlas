@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { StaticPrompt } from '@/lib/prompts'
 import { WORKFLOWS } from '@/data/workflows'
 
-import { X, Check, Clipboard, Info, Star, ArrowRight } from 'lucide-react'
+import { X, Check, Clipboard, Info, Star, ArrowRight, ArrowLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useFavorites } from '@/lib/favorites'
@@ -32,20 +32,35 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
 
     if (!prompt) {
         return (
-            <aside className="hidden lg:flex w-[800px] bg-background border-l border-border flex-col shrink-0 items-center justify-center text-muted-foreground">
+            <aside className="hidden lg:flex lg:w-[50%] xl:w-[40%] 2xl:w-[800px] bg-background border-l border-border flex-col shrink-0 items-center justify-center text-muted-foreground">
                 <p>Select a prompt to view details</p>
             </aside>
         )
     }
 
     return (
-        <aside className="w-full lg:w-[800px] bg-background border-l border-border flex flex-col shrink-0 overflow-y-auto relative h-full">
+        <aside className={cn(
+            "bg-background border-l border-border flex flex-col shrink-0 overflow-y-auto relative h-full",
+            // Mobile full screen
+            "fixed inset-0 z-50 w-full lg:static lg:w-[50%] xl:w-[40%] 2xl:w-[800px] lg:z-auto"
+        )}>
             <div className="p-6 flex-1">
                 {/* Close Button & Favorites Header */}
                 <div className="flex items-center justify-between mb-6">
+                    {/* Mobile Back Button */}
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="lg:hidden flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors -ml-2 px-2 py-1"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to Library
+                        </button>
+                    )}
+
                     <button
                         onClick={() => toggleFavorite(prompt.id)}
-                        className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors ml-auto lg:ml-0"
                     >
                         <Star
                             className={cn(
@@ -56,10 +71,11 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
                         {isFavorite(prompt.id) ? "Saved" : "Save to Favorites"}
                     </button>
 
+                    {/* Desktop Close Button */}
                     {onClose && (
                         <button
                             onClick={onClose}
-                            className="w-8 h-8 rounded-full bg-secondary hover:bg-secondary/80 text-muted-foreground flex items-center justify-center transition-colors"
+                            className="hidden lg:flex w-8 h-8 rounded-full bg-secondary hover:bg-secondary/80 text-muted-foreground items-center justify-center transition-colors ml-4"
                         >
                             <X className="h-4 w-4" />
                         </button>

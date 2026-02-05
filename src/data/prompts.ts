@@ -930,20 +930,19 @@ Task: Please process my draft, polishing it into an academic paper fragment.
     updatedAt: timestamp,
   },
   {
-    id: "latex_shorten",
-    title: "Shorten (LaTeX)",
+    id: "latex_abbreviate",
+    title: "Abbreviate (LaTeX)",
     description: "Syntactically compress text without losing meaning.",
     stages: ["writing", "polishing"],
     researchTypes: ["quantitative", "theoretical", "mixed_methods"],
-    tags: ["Latex", "Shorten", "Conciseness"],
+    tags: ["Latex", "Abbreviate", "Conciseness"],
     framework: "TIDD-EC",
     difficulty: "advanced",
     content: {
       goal: "Reduce word count while preserving core meaning and LaTeX syntax.",
       context: "You are a top academic editor specializing in conciseness.",
       constraints: "Keep LaTeX clean. No major edits. 5-15 word reduction.",
-      instructions: `ABBREVIATE
-
+      instructions: `
 # Role
 I want you to act as a top academic editor who specializes in concise writing. Your strength is reducing length through syntactic optimization without losing any information.
 
@@ -1001,8 +1000,7 @@ Please make a light, minimal shortening pass on the LaTeX snippet I provide.
       goal: "Minimal expansion to improve logical flow and clarity.",
       context: "You are a top academic editor specializing in logical flow.",
       constraints: "5-15 word increase. No fluff. Explicitize implied logic.",
-      instructions: `EXPAND
-
+      instructions: `
 # Role
 I want you to act as a top academic editor who specializes in logical flow and completeness. Your strength is adding depth and connective logic without bloating the text.
 
@@ -1120,8 +1118,7 @@ Please deeply polish and rewrite the LaTeX snippet I provide. The goal is not on
       goal: "Identify fatal logic issues/contradictions in final draft.",
       context: "You are an academic assistant performing a final proofing.",
       constraints: "High threshold. Only report material blockers.",
-      instructions: `LOGIC AND CONSISTENCY CHECK (FINAL PASS)
-
+      instructions: `
 # Role
 I want you to act as an academic assistant performing a final, high-threshold proofing pass. Your job is a redline review to prevent serious issues before submission.
 
@@ -1169,8 +1166,7 @@ Please perform a final consistency and logic check on the English LaTeX snippet 
       goal: "Remove robotic/AI-generated phrasing.",
       context: "You are a senior academic editor adding a human touch.",
       constraints: "Prefer plain terms. Remove stiff transitions. Don't over-edit.",
-      instructions: `DE-AI REWRITE (NATIVE ACADEMIC TONE)
-
+      instructions: `
 # Role
 I want you to act as a senior academic editor who improves naturalness and readability. Your task is to rewrite overly mechanical model-generated text into native-like academic English appropriate for top venues (e.g., Nature Methods, Science Advances, PNAS).
 
@@ -1235,8 +1231,7 @@ Please rewrite the English LaTeX snippet I provide to remove obvious machine-lik
       goal: "Design a professional, minimalist method figure blueprint.",
       context: "You are an expert scientific illustrator.",
       constraints: "Flat vector style. Soft palette. White background.",
-      instructions: `PAPER METHOD FIGURE (ARCHITECTURE DIAGRAM)
-
+      instructions: `
 # Role
 I want you to act as an expert scientific illustrator who creates clear, publication-ready method figures for top-tier research venues (e.g., Nature Methods, Science Advances, PNAS). You produce diagrams that are rigorous, minimalist, and easy to parse.
 
@@ -1303,8 +1298,7 @@ F) One optional alternative layout if the first is crowded.
       goal: "Convert a description into a standard academic figure caption.",
       context: "You are an experienced academic editor.",
       constraints: "Title Case for noun phrases. Sentence case for sentences. No fancy words.",
-      instructions: `FIGURE CAPTION GENERATION
-
+      instructions: `
 # Role
 I want you to act as an experienced academic editor who writes precise, publication-ready figure captions.
 
@@ -1351,8 +1345,7 @@ Convert the description I provide into an English figure caption that matches to
       goal: "Convert a description into a standard table caption.",
       context: "You are an experienced academic editor.",
       constraints: "Use standard phrases (Comparison with, Ablation study on).",
-      instructions: `TABLE CAPTION GENERATION
-
+      instructions: `
 # Role
 I want you to act as an experienced academic editor who writes precise, publication-ready table captions.
 
@@ -1455,8 +1448,7 @@ Read the experimental results I provide, extract key patterns, trends, and compa
       goal: "Perform a tough but constructive review focusing on rigor and originality.",
       context: "You are a strict senior reviewer.",
       constraints: "Default to skepticism. Focus on material issues.",
-      instructions: `FULL PAPER REVIEW (STRICT REVIEWER MODE)
-
+      instructions: `
 # Role
 I want you to act as a strict, detail-oriented senior reviewer who understands top-tier scholarly review standards. Your job is to protect the bar for rigor, originality, and internal coherence.
 

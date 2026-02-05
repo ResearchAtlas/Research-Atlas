@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Star } from 'lucide-react'
+import { Search, Star, Menu } from 'lucide-react'
 import { STAGE_LABELS, RESEARCH_TYPE_LABELS, TAG_COLORS } from '@/data/taxonomy'
 import { StaticPrompt } from '@/lib/prompts'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,7 @@ interface PromptListProps {
     search: string
     onSearchChange: (value: string) => void
     loading?: boolean
+    onMenuClick?: () => void
 }
 
 export function PromptList({
@@ -20,7 +21,8 @@ export function PromptList({
     onSelectPrompt,
     search,
     onSearchChange,
-    loading
+    loading,
+    onMenuClick
 }: PromptListProps) {
     const { isFavorite } = useFavorites()
     const [filterType, setFilterType] = useState<'all' | 'standalone' | 'workflow'>('all')
@@ -35,7 +37,16 @@ export function PromptList({
     return (
         <section className="flex-1 flex flex-col bg-background overflow-hidden relative">
             <div className="px-8 pt-8 pb-4 shrink-0">
-                <h1 className="text-3xl font-bold text-foreground mb-6">Prompt Library Explorer</h1>
+                <div className="flex items-center gap-4 mb-6">
+                    {/* Hamburger Menu (Mobile/Tablet) */}
+                    <button
+                        onClick={onMenuClick}
+                        className="xl:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <Menu className="h-6 w-6" />
+                    </button>
+                    <h1 className="text-3xl font-bold text-foreground">Prompt Library Explorer</h1>
+                </div>
 
                 {/* Search Bar */}
                 <div className="relative w-full mb-4">

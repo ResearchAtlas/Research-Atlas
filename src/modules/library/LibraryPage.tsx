@@ -25,6 +25,7 @@ export function LibraryPage() {
 
     // Local State
     const [search, setSearch] = useState(searchQuery)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     // Derived State: Counts
     const counts = useMemo(() => {
@@ -80,7 +81,7 @@ export function LibraryPage() {
         setSearchParams(newParams, { replace: true })
     }
 
-    const handleSelectPrompt = (id: string) => {
+    const handleSelectPrompt = (id: string | null) => {
         updateParams({ prompt: id })
     }
 
@@ -102,7 +103,7 @@ export function LibraryPage() {
     }
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-background">
+        <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-background relative">
             <LibrarySidebar
                 selectedStages={stages}
                 selectedTypes={types}
@@ -112,22 +113,28 @@ export function LibraryPage() {
                 counts={counts}
                 favoriteIds={favorites}
                 prompts={prompts}
-                onSelectPrompt={handleSelectPrompt}
+                onSelectPrompt={(id) => handleSelectPrompt(id)}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
             />
 
             <PromptList
                 prompts={filteredPrompts}
                 selectedPromptId={promptId}
-                onSelectPrompt={handleSelectPrompt}
+                onSelectPrompt={(id) => handleSelectPrompt(id)}
                 search={search}
                 onSearchChange={(qs) => {
                     setSearch(qs)
                     updateParams({ q: qs || null })
                 }}
                 loading={isLoading}
+                onMenuClick={() => setIsSidebarOpen(true)}
             />
 
-            <PromptDetailPane prompt={selectedPrompt} />
+            <PromptDetailPane
+                prompt={selectedPrompt}
+                onClose={() => handleSelectPrompt(null)}
+            />
         </div>
     )
 }
