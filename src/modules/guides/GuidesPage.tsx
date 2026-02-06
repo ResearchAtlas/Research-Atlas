@@ -1,9 +1,8 @@
-import { useMemo, useEffect } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { Helmet } from 'react-helmet-async'
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Menu } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { EDITORIAL_POLICY, GUIDES } from "@/data/guides"
-import { RESEARCH_TYPE_LABELS } from "@/data/taxonomy"
 import { guidePathFromId } from "@/lib/seoRoutes"
 import { GuideSidebar } from "./GuideSidebar"
 import { Button } from "@/components/ui/button"
@@ -23,6 +22,7 @@ function formatIsoDate(isoDate: string) {
 export function GuidesPage() {
   const { guideId } = useParams<{ guideId?: string }>()
   const selectedGuideId = guideId ?? "welcome"
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const selectedGuide = useMemo(() => {
     return GUIDES.find(g => g.id === selectedGuideId) || null
@@ -52,6 +52,7 @@ export function GuidesPage() {
   // Scroll to top when guide changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
+    setIsSidebarOpen(false)
   }, [selectedGuideId])
 
   // Get next and previous guides for navigation
@@ -85,18 +86,31 @@ export function GuidesPage() {
       <div className="flex gap-8 relative">
         <GuideSidebar
           currentGuideId={sidebarGuideId}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
         />
 
         <section aria-label="Guide content" className="flex-1 min-w-0">
+          <div className="mb-4 md:hidden">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsSidebarOpen(true)}
+              aria-label="Open guide navigation"
+              className="gap-2"
+            >
+              <Menu className="h-4 w-4" />
+              Browse Guides
+            </Button>
+          </div>
           {!isNotFound ? (
             <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-4 border-b border-border/50 pb-8">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                   <span>Guides</span>
                   <ChevronRight className="h-3 w-3" />
-                  <span className="items-center gap-1 inline-flex">
-                    {activeGuide.researchTypes[0] && RESEARCH_TYPE_LABELS[activeGuide.researchTypes[0]]}
-                  </span>
+                  <span className="items-center gap-1 inline-flex">{activeGuide.group}</span>
                 </div>
 
                 <h1 className="text-4xl font-bold tracking-tight text-balance">{activeGuide.title}</h1>

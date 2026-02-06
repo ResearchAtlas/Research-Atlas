@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Book, FileText, FlaskConical, Layout, Settings } from "lucide-react"
+import { ChevronDown, ChevronRight, Book, FileText, FlaskConical, Layout, Settings, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -43,9 +43,10 @@ interface SidebarItemProps {
     icon?: React.ReactNode
     to?: string
     active?: boolean
+    onNavigate?: () => void
 }
 
-function SidebarItem({ label, icon, to, active }: SidebarItemProps) {
+function SidebarItem({ label, icon, to, active, onNavigate }: SidebarItemProps) {
     const className = cn(
         "w-full justify-start font-normal h-8",
         active ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground",
@@ -71,7 +72,7 @@ function SidebarItem({ label, icon, to, active }: SidebarItemProps) {
             size="sm"
             className={className}
         >
-            <Link to={to}>
+            <Link to={to} onClick={onNavigate}>
                 {icon && <span className="mr-2">{icon}</span>}
                 {label}
             </Link>
@@ -81,24 +82,61 @@ function SidebarItem({ label, icon, to, active }: SidebarItemProps) {
 
 interface GuideSidebarProps {
     currentGuideId: string | null
+    isOpen?: boolean
+    onClose?: () => void
 }
 
-export function GuideSidebar({ currentGuideId }: GuideSidebarProps) {
+export function GuideSidebar({ currentGuideId, isOpen = false, onClose }: GuideSidebarProps) {
+    const handleNavigate = () => onClose?.()
+
     return (
-        <div className="w-64 flex-shrink-0 border-r bg-card/30 hidden md:block h-[calc(100vh-4rem)] sticky top-16">
-            <ScrollArea className="h-full py-6 pr-4">
+        <>
+            {isOpen && (
+                <button
+                    type="button"
+                    aria-label="Close guide navigation overlay"
+                    onClick={onClose}
+                    className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+                />
+            )}
+
+            <aside
+                className={cn(
+                    "w-64 flex-shrink-0 border-r bg-card/95 md:bg-card/30 h-[calc(100vh-4rem)] flex flex-col",
+                    "fixed top-16 left-0 z-50 transition-transform duration-300 ease-in-out md:sticky md:z-auto",
+                    isOpen ? "translate-x-0" : "-translate-x-full",
+                    "md:translate-x-0",
+                )}
+            >
+                <div className="flex items-center justify-between border-b px-4 py-3 md:hidden">
+                    <h2 className="text-sm font-semibold text-foreground">Guide Navigation</h2>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Close guide navigation"
+                        onClick={onClose}
+                        className="h-8 w-8"
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+
+                <ScrollArea className="flex-1 py-6 pr-4">
                 <SidebarSection title="Introduction">
                     <SidebarItem
                         label="Welcome"
                         icon={<Book className="h-4 w-4" />}
                         active={currentGuideId === 'welcome'}
                         to={guidePathFromId('welcome')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="About Research Atlas"
                         icon={<FileText className="h-4 w-4" />}
                         active={currentGuideId === 'about-research-atlas'}
                         to={guidePathFromId('about-research-atlas')}
+                        onNavigate={handleNavigate}
                     />
                 </SidebarSection>
 
@@ -108,24 +146,28 @@ export function GuideSidebar({ currentGuideId }: GuideSidebarProps) {
                         icon={<FlaskConical className="h-4 w-4" />}
                         active={currentGuideId === 'ai-research-overview'}
                         to={guidePathFromId('ai-research-overview')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="Prompting Fundamentals"
                         icon={<Layout className="h-4 w-4" />}
                         active={currentGuideId === 'prompting-fundamentals'}
                         to={guidePathFromId('prompting-fundamentals')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="Verification & Integrity"
                         icon={<Settings className="h-4 w-4" />}
                         active={currentGuideId === 'verification-integrity'}
                         to={guidePathFromId('verification-integrity')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="Ethics & Privacy"
                         icon={<Settings className="h-4 w-4" />}
                         active={currentGuideId === 'ethics-policies'}
                         to={guidePathFromId('ethics-policies')}
+                        onNavigate={handleNavigate}
                     />
                 </SidebarSection>
 
@@ -143,19 +185,23 @@ export function GuideSidebar({ currentGuideId }: GuideSidebarProps) {
                         label="FOCUS Workflow"
                         active={currentGuideId === 'focus-guide'}
                         to={guidePathFromId('focus-guide')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="Quickstart"
                         active={currentGuideId === 'quickstart'}
                         to={guidePathFromId('quickstart')}
+                        onNavigate={handleNavigate}
                     />
                     <SidebarItem
                         label="Glossary"
                         active={currentGuideId === 'glossary'}
                         to={guidePathFromId('glossary')}
+                        onNavigate={handleNavigate}
                     />
                 </SidebarSection>
-            </ScrollArea>
-        </div>
+                </ScrollArea>
+            </aside>
+        </>
     )
 }

@@ -1,5 +1,11 @@
 import type { ResearchStage, ResearchType } from "@/data/taxonomy"
 
+export type GuideGroup =
+  | "Introduction"
+  | "Core Guides"
+  | "Research Stages"
+  | "Methodology"
+
 export interface GuideSection {
   id: string
   title: string
@@ -16,6 +22,7 @@ export interface Guide {
   id: string
   title: string
   summary: string
+  group: GuideGroup
   stages: ResearchStage[]
   researchTypes: ResearchType[]
   tags: string[]
@@ -32,6 +39,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "welcome",
     title: "Welcome to Research Atlas",
     summary: "Your central hub for rigorous, AI-enabled research workflows.",
+    group: "Introduction",
     stages: ["design"],
     researchTypes: ["qualitative", "quantitative", "mixed_methods"],
     tags: ["welcome", "onboarding"],
@@ -62,6 +70,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "about-research-atlas",
     title: "About Research Atlas",
     summary: "The mission, methodology, and philosophy behind this platform.",
+    group: "Introduction",
     stages: ["design"],
     researchTypes: ["qualitative", "quantitative", "mixed_methods"],
     tags: ["about", "mission"],
@@ -93,6 +102,7 @@ const RAW_GUIDES: GuideDraft[] = [
     title: "AI in Research: Executive Summary",
     summary:
       "A high-level briefing on using AI for rigorous research without sacrificing integrity.",
+    group: "Core Guides",
     stages: ["design", "analysis", "interpretation", "writing"],
     researchTypes: [
       "qualitative",
@@ -193,6 +203,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "prompting-fundamentals",
     title: "Prompting Fundamentals",
     summary: "Core frameworks for reliable research prompting.",
+    group: "Core Guides",
     stages: ["design", "analysis", "interpretation", "writing"],
     researchTypes: [
       "qualitative",
@@ -233,6 +244,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "verification-integrity",
     title: "Verification & Integrity",
     summary: "Protocols to validate AI outputs and reduce hallucinations.",
+    group: "Core Guides",
     stages: ["analysis", "interpretation", "writing"],
     researchTypes: [
       "qualitative",
@@ -270,6 +282,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "ethics-policies",
     title: "Ethics, Privacy, and Disclosure",
     summary: "Publisher policies and human-in-the-loop requirements.",
+    group: "Core Guides",
     stages: ["design", "analysis", "writing"],
     researchTypes: [
       "qualitative",
@@ -305,6 +318,7 @@ const RAW_GUIDES: GuideDraft[] = [
     title: "FOCUS Workflow Guide",
     summary:
       "A practical framework for discovery, synthesis, and evidence-backed validation.",
+    group: "Methodology",
     stages: ["design", "data_qc", "interpretation", "writing"],
     researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
     tags: ["workflow", "FOCUS"],
@@ -333,6 +347,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "quickstart",
     title: "Research Atlas Quickstart",
     summary: "A 5-step path to get immediate value from the library.",
+    group: "Methodology",
     stages: ["design", "analysis", "writing"],
     researchTypes: [
       "qualitative",
@@ -363,6 +378,7 @@ const RAW_GUIDES: GuideDraft[] = [
     id: "glossary",
     title: "Glossary",
     summary: "Core terms used throughout Research Atlas.",
+    group: "Methodology",
     stages: ["design", "analysis", "interpretation", "writing"],
     researchTypes: [
       "qualitative",
