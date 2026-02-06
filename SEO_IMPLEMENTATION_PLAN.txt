@@ -1,0 +1,119 @@
+# SEO Improvement Implementation Plan
+
+Last updated: 2026-02-06
+
+## Goal
+Improve baseline SEO/social sharing quality now, then finish SSR/SSG architecture so deep links are crawlable and shareable without client-side JS execution.
+
+## Current Status
+- Phase 0: Passed.
+- Phase 1: Implemented in app/static assets.
+- Phase 2: Implemented with route-level Helmet metadata.
+- Phase 3A: Implemented (top-level prerender routes).
+- Phase 3B: Implemented (deep prerender routes + sitemap from route source).
+- Phase 4: In progress (editorial policy, citations, and last-updated signals implemented; broader content claim audit remains).
+- Phase 5: In progress (404 route and chunk-splitting baseline done; a11y/perf hardening remains).
+- Phase 6: In progress (manifest + sitemap parity checks in place; CI wiring remains).
+
+## Phase 0 (Completed): URL Policy + Redirect Standards
+Cloudflare is configured with 301 redirects and HTTPS enforcement:
+- `research-atlas.pages.dev/*` -> `https://researchatlas.info/*`
+- `www.researchatlas.info/*` -> `https://researchatlas.info/*`
+- `Always Use HTTPS: ON`
+- SSL mode: `Full (strict)`
+
+Verification matrix (all variants must end at apex HTTPS in one hop preferred):
+- `http://www.researchatlas.info/...` -> `https://researchatlas.info/...`
+- `https://www.researchatlas.info/...` -> `https://researchatlas.info/...`
+- `http://researchatlas.info/...` -> `https://researchatlas.info/...`
+- `https://research-atlas.pages.dev/...` -> `https://researchatlas.info/...`
+
+## Phase 1 (Completed): Static Baseline SEO
+Implemented:
+- `index.html` primary metadata (title, description, canonical, OG, Twitter).
+- JSON-LD (`Organization` + `WebSite`).
+- `noscript` crawl fallback links.
+- `public/robots.txt`.
+- `public/_headers` cache + baseline security header.
+- OG image asset in `public/og/cover-1200x630.png`.
+
+Validation:
+- `curl -s https://researchatlas.info/ | head -n 80`
+- Confirm canonical + OG + JSON-LD tags in HTML source.
+
+## Phase 2 (Completed): Route-Level Metadata System
+Implemented:
+- `react-helmet-async` integrated in `src/main.tsx`.
+- Default title template + description in `src/App.tsx`.
+- Route-level title/description/canonical/OG/Twitter tags in:
+  - `src/modules/home/HomePage.tsx`
+  - `src/modules/library/LibraryPage.tsx`
+  - `src/modules/workflows/WorkflowsPage.tsx`
+  - `src/modules/workflows/WorkflowDetailPage.tsx`
+  - `src/modules/guides/GuidesPage.tsx`
+
+## Phase 3A (Completed): Pre-render Top Routes
+Implemented:
+- SSR entry: `src/entry-server.tsx`
+- Prerender pipeline: `scripts/prerender.mjs`
+- Top routes pre-rendered: `/`, `/library`, `/workflows`, `/guides`
+
+## Phase 3B (Completed): Pre-render Deep Links + Shared Route Source
+Implemented:
+- Shared route/canonical source: `src/lib/seoRoutes.ts`
+- Guide deep routes: `/guides/:guideId`
+- Workflow deep routes: `/workflows/:workflowId`
+- Prerender route manifest: `dist/prerender-manifest.json`
+- Sitemap generated from prerender manifest: `dist/sitemap.xml`
+- SEO smoke checks from manifest: `scripts/seo-smoke.mjs`
+- Prerender tag merge supports route-level title/description/canonical/OG/Twitter tags.
+
+Verification:
+- `npm run build`
+- `npm run seo:smoke`
+- Confirm prerender logs include deep routes.
+
+## Remaining Work
+
+## Phase 4: Content Quality and Trust Signals
+1. Remove or qualify unsupported quantified claims (for example "up to 60%").
+2. Add clear editorial policy on About/Guides pages (who curates content, update process).
+3. Add visible `Last updated` dates sourced from data for guides/workflows.
+4. Add per-guide source citation section where factual claims are made.
+
+Completed in this phase:
+- Home page unsupported quantified claim removed.
+- Community/trust copy rewritten to avoid unverifiable claims.
+- Added guide-level editorial policy block in UI.
+- Added per-guide Sources section sourced from guide metadata.
+- Added explicit `lastUpdated` fields to guide/workflow data and surfaced dates in guides/workflows UI.
+
+## Phase 5: UX/Accessibility/Performance Hardening
+1. Full keyboard traversal and visible focus checks for 3-pane workflow UI and guide sidebar.
+2. Add meaningful 404 UI route in-app for client navigation fallback.
+3. Triage large bundle warning (>500 kB) and split heavy modules.
+4. Run Lighthouse and axe checks on home/library/workflows/guides.
+5. After deploying `_redirects`, verify unknown routes return HTTP 404 (not 200).
+
+Completed in this phase:
+- Added wildcard route with explicit noindex/canonical not-found page.
+- Added static `public/404.html` for host-level not-found handling.
+- Added `public/_redirects` fallback rule (`/* /404.html 404`) to enforce hard 404 on unknown paths after deploy.
+- Implemented client-side route lazy-loading with SSR-safe static route rendering for prerender.
+- Added Vite manual chunk rules to split heavy vendor groups and reduce entry bundle weight.
+
+## Phase 6: Monitoring and Regression Guardrails
+1. Add CI step: `npm run build && npm run seo:smoke`.
+2. Add CI check to validate `dist/sitemap.xml` URL count equals prerender manifest count.
+3. Add curl smoke matrix script for canonical/OG/robots checks on representative routes.
+4. Connect and monitor Google Search Console and Bing Webmaster Tools.
+
+Completed in this phase:
+- Smoke test now validates sitemap URL set against prerender manifest.
+- Smoke test now validates OG/Twitter/canonical tag parity per prerendered route.
+
+## Definition of Done
+1. All Phase 4-6 tasks complete.
+2. Build + smoke checks passing on each PR.
+3. Deployed pages return prerendered HTML with route-correct head tags.
+4. Search console reports submitted sitemap and no critical coverage/canonical issues.

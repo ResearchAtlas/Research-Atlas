@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useParams, Link } from "react-router-dom"
+import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, Copy, Check, Info, CheckCircle2 } from "lucide-react"
 import { WORKFLOWS, Workflow, WorkflowStep } from "@/data/workflows"
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { workflowPathFromId } from "@/lib/seoRoutes"
 
 const PROMPT_MAP = new Map(PROMPTS.map((p) => [p.id, p]))
 
@@ -45,7 +47,39 @@ export function WorkflowDetailPage() {
         }
     }, [flatSteps, activeStepId])
 
-    if (!workflow) return <div className="container py-20">Workflow not found</div>
+    if (!workflow) {
+        const canonical = "https://researchatlas.info/workflows"
+        const description = "The requested workflow does not exist."
+        const socialTitle = "Workflow Not Found | Research Atlas"
+
+        return (
+            <div className="container py-20">
+                <Helmet>
+                    <title>{socialTitle}</title>
+                    <meta name="description" content={description} />
+                    <meta name="robots" content="noindex, nofollow" />
+                    <link rel="canonical" href={canonical} />
+                    <meta property="og:type" content="website" />
+                    <meta property="og:url" content={canonical} />
+                    <meta property="og:title" content={socialTitle} />
+                    <meta property="og:description" content={description} />
+                    <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                    <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:height" content="630" />
+                    <meta name="twitter:card" content="summary_large_image" />
+                    <meta name="twitter:url" content={canonical} />
+                    <meta name="twitter:title" content={socialTitle} />
+                    <meta name="twitter:description" content={description} />
+                    <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                </Helmet>
+                Workflow not found
+            </div>
+        )
+    }
+
+    const canonical = `https://researchatlas.info${workflowPathFromId(workflow.id)}`
+    const socialTitle = `${workflow.title} | Research Atlas`
+    const description = workflow.description
 
     const activeStep = flatSteps.find(s => s.id === activeStepId)
     const activeStepIndex = flatSteps.findIndex(s => s.id === activeStepId)
@@ -64,6 +98,23 @@ export function WorkflowDetailPage() {
 
     return (
         <div className="flex h-[calc(100vh-4rem)] flex-col bg-background">
+            <Helmet>
+                <title>{socialTitle}</title>
+                <link rel="canonical" href={canonical} />
+                <meta name="description" content={description} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={canonical} />
+                <meta property="og:title" content={socialTitle} />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={canonical} />
+                <meta name="twitter:title" content={socialTitle} />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+            </Helmet>
             {/* Header */}
             <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center gap-4">

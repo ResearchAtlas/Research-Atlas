@@ -24,10 +24,13 @@ export interface Workflow {
   tags: string[]
   phases?: WorkflowPhase[]
   steps?: WorkflowStep[]
+  lastUpdated: string
   sourceNote?: string
 }
 
-export const WORKFLOWS: Workflow[] = [
+type WorkflowDraft = Omit<Workflow, "lastUpdated">
+
+const RAW_WORKFLOWS: WorkflowDraft[] = [
   {
     id: "focus",
     title: "FOCUS: Find → Organize → Condense → Understand → Synthesize",
@@ -549,3 +552,29 @@ export const WORKFLOWS: Workflow[] = [
     sourceNote: "Academic Use Toolkit.md (Workflow 6)",
   },
 ]
+
+const DEFAULT_WORKFLOW_LAST_UPDATED = "2026-02-06"
+
+const WORKFLOW_LAST_UPDATED: Record<string, string> = {
+  focus: "2026-02-06",
+  exhyte: "2026-02-06",
+  autoresearcher: "2026-02-06",
+  "deepresearch-eco": "2026-02-05",
+  scideator: "2026-02-05",
+  "plan-execute-test-fix": "2026-02-05",
+  bioplanner: "2026-02-04",
+  "six-stage-autonomous-scientist": "2026-02-04",
+  "manuscript-review-pipeline": "2026-02-04",
+  w1_ops: "2026-02-04",
+  w2_comp: "2026-02-04",
+  w3_stress: "2026-02-04",
+  w4_cite: "2026-02-04",
+  w5_repro: "2026-02-04",
+  w6_rebut: "2026-02-04",
+}
+
+export const WORKFLOWS: Workflow[] = RAW_WORKFLOWS.map((workflow) => ({
+  ...workflow,
+  lastUpdated:
+    WORKFLOW_LAST_UPDATED[workflow.id] ?? DEFAULT_WORKFLOW_LAST_UPDATED,
+}))

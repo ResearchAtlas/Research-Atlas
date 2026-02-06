@@ -4,8 +4,62 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Research Atlas - Prompts, workflows, and guides for rigorous research with AI" />
+  
+  <!-- Primary Meta Tags -->
+  <title>Research Atlas | AI Prompts & Workflows for Academic Research</title>
+  <meta name="description" content="Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts." />
+  <link rel="canonical" href="https://researchatlas.info/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://researchatlas.info/" />
+  <meta property="og:site_name" content="Research Atlas" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
+  <meta property="og:description" content="Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts." />
+  <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://researchatlas.info/" />
+  <meta name="twitter:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
+  <meta name="twitter:description" content="Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts." />
+  <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://researchatlas.info/#organization",
+          "name": "Research Atlas",
+          "url": "https://researchatlas.info/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://researchatlas.info/favicon.svg"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://researchatlas.info/#website",
+          "url": "https://researchatlas.info/",
+          "name": "Research Atlas",
+          "description": "Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts.",
+          "publisher": {
+            "@id": "https://researchatlas.info/#organization"
+          },
+          "inLanguage": "en-US"
+        }
+      ]
+    }
+  </script>
+
   <script>
     (() => {
       const storageKey = "research-atlas-theme";
@@ -21,11 +75,26 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
     rel="stylesheet">
-  <title>Research Atlas</title>
 </head>
 
 <body>
   <div id="root"></div>
+  <noscript>
+    <div style="font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto;">
+      <h1>Research Atlas</h1>
+      <p>Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts.</p>
+      <hr />
+      
+      <h2>Explore</h2>
+      <ul>
+        <li><a href="/library">Prompt Library</a> - Field-tested prompts with variables</li>
+        <li><a href="/workflows">Research Workflows</a> - Multi-phase research pipelines</li>
+        <li><a href="/guides">Guides & Protocols</a> - Method guidance & ethics primers</li>
+      </ul>
+      
+      <p>Research Atlas is designed to bridge the gap between academic rigor and AI efficiency.</p>
+    </div>
+  </noscript>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

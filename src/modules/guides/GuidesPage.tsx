@@ -1,18 +1,52 @@
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useEffect } from "react"
+import { Helmet } from 'react-helmet-async'
 import { ChevronRight } from "lucide-react"
-import { GUIDES } from "@/data/guides"
+import { Link, useParams } from "react-router-dom"
+import { EDITORIAL_POLICY, GUIDES } from "@/data/guides"
 import { RESEARCH_TYPE_LABELS } from "@/data/taxonomy"
+import { guidePathFromId } from "@/lib/seoRoutes"
 import { GuideSidebar } from "./GuideSidebar"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+function formatIsoDate(isoDate: string) {
+  const [year, month, day] = isoDate.split("-").map(Number)
+  const safeDate = new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1))
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(safeDate)
+}
+
 export function GuidesPage() {
-  const [selectedGuideId, setSelectedGuideId] = useState<string>("welcome")
+  const { guideId } = useParams<{ guideId?: string }>()
+  const selectedGuideId = guideId ?? "welcome"
 
   const selectedGuide = useMemo(() => {
-    return GUIDES.find(g => g.id === selectedGuideId) || GUIDES[0]
+    return GUIDES.find(g => g.id === selectedGuideId) || null
   }, [selectedGuideId])
+
+  const fallbackGuide = GUIDES[0]
+  const activeGuide = selectedGuide ?? fallbackGuide
+  const isNotFound = selectedGuide === null
+
+  const canonicalHref = isNotFound
+    ? "https://researchatlas.info/guides"
+    : `https://researchatlas.info${guidePathFromId(activeGuide.id)}`
+
+  const pageDescription = isNotFound
+    ? "The requested guide could not be found."
+    : activeGuide.summary
+
+  const socialTitle = isNotFound
+    ? "Guide Not Found | Research Atlas"
+    : activeGuide.id === "welcome"
+      ? "Research Guides | Research Atlas"
+      : `${activeGuide.title} | Research Atlas`
+
+  const updatedLabel = formatIsoDate(activeGuide.lastUpdated)
 
   // Scroll to top when guide changes
   useEffect(() => {
@@ -21,34 +55,51 @@ export function GuidesPage() {
 
   // Get next and previous guides for navigation
   const { prevGuide, nextGuide } = useMemo(() => {
-    const currentIndex = GUIDES.findIndex(g => g.id === selectedGuideId)
+    const currentIndex = GUIDES.findIndex(g => g.id === activeGuide.id)
     const prev = currentIndex > 0 ? GUIDES[currentIndex - 1] : null
     const next = currentIndex < GUIDES.length - 1 ? GUIDES[currentIndex + 1] : null
     return { prevGuide: prev, nextGuide: next }
-  }, [selectedGuideId])
+  }, [activeGuide.id])
 
   return (
     <div className="container mx-auto py-8">
+      <Helmet>
+        <title>{socialTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={canonicalHref} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalHref} />
+        <meta property="og:title" content={socialTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={canonicalHref} />
+        <meta name="twitter:title" content={socialTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+        {isNotFound && <meta name="robots" content="noindex, nofollow" />}
+      </Helmet>
       <div className="flex gap-8 relative">
         <GuideSidebar
           currentGuideId={selectedGuideId}
-          onSelectGuide={setSelectedGuideId}
         />
 
         <main className="flex-1 min-w-0">
-          {selectedGuide ? (
+          {!isNotFound ? (
             <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-4 border-b border-border/50 pb-8">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                   <span>Guides</span>
                   <ChevronRight className="h-3 w-3" />
                   <span className="items-center gap-1 inline-flex">
-                    {selectedGuide.researchTypes[0] && RESEARCH_TYPE_LABELS[selectedGuide.researchTypes[0]]}
+                    {activeGuide.researchTypes[0] && RESEARCH_TYPE_LABELS[activeGuide.researchTypes[0]]}
                   </span>
                 </div>
 
-                <h1 className="text-4xl font-bold tracking-tight text-balance">{selectedGuide.title}</h1>
-                <p className="text-xl text-muted-foreground leading-relaxed">{selectedGuide.summary}</p>
+                <h1 className="text-4xl font-bold tracking-tight text-balance">{activeGuide.title}</h1>
+                <p className="text-xl text-muted-foreground leading-relaxed">{activeGuide.summary}</p>
 
                 <div className="flex items-center gap-6 text-sm text-muted-foreground pt-2">
                   <div className="flex items-center gap-2">
@@ -59,13 +110,25 @@ export function GuidesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
-                    <span>Updated recently</span>
+                    <span>Updated {updatedLabel}</span>
                   </div>
                 </div>
               </div>
 
+              <section className="rounded-xl border bg-muted/20 p-5 space-y-3">
+                <h2 className="text-lg font-semibold">Editorial Policy</h2>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {EDITORIAL_POLICY.map((policy) => (
+                    <li key={policy} className="flex gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                      <span>{policy}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
               <div className="prose prose-slate dark:prose-invert max-w-none">
-                {selectedGuide.sections.map((section) => (
+                {activeGuide.sections.map((section) => (
                   <section key={section.id} className="mb-10">
                     <h2 className="text-2xl font-semibold tracking-tight mb-4 flex items-center gap-2 group">
                       {section.title}
@@ -113,30 +176,58 @@ export function GuidesPage() {
                 ))}
               </div>
 
+              {activeGuide.sources.length > 0 && (
+                <section className="rounded-xl border bg-background p-5">
+                  <h2 className="text-xl font-semibold">Sources</h2>
+                  <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                    {activeGuide.sources.map((source) => (
+                      <li key={`${activeGuide.id}-${source.title}`} className="leading-relaxed">
+                        {source.url ? (
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline underline-offset-4 decoration-primary/50 hover:decoration-primary"
+                          >
+                            {source.title}
+                          </a>
+                        ) : (
+                          <span>{source.title}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
               <div className="border-t border-border/50 pt-8 mt-12 flex items-center justify-between">
                 {prevGuide ? (
                   <Button
+                    asChild
                     variant="outline"
                     className="h-auto py-4 px-6 flex flex-col items-start gap-1 max-w-[200px] text-left"
-                    onClick={() => setSelectedGuideId(prevGuide.id)}
                   >
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                      <ChevronRight className="h-3 w-3 rotate-180" /> Previous
-                    </span>
-                    <span className="font-medium truncate w-full">{prevGuide.title}</span>
+                    <Link to={guidePathFromId(prevGuide.id)}>
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <ChevronRight className="h-3 w-3 rotate-180" /> Previous
+                      </span>
+                      <span className="font-medium truncate w-full">{prevGuide.title}</span>
+                    </Link>
                   </Button>
                 ) : <div />}
 
                 {nextGuide ? (
                   <Button
+                    asChild
                     variant="default"
                     className="h-auto py-4 px-6 flex flex-col items-end gap-1 max-w-[200px] text-right"
-                    onClick={() => setSelectedGuideId(nextGuide.id)}
                   >
-                    <span className="text-xs text-primary-foreground/80 uppercase tracking-wider flex items-center gap-1">
-                      Next <ChevronRight className="h-3 w-3" />
-                    </span>
-                    <span className="font-medium truncate w-full">{nextGuide.title}</span>
+                    <Link to={guidePathFromId(nextGuide.id)}>
+                      <span className="text-xs text-primary-foreground/80 uppercase tracking-wider flex items-center gap-1">
+                        Next <ChevronRight className="h-3 w-3" />
+                      </span>
+                      <span className="font-medium truncate w-full">{nextGuide.title}</span>
+                    </Link>
                   </Button>
                 ) : <div />}
               </div>
@@ -144,8 +235,14 @@ export function GuidesPage() {
               <div className="h-20" /> {/* Spacer */}
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-              Select a guide to view details
+            <div className="max-w-3xl mx-auto py-24 text-center space-y-4">
+              <h1 className="text-3xl font-bold tracking-tight">Guide Not Found</h1>
+              <p className="text-muted-foreground">
+                The requested guide does not exist. Browse all available guides from the sidebar.
+              </p>
+              <Button asChild>
+                <Link to="/guides">Back to Research Guides</Link>
+              </Button>
             </div>
           )}
         </main>

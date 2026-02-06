@@ -16,20 +16,26 @@ const storageKey = "research-atlas-theme"
 
 type Theme = "dark" | "light"
 
-const getInitialTheme = (): Theme => {
-  if (typeof window === "undefined") return "dark"
-  const stored = window.localStorage.getItem(storageKey)
-  return stored === "light" ? "light" : "dark"
-}
-
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [theme, setTheme] = useState<Theme>("dark") // always matches SSR
+  const [isHydrated, setIsHydrated] = useState(false)
 
+  // Phase 1: read stored preference after mount
   useEffect(() => {
+    const stored = window.localStorage.getItem(storageKey)
+    if (stored === "light" || stored === "dark") {
+      setTheme(stored)
+    }
+    setIsHydrated(true)
+  }, [])
+
+  // Phase 2: sync DOM + persist -- only after hydration
+  useEffect(() => {
+    if (!isHydrated) return
     const root = document.documentElement
     root.classList.toggle("dark", theme === "dark")
     window.localStorage.setItem(storageKey, theme)
-  }, [theme])
+  }, [theme, isHydrated])
 
   return (
     <DropdownMenu>

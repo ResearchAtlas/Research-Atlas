@@ -47,8 +47,26 @@ export default function BlurText({
   const [inView, setInView] = useState(false)
   const ref = useRef<HTMLParagraphElement>(null)
 
-  const prefersReducedMotion =
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setPrefersReducedMotion(mql.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    // Safari <14 only supports addListener/removeListener
+    if (mql.addEventListener) {
+      mql.addEventListener("change", handler)
+    } else {
+      mql.addListener(handler)
+    }
+    return () => {
+      if (mql.removeEventListener) {
+        mql.removeEventListener("change", handler)
+      } else {
+        mql.removeListener(handler)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (!ref.current || prefersReducedMotion) {

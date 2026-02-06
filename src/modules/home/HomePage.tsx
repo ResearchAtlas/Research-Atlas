@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { ArrowRight, Copy, Layers, Sparkles, Zap, Shield, Users, Lightbulb, BarChart } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import { motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react'
+import { Helmet } from 'react-helmet-async'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +11,7 @@ import { GUIDES } from '@/data/guides'
 import { PROMPTS } from '@/data/prompts'
 import { STAGES } from '@/data/taxonomy'
 import { WORKFLOWS } from '@/data/workflows'
+import { guidePathFromId } from '@/lib/seoRoutes'
 
 const Counter = ({ value }: { value: number }) => {
     const ref = useRef<HTMLSpanElement>(null)
@@ -75,12 +77,29 @@ export function HomePage() {
             category: 'Guide',
             title: GUIDES[0].title,
             description: GUIDES[0].summary,
-            to: `/guides?q=${encodeURIComponent(GUIDES[0].title)}`,
+            to: guidePathFromId(GUIDES[0].id),
         })
     }
 
     return (
         <div className="flex flex-col min-h-screen">
+            <Helmet titleTemplate="%s">
+                <title>Research Atlas | AI Prompts & Workflows for Academic Research</title>
+                <meta name="description" content="Explore AI prompts, workflows, and method guides designed to strengthen academic research quality and speed." />
+                <link rel="canonical" href="https://researchatlas.info/" />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://researchatlas.info/" />
+                <meta property="og:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
+                <meta property="og:description" content="Explore AI prompts, workflows, and method guides designed to strengthen academic research quality and speed." />
+                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content="https://researchatlas.info/" />
+                <meta name="twitter:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
+                <meta name="twitter:description" content="Explore AI prompts, workflows, and method guides designed to strengthen academic research quality and speed." />
+                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+            </Helmet>
             {/* Hero Section */}
             <section className="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24">
                 {/* Background gradient */}
@@ -114,7 +133,7 @@ export function HomePage() {
                                 text="with AI-Assisted Tools"
                                 animateBy="words"
                                 delay={120}
-                                className="mt-3 text-2xl font-semibold text-primary sm:text-3xl lg:text-4xl"
+                                className="mt-3 text-2xl font-semibold text-primary sm:text-3xl lg:text-4xl justify-center lg:justify-start"
                             />
                             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
                                 Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts.
@@ -334,26 +353,29 @@ export function HomePage() {
                             {
                                 icon: Zap,
                                 title: "Accelerated Discovery",
-                                description: "Method-specific workflows reduce time-to-insight by up to 60% without sacrificing depth.",
+                                description: "Method-specific workflows reduce repetitive setup time while preserving rigor-focused steps.",
                                 color: "text-blue-500",
                                 bg: "bg-blue-500/10",
-                                border: "group-hover:border-blue-500/50"
+                                border: "group-hover:border-blue-500/50",
+                                glow: "to-blue-500/5",
                             },
                             {
                                 icon: Shield,
                                 title: "Rigor First",
-                                description: "All prompts include verification steps, bias checks, and citation requirements by default.",
+                                description: "Prompts are designed with verification steps, bias checks, and citation-oriented review patterns.",
                                 color: "text-purple-500",
                                 bg: "bg-purple-500/10",
-                                border: "group-hover:border-purple-500/50"
+                                border: "group-hover:border-purple-500/50",
+                                glow: "to-purple-500/5",
                             },
                             {
                                 icon: Users,
-                                title: "Community Vetted",
-                                description: "Library inputs are tested and refined by a growing community of academic researchers.",
+                                title: "Iteratively Refined",
+                                description: "Library entries are reviewed and improved over time as new use cases and edge cases are identified.",
                                 color: "text-orange-500",
                                 bg: "bg-orange-500/10",
-                                border: "group-hover:border-orange-500/50"
+                                border: "group-hover:border-orange-500/50",
+                                glow: "to-orange-500/5",
                             }
                         ].map((feature, i) => (
                             <motion.div key={i} variants={fadeInUp} className="h-full">
@@ -369,7 +391,7 @@ export function HomePage() {
                                             {feature.description}
                                         </CardDescription>
                                     </CardContent>
-                                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-transparent to-${feature.color.split('-')[1]}-500/5`} />
+                                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-transparent ${feature.glow}`} />
                                 </Card>
                             </motion.div>
                         ))}

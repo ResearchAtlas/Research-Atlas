@@ -7,6 +7,11 @@ export interface GuideSection {
   bullets?: string[]
 }
 
+export interface GuideSource {
+  title: string
+  url?: string
+}
+
 export interface Guide {
   id: string
   title: string
@@ -15,10 +20,14 @@ export interface Guide {
   researchTypes: ResearchType[]
   tags: string[]
   sections: GuideSection[]
+  lastUpdated: string
+  sources: GuideSource[]
   sourceNote?: string
 }
 
-export const GUIDES: Guide[] = [
+type GuideDraft = Omit<Guide, "lastUpdated" | "sources">
+
+const RAW_GUIDES: GuideDraft[] = [
   {
     id: "welcome",
     title: "Welcome to Research Atlas",
@@ -400,3 +409,46 @@ export const GUIDES: Guide[] = [
     sourceNote: "AI in research report.md (Glossary)",
   },
 ]
+
+const DEFAULT_GUIDE_LAST_UPDATED = "2026-02-06"
+
+const GUIDE_LAST_UPDATED: Record<string, string> = {
+  welcome: "2026-02-06",
+  "about-research-atlas": "2026-02-06",
+  "ai-research-overview": "2026-02-05",
+  "prompting-fundamentals": "2026-02-05",
+  "verification-integrity": "2026-02-05",
+  "ethics-policies": "2026-02-05",
+  "focus-guide": "2026-02-04",
+  quickstart: "2026-02-04",
+  glossary: "2026-02-04",
+}
+
+export const EDITORIAL_POLICY = [
+  "Guides are curated by the Research Atlas editorial team and revised when workflows, policies, or tooling materially change.",
+  "Factual claims should be traceable to source documents listed in each guide's Sources section.",
+  "Generative outputs are treated as drafts and require researcher verification before use in manuscripts or protocols.",
+]
+
+const buildGuideSources = (guide: GuideDraft): GuideSource[] => {
+  const sources: GuideSource[] = []
+
+  if (guide.sourceNote) {
+    sources.push({ title: guide.sourceNote })
+  }
+
+  if (guide.id === "ethics-policies") {
+    sources.push({
+      title: "COPE: Authorship and AI tools guidance",
+      url: "https://publicationethics.org/resources/discussion-documents/authorship-and-ai-tools",
+    })
+  }
+
+  return sources
+}
+
+export const GUIDES: Guide[] = RAW_GUIDES.map((guide) => ({
+  ...guide,
+  lastUpdated: GUIDE_LAST_UPDATED[guide.id] ?? DEFAULT_GUIDE_LAST_UPDATED,
+  sources: buildGuideSources(guide),
+}))

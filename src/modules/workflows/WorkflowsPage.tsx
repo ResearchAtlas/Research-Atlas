@@ -14,6 +14,8 @@ const formatTag = (tag: string) =>
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase())
 
+import { Helmet } from 'react-helmet-async'
+
 export function WorkflowsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const queryParam = searchParams.get("q") || ""
@@ -58,8 +60,29 @@ export function WorkflowsPage() {
     })
   }, [search, selectedStage, selectedType])
 
+  const canonical = "https://researchatlas.info/workflows"
+  const socialTitle = "Research Workflows | Research Atlas"
+  const description = "Follow stage-based research workflows spanning qualitative, quantitative, and mixed methods studies."
+
   return (
     <div className="container mx-auto py-8">
+      <Helmet>
+        <title>{socialTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:title" content={socialTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={canonical} />
+        <meta name="twitter:title" content={socialTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+      </Helmet>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-balance">Workflows</h1>

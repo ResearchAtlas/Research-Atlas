@@ -11,20 +11,25 @@ interface FavoritesContextType {
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined)
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-    const [favorites, setFavorites] = useState<Set<string>>(() => {
-        if (typeof window === 'undefined') return new Set()
+    const [favorites, setFavorites] = useState<Set<string>>(() => new Set()) // lazy init, always empty, matches SSR
+    const [isHydrated, setIsHydrated] = useState(false)
+
+    // Phase 1: read from storage on mount
+    useEffect(() => {
         try {
             const stored = localStorage.getItem(FAVORITES_KEY)
-            return stored ? new Set(JSON.parse(stored)) : new Set()
-        } catch {
-            return new Set()
-        }
-    })
+            if (stored) {
+                setFavorites(new Set(JSON.parse(stored)))
+            }
+        } catch { /* ignore corrupt data */ }
+        setIsHydrated(true)
+    }, [])
 
+    // Phase 2: persist -- only after hydration read is complete
     useEffect(() => {
-        const array = Array.from(favorites)
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(array))
-    }, [favorites])
+        if (!isHydrated) return
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(favorites)))
+    }, [favorites, isHydrated])
 
     const toggleFavorite = (promptId: string) => {
         setFavorites(prev => {

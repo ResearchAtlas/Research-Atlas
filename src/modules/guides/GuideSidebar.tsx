@@ -3,7 +3,9 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { STAGES } from "@/data/taxonomy"
+import { guidePathFromId } from "@/lib/seoRoutes"
 
 interface SidebarSectionProps {
     title: string
@@ -39,33 +41,49 @@ function SidebarSection({ title, children, defaultOpen = true }: SidebarSectionP
 interface SidebarItemProps {
     label: string
     icon?: React.ReactNode
+    to?: string
     active?: boolean
-    onClick?: () => void
 }
 
-function SidebarItem({ label, icon, active, onClick }: SidebarItemProps) {
+function SidebarItem({ label, icon, to, active }: SidebarItemProps) {
+    const className = cn(
+        "w-full justify-start font-normal h-8",
+        active ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground",
+    )
+
+    if (!to) {
+        return (
+            <Button
+                variant="ghost"
+                size="sm"
+                className={className}
+            >
+                {icon && <span className="mr-2">{icon}</span>}
+                {label}
+            </Button>
+        )
+    }
+
     return (
         <Button
+            asChild
             variant="ghost"
             size="sm"
-            className={cn(
-                "w-full justify-start font-normal h-8",
-                active ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground"
-            )}
-            onClick={onClick}
+            className={className}
         >
-            {icon && <span className="mr-2">{icon}</span>}
-            {label}
+            <Link to={to}>
+                {icon && <span className="mr-2">{icon}</span>}
+                {label}
+            </Link>
         </Button>
     )
 }
 
 interface GuideSidebarProps {
     currentGuideId: string | null
-    onSelectGuide: (guideId: string) => void
 }
 
-export function GuideSidebar({ currentGuideId, onSelectGuide }: GuideSidebarProps) {
+export function GuideSidebar({ currentGuideId }: GuideSidebarProps) {
     return (
         <div className="w-64 flex-shrink-0 border-r bg-card/30 hidden md:block h-[calc(100vh-4rem)] sticky top-16">
             <ScrollArea className="h-full py-6 pr-4">
@@ -74,13 +92,13 @@ export function GuideSidebar({ currentGuideId, onSelectGuide }: GuideSidebarProp
                         label="Welcome"
                         icon={<Book className="h-4 w-4" />}
                         active={currentGuideId === 'welcome'}
-                        onClick={() => onSelectGuide('welcome')}
+                        to={guidePathFromId('welcome')}
                     />
                     <SidebarItem
                         label="About Research Atlas"
                         icon={<FileText className="h-4 w-4" />}
                         active={currentGuideId === 'about-research-atlas'}
-                        onClick={() => onSelectGuide('about-research-atlas')}
+                        to={guidePathFromId('about-research-atlas')}
                     />
                 </SidebarSection>
 
@@ -89,37 +107,34 @@ export function GuideSidebar({ currentGuideId, onSelectGuide }: GuideSidebarProp
                         label="AI in Research"
                         icon={<FlaskConical className="h-4 w-4" />}
                         active={currentGuideId === 'ai-research-overview'}
-                        onClick={() => onSelectGuide('ai-research-overview')}
+                        to={guidePathFromId('ai-research-overview')}
                     />
                     <SidebarItem
                         label="Prompting Fundamentals"
                         icon={<Layout className="h-4 w-4" />}
                         active={currentGuideId === 'prompting-fundamentals'}
-                        onClick={() => onSelectGuide('prompting-fundamentals')}
+                        to={guidePathFromId('prompting-fundamentals')}
                     />
                     <SidebarItem
                         label="Verification & Integrity"
                         icon={<Settings className="h-4 w-4" />}
                         active={currentGuideId === 'verification-integrity'}
-                        onClick={() => onSelectGuide('verification-integrity')}
+                        to={guidePathFromId('verification-integrity')}
                     />
                     <SidebarItem
                         label="Ethics & Privacy"
                         icon={<Settings className="h-4 w-4" />}
                         active={currentGuideId === 'ethics-policies'}
-                        onClick={() => onSelectGuide('ethics-policies')}
-                    />
-                    <SidebarItem
-                        label="Computational Rigor"
-                        icon={<Settings className="h-4 w-4" />}
-                        active={currentGuideId === 'computational-rigor'} // Note: this ID doesn't explicitly exist in the provided guides list, mapping broadly or needs a specific guide ID. Using placeholder or mapping to relevant section if it existed as separate guide.
-                        onClick={() => { }} // Placeholder logic
+                        to={guidePathFromId('ethics-policies')}
                     />
                 </SidebarSection>
 
                 <SidebarSection title="Research Stages" defaultOpen={false}>
                     {STAGES.map(stage => (
-                        <SidebarItem key={stage.id} label={stage.label} />
+                        <SidebarItem
+                            key={stage.id}
+                            label={stage.label}
+                        />
                     ))}
                 </SidebarSection>
 
@@ -127,17 +142,17 @@ export function GuideSidebar({ currentGuideId, onSelectGuide }: GuideSidebarProp
                     <SidebarItem
                         label="FOCUS Workflow"
                         active={currentGuideId === 'focus-guide'}
-                        onClick={() => onSelectGuide('focus-guide')}
+                        to={guidePathFromId('focus-guide')}
                     />
                     <SidebarItem
                         label="Quickstart"
                         active={currentGuideId === 'quickstart'}
-                        onClick={() => onSelectGuide('quickstart')}
+                        to={guidePathFromId('quickstart')}
                     />
                     <SidebarItem
                         label="Glossary"
                         active={currentGuideId === 'glossary'}
-                        onClick={() => onSelectGuide('glossary')}
+                        to={guidePathFromId('glossary')}
                     />
                 </SidebarSection>
             </ScrollArea>

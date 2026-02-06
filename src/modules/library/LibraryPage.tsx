@@ -3,9 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchPublicPrompts } from '@/lib/prompts'
 import { useFavorites } from '@/lib/favorites'
+import { PROMPTS } from '@/data/prompts'
 import { LibrarySidebar } from './LibrarySidebar'
 import { PromptList } from './PromptList'
 import { PromptDetailPane } from './PromptDetailPane'
+
+import { Helmet } from 'react-helmet-async'
 
 export function LibraryPage() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -21,6 +24,7 @@ export function LibraryPage() {
     const { data: prompts = [], isLoading } = useQuery({
         queryKey: ['publicPrompts'],
         queryFn: fetchPublicPrompts,
+        initialData: PROMPTS,
     })
 
     // Local State
@@ -102,8 +106,29 @@ export function LibraryPage() {
         setSearchParams(newParams)
     }
 
+    const canonical = 'https://researchatlas.info/library'
+    const socialTitle = 'Prompt Library | Research Atlas'
+    const description = 'Browse a curated library of research prompts with filters for stage and method to accelerate rigorous analysis.'
+
     return (
         <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-background relative">
+            <Helmet>
+                <title>{socialTitle}</title>
+                <meta name="description" content={description} />
+                <link rel="canonical" href={canonical} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={canonical} />
+                <meta property="og:title" content={socialTitle} />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={canonical} />
+                <meta name="twitter:title" content={socialTitle} />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+            </Helmet>
             <LibrarySidebar
                 selectedStages={stages}
                 selectedTypes={types}
