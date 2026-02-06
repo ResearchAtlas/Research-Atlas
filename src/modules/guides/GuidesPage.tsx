@@ -31,6 +31,7 @@ export function GuidesPage() {
   const fallbackGuide = GUIDES[0]
   const activeGuide = selectedGuide ?? fallbackGuide
   const isNotFound = selectedGuide === null
+  const sidebarGuideId = selectedGuide?.id ?? null
 
   const canonicalHref = isNotFound
     ? "https://researchatlas.info/guides"
@@ -83,10 +84,10 @@ export function GuidesPage() {
       </Helmet>
       <div className="flex gap-8 relative">
         <GuideSidebar
-          currentGuideId={selectedGuideId}
+          currentGuideId={sidebarGuideId}
         />
 
-        <main className="flex-1 min-w-0">
+        <section aria-label="Guide content" className="flex-1 min-w-0">
           {!isNotFound ? (
             <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-4 border-b border-border/50 pb-8">
@@ -140,17 +141,50 @@ export function GuidesPage() {
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
-                            table: ({ node, ...props }) => <div className="my-6 w-full overflow-y-auto rounded-lg border bg-muted/20"><table className="w-full" {...props} /></div>,
-                            thead: ({ node, ...props }) => <thead className="bg-muted/50 border-b" {...props} />,
-                            tbody: ({ node, ...props }) => <tbody className="[&_tr:last-child]:border-0" {...props} />,
-                            tr: ({ node, ...props }) => <tr className="border-b transition-colors hover:bg-muted/30" {...props} />,
-                            th: ({ node, ...props }) => <th className="h-10 px-4 text-left align-middle font-semibold text-foreground [&:has([role=checkbox])]:pr-0" {...props} />,
-                            td: ({ node, ...props }) => <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm" {...props} />,
-                            p: ({ node, ...props }) => <p className="mb-4 last:mb-0" {...props} />,
-                            a: ({ node, ...props }) => <a className="font-medium underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-colors" {...props} />,
-                            ul: ({ node, ...props }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2" {...props} />,
-                            ol: ({ node, ...props }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2" {...props} />,
-                            blockquote: ({ node, ...props }) => <blockquote className="mt-6 border-l-2 pl-6 italic text-muted-foreground" {...props} />,
+                            table: ({ node, ...props }) => {
+                              void node
+                              return <div className="my-6 w-full overflow-y-auto rounded-lg border bg-muted/20"><table className="w-full" {...props} /></div>
+                            },
+                            thead: ({ node, ...props }) => {
+                              void node
+                              return <thead className="bg-muted/50 border-b" {...props} />
+                            },
+                            tbody: ({ node, ...props }) => {
+                              void node
+                              return <tbody className="[&_tr:last-child]:border-0" {...props} />
+                            },
+                            tr: ({ node, ...props }) => {
+                              void node
+                              return <tr className="border-b transition-colors hover:bg-muted/30" {...props} />
+                            },
+                            th: ({ node, ...props }) => {
+                              void node
+                              return <th className="h-10 px-4 text-left align-middle font-semibold text-foreground [&:has([role=checkbox])]:pr-0" {...props} />
+                            },
+                            td: ({ node, ...props }) => {
+                              void node
+                              return <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm" {...props} />
+                            },
+                            p: ({ node, ...props }) => {
+                              void node
+                              return <p className="mb-4 last:mb-0" {...props} />
+                            },
+                            a: ({ node, ...props }) => {
+                              void node
+                              return <a className="font-medium underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-colors" {...props} />
+                            },
+                            ul: ({ node, ...props }) => {
+                              void node
+                              return <ul className="my-6 ml-6 list-disc [&>li]:mt-2" {...props} />
+                            },
+                            ol: ({ node, ...props }) => {
+                              void node
+                              return <ol className="my-6 ml-6 list-decimal [&>li]:mt-2" {...props} />
+                            },
+                            blockquote: ({ node, ...props }) => {
+                              void node
+                              return <blockquote className="mt-6 border-l-2 pl-6 italic text-muted-foreground" {...props} />
+                            },
                           }}
                         >
                           {section.body}
@@ -164,7 +198,18 @@ export function GuidesPage() {
                           <li key={i} className="flex gap-3 text-muted-foreground/90">
                             <div className="mt-2 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                             <span className="flex-1">
-                              <ReactMarkdown components={{ p: ({ node, ...props }) => <span {...props} />, strong: ({ node, ...props }) => <span className="font-semibold text-foreground" {...props} /> }}>
+                              <ReactMarkdown
+                                components={{
+                                  p: ({ node, ...props }) => {
+                                    void node
+                                    return <span {...props} />
+                                  },
+                                  strong: ({ node, ...props }) => {
+                                    void node
+                                    return <span className="font-semibold text-foreground" {...props} />
+                                  },
+                                }}
+                              >
                                 {item}
                               </ReactMarkdown>
                             </span>
@@ -200,12 +245,12 @@ export function GuidesPage() {
                 </section>
               )}
 
-              <div className="border-t border-border/50 pt-8 mt-12 flex items-center justify-between">
+              <div className="border-t border-border/50 pt-8 mt-12 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 {prevGuide ? (
                   <Button
                     asChild
                     variant="outline"
-                    className="h-auto py-4 px-6 flex flex-col items-start gap-1 max-w-[200px] text-left"
+                    className="h-auto py-4 px-6 flex flex-col items-start gap-1 w-full max-w-none text-left sm:max-w-[200px]"
                   >
                     <Link to={guidePathFromId(prevGuide.id)}>
                       <span className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
@@ -214,13 +259,13 @@ export function GuidesPage() {
                       <span className="font-medium truncate w-full">{prevGuide.title}</span>
                     </Link>
                   </Button>
-                ) : <div />}
+                ) : <div className="hidden sm:block" />}
 
                 {nextGuide ? (
                   <Button
                     asChild
                     variant="default"
-                    className="h-auto py-4 px-6 flex flex-col items-end gap-1 max-w-[200px] text-right"
+                    className="h-auto py-4 px-6 flex flex-col items-end gap-1 w-full max-w-none text-right sm:max-w-[200px]"
                   >
                     <Link to={guidePathFromId(nextGuide.id)}>
                       <span className="text-xs text-primary-foreground/80 uppercase tracking-wider flex items-center gap-1">
@@ -245,7 +290,7 @@ export function GuidesPage() {
               </Button>
             </div>
           )}
-        </main>
+        </section>
       </div>
     </div>
   )

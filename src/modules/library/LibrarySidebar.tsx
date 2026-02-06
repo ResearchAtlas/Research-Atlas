@@ -120,6 +120,7 @@ export function LibrarySidebar({
                         {/* Mobile/Tablet Close Button */}
                         <button
                             onClick={onClose}
+                            aria-label="Close filters panel"
                             className="xl:hidden p-1 -mr-2 text-muted-foreground hover:text-foreground"
                         >
                             <X className="h-5 w-5" />

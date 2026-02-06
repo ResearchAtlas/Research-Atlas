@@ -27,6 +27,14 @@ export default [
     },
   },
   {
+    files: ["scripts/**/*.{js,mjs,cjs}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: globals.node,
+    },
+  },
+  {
     files: ["*.config.js", "vite.config.ts", "postcss.config.js", "tailwind.config.js"],
     languageOptions: {
       ecmaVersion: "latest",

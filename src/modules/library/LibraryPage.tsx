@@ -56,8 +56,8 @@ export function LibraryPage() {
                 p.title.toLowerCase().includes(queryLower) ||
                 p.description?.toLowerCase().includes(queryLower)
 
-            const matchesStage = stages.length === 0 || stages.some(s => p.stages.includes(s as any))
-            const matchesType = types.length === 0 || types.some(t => p.researchTypes.includes(t as any))
+            const matchesStage = stages.length === 0 || stages.some((s) => p.stages.some((stage) => stage === s))
+            const matchesType = types.length === 0 || types.some((t) => p.researchTypes.some((type) => type === t))
 
             return matchesSearch && matchesStage && matchesType
         })

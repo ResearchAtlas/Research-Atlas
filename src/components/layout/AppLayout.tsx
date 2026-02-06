@@ -24,7 +24,7 @@ export function AppLayout() {
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="flex h-14 w-full items-center px-4 md:px-8">
                     {/* Left: Logo */}
-                    <div className="flex w-[200px] shrink-0 items-center justify-start">
+                    <div className="flex min-w-0 flex-1 items-center justify-start md:w-[200px] md:flex-none">
                         <NavLink to="/" className="flex items-center space-x-2" aria-label="Research Atlas home">
                             <BookOpen className="h-6 w-6 text-primary" aria-hidden="true" />
                             <span className="hidden font-bold sm:inline-block">
@@ -34,7 +34,7 @@ export function AppLayout() {
                     </div>
 
                     {/* Center: Navigation Links */}
-                    <nav className="flex flex-1 items-center justify-center space-x-6 text-sm font-medium">
+                    <nav className="flex flex-1 items-center justify-center space-x-2 text-sm font-medium sm:space-x-4 md:space-x-6">
                         {navItems.map((item) => (
                             <NavLink
                                 key={item.to}
@@ -54,7 +54,7 @@ export function AppLayout() {
                     </nav>
 
                     {/* Right: Actions */}
-                    <div className="flex w-[200px] shrink-0 items-center justify-end space-x-2">
+                    <div className="flex min-w-0 flex-1 items-center justify-end space-x-1 md:w-[200px] md:flex-none md:space-x-2">
                         <ThemeToggle />
                         <Button variant="outline" size="sm" asChild>
                             <a

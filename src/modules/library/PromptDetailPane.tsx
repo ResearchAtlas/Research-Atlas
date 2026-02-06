@@ -75,6 +75,7 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
                     {onClose && (
                         <button
                             onClick={onClose}
+                            aria-label="Close prompt details"
                             className="hidden lg:flex w-8 h-8 rounded-full bg-secondary hover:bg-secondary/80 text-muted-foreground items-center justify-center transition-colors ml-4"
                         >
                             <X className="h-4 w-4" />

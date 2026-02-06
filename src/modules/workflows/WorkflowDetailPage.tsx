@@ -53,7 +53,7 @@ export function WorkflowDetailPage() {
         const socialTitle = "Workflow Not Found | Research Atlas"
 
         return (
-            <div className="container py-20">
+            <section className="container mx-auto py-20 text-center">
                 <Helmet>
                     <title>{socialTitle}</title>
                     <meta name="description" content={description} />
@@ -72,8 +72,19 @@ export function WorkflowDetailPage() {
                     <meta name="twitter:description" content={description} />
                     <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
                 </Helmet>
-                Workflow not found
-            </div>
+                <h1 className="text-3xl font-bold tracking-tight">Workflow Not Found</h1>
+                <p className="mt-3 text-muted-foreground">
+                    The requested workflow does not exist. Continue from one of the main sections.
+                </p>
+                <div className="mt-8 flex justify-center gap-3">
+                    <Button asChild variant="outline">
+                        <Link to="/workflows">All Workflows</Link>
+                    </Button>
+                    <Button asChild>
+                        <Link to="/">Go Home</Link>
+                    </Button>
+                </div>
+            </section>
         )
     }
 
@@ -119,7 +130,7 @@ export function WorkflowDetailPage() {
             <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center gap-4">
                     <Button variant="ghost" size="icon" asChild>
-                        <Link to="/workflows">
+                        <Link to="/workflows" aria-label="Back to workflows">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>

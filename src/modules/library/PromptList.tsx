@@ -41,6 +41,7 @@ export function PromptList({
                     {/* Hamburger Menu (Mobile/Tablet) */}
                     <button
                         onClick={onMenuClick}
+                        aria-label="Open filters"
                         className="xl:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <Menu className="h-6 w-6" />

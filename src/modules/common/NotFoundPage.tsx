@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export function NotFoundPage() {
     return (
-        <main className="container mx-auto py-20 text-center">
+        <section className="container mx-auto py-20 text-center">
             <Helmet>
                 <title>Page Not Found | Research Atlas</title>
                 <meta
@@ -28,6 +28,6 @@ export function NotFoundPage() {
                     <Link to="/">Go Home</Link>
                 </Button>
             </div>
-        </main>
+        </section>
     )
 }
