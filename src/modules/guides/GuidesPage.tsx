@@ -274,7 +274,7 @@ export function GuidesPage() {
                       <span className="font-medium truncate w-full">{nextGuide.title}</span>
                     </Link>
                   </Button>
-                ) : <div />}
+                ) : <div className="hidden sm:block" />}
               </div>
 
               <div className="h-20" /> {/* Spacer */}
