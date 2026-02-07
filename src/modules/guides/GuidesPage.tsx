@@ -98,7 +98,7 @@ export function GuidesPage() {
               size="sm"
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Open guide navigation"
-              className="gap-2"
+              className="gap-2 hover:bg-secondary hover:text-foreground"
             >
               <Menu className="h-4 w-4" />
               Browse Guides
