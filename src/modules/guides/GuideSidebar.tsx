@@ -116,7 +116,7 @@ export function GuideSidebar({ currentGuideId, isOpen = false, onClose }: GuideS
                         size="icon"
                         aria-label="Close guide navigation"
                         onClick={onClose}
-                        className="h-8 w-8"
+                        className="h-8 w-8 hover:bg-secondary hover:text-foreground"
                     >
                         <X className="h-4 w-4" />
                     </Button>

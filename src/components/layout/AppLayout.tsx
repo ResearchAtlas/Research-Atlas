@@ -47,7 +47,7 @@ export function AppLayout() {
                     <div className="flex min-w-0 flex-1 items-center justify-start md:w-[200px] md:flex-none">
                         <NavLink to="/" end className="flex items-center space-x-2" aria-label="Research Atlas home">
                             <BookOpen className="h-6 w-6 text-primary" aria-hidden="true" />
-                            <span className="hidden font-bold sm:inline-block">
+                            <span className="font-semibold text-sm sm:text-base">
                                 Research Atlas
                             </span>
                         </NavLink>
