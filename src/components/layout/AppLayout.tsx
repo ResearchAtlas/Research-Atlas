@@ -25,7 +25,7 @@ export function AppLayout() {
                 <div className="flex h-14 w-full items-center px-4 md:px-8">
                     {/* Left: Logo */}
                     <div className="flex min-w-0 flex-1 items-center justify-start md:w-[200px] md:flex-none">
-                        <NavLink to="/" className="flex items-center space-x-2" aria-label="Research Atlas home">
+                        <NavLink to="/" end className="flex items-center space-x-2" aria-label="Research Atlas home">
                             <BookOpen className="h-6 w-6 text-primary" aria-hidden="true" />
                             <span className="hidden font-bold sm:inline-block">
                                 Research Atlas
@@ -39,15 +39,16 @@ export function AppLayout() {
                             <NavLink
                                 key={item.to}
                                 to={item.to}
+                                end={item.to === '/'}
                                 className={({ isActive }) =>
                                     cn(
-                                        'flex items-center gap-2 transition-colors hover:text-foreground/80',
-                                        isActive ? 'text-foreground' : 'text-foreground/60'
+                                        'flex items-center justify-center rounded-md p-2 transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-secondary/50 data-[state=open]:bg-secondary/50',
+                                        isActive ? 'bg-secondary text-foreground' : 'text-foreground/60'
                                     )
                                 }
                                 aria-label={item.label}
                             >
-                                <item.icon className="h-4 w-4" aria-hidden="true" />
+                                <item.icon className="h-5 w-5" aria-hidden="true" />
                                 <span className="hidden lg:inline-block">{item.label}</span>
                             </NavLink>
                         ))}
@@ -56,7 +57,12 @@ export function AppLayout() {
                     {/* Right: Actions */}
                     <div className="flex min-w-0 flex-1 items-center justify-end space-x-1 md:w-[200px] md:flex-none md:space-x-2">
                         <ThemeToggle />
-                        <Button variant="outline" size="sm" asChild>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="hover:bg-secondary hover:text-foreground"
+                        >
                             <a
                                 href="https://docs.google.com/forms/d/e/1FAIpQLSenxH7AT7kKffyO3u2TSBpqJejdkYDQfMtRP6cCVC1Sbi1pzA/viewform?usp=publish-editor"
                                 target="_blank"

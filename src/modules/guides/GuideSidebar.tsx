@@ -48,8 +48,8 @@ interface SidebarItemProps {
 
 function SidebarItem({ label, icon, to, active, onNavigate }: SidebarItemProps) {
     const className = cn(
-        "w-full justify-start font-normal h-8",
-        active ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground",
+        "w-full justify-start font-normal h-8 hover:bg-secondary hover:text-foreground",
+        active ? "bg-secondary text-foreground font-medium" : "text-muted-foreground",
     )
 
     if (!to) {

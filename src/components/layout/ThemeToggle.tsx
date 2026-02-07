@@ -38,12 +38,12 @@ export function ThemeToggle() {
   }, [theme, isHydrated])
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className="rounded-full hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground"
           aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           type="button"
         >
@@ -59,13 +59,19 @@ export function ThemeToggle() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => setTheme("dark")}
-          className={cn(theme === "dark" && "font-semibold")}
+          className={cn(
+            "focus:bg-secondary focus:text-foreground",
+            theme === "dark" && "font-semibold"
+          )}
         >
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme("light")}
-          className={cn(theme === "light" && "font-semibold")}
+          className={cn(
+            "focus:bg-secondary focus:text-foreground",
+            theme === "light" && "font-semibold"
+          )}
         >
           Light
         </DropdownMenuItem>
