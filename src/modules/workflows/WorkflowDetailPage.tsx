@@ -129,7 +129,7 @@ export function WorkflowDetailPage() {
             {/* Header */}
             <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
+                    <Button variant="ghost" size="icon" asChild className="hover:bg-secondary hover:text-foreground">
                         <Link to="/workflows" aria-label="Back to workflows">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
@@ -379,7 +379,7 @@ function PromptSandbox({
                                             </motion.span>
                                         )}
                                     </AnimatePresence>
-                                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-secondary hover:text-foreground">
                                         <Copy className="h-3.5 w-3.5" />
                                         Copy to Clipboard
                                     </Button>

@@ -16,6 +16,15 @@ const formatTag = (tag: string) =>
 
 import { Helmet } from 'react-helmet-async'
 
+const WORKFLOW_DISPLAY_PRIORITY = ["focus", "nlm-research-workflow"] as const
+
+const getWorkflowPriority = (workflowId: string) => {
+  const priorityIndex = WORKFLOW_DISPLAY_PRIORITY.indexOf(
+    workflowId as (typeof WORKFLOW_DISPLAY_PRIORITY)[number],
+  )
+  return priorityIndex === -1 ? Number.MAX_SAFE_INTEGER : priorityIndex
+}
+
 export function WorkflowsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const queryParam = searchParams.get("q") || ""
@@ -44,7 +53,7 @@ export function WorkflowsPage() {
   }
 
   const filteredWorkflows = useMemo(() => {
-    return WORKFLOWS.filter((workflow) => {
+    const filtered = WORKFLOWS.filter((workflow) => {
       const matchesSearch =
         !search ||
         workflow.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -57,6 +66,13 @@ export function WorkflowsPage() {
         selectedType === "all" || workflow.researchTypes.includes(selectedType)
 
       return matchesSearch && matchesStage && matchesType
+    })
+
+    // Keep a stable baseline order while pinning curated workflows to the top.
+    return filtered.sort((a, b) => {
+      const priorityDiff = getWorkflowPriority(a.id) - getWorkflowPriority(b.id)
+      if (priorityDiff !== 0) return priorityDiff
+      return WORKFLOWS.findIndex((workflow) => workflow.id === a.id) - WORKFLOWS.findIndex((workflow) => workflow.id === b.id)
     })
   }, [search, selectedStage, selectedType])
 

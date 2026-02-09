@@ -188,6 +188,12 @@ export function GuideSidebar({ currentGuideId, isOpen = false, onClose }: GuideS
                         onNavigate={handleNavigate}
                     />
                     <SidebarItem
+                        label="NotebookLM Workflow"
+                        active={currentGuideId === 'nlm-research-workflow'}
+                        to={guidePathFromId('nlm-research-workflow')}
+                        onNavigate={handleNavigate}
+                    />
+                    <SidebarItem
                         label="Quickstart"
                         active={currentGuideId === 'quickstart'}
                         to={guidePathFromId('quickstart')}

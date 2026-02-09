@@ -40,6 +40,8 @@ const timestamp = "2026-02-04T00:00:00Z"
 const toolkitAuthor = { name: "Academic Use Toolkit" }
 // Note: atlasAuthor was removed as it was unused
 const reportAuthor = { name: "AI in Research Report" }
+const nlmAuthor = { name: "NotebookLM Research Workflow Guide" }
+const nlmTimestamp = "2026-02-08T00:00:00Z"
 
 export const PROMPTS: StaticPrompt[] = [
   {
@@ -3340,5 +3342,602 @@ Response: Cover letter draft.`,
     author: toolkitAuthor,
     createdAt: timestamp,
     updatedAt: timestamp,
+  },
+
+  // ── NotebookLM Research Workflow Prompts ─────────────────────────────
+
+  {
+    id: "nlm_notebook_protocol_readme",
+    title: "Notebook Protocol README Setup",
+    description:
+      "Create the reproducible README protocol note for a NotebookLM notebook with topic, time window, inclusion/exclusion rules, and naming conventions.",
+    stages: ["design"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Setup", "Reproducibility"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Produce a pinned README - Notebook Protocol note that defines all reproducibility conventions for a new notebook.",
+      context: "Setting up a new NotebookLM notebook with reproducible research conventions before uploading any sources.",
+      constraints: "All conventions must be filled in before uploading any sources. Follow naming patterns: notebook as [project] | [topic] | v[major.minor] | [YYYY-MM-DD], sources as A01_authority, E01_empirical, R01_review, C01_critique, notes as N01-N05.",
+      instructions: `Create a pinned note called "README - Notebook Protocol" with the following sections:
+
+Topic name: {{topic}}
+Time window: {{time_window}}
+Research goal: {{goal}}
+Inclusion rules: {{include_rules}}
+Exclusion rules: {{exclude_rules}}
+Evidence grading: high, medium, low (define what qualifies for each)
+
+Naming conventions:
+- Notebook: [project] | {{topic}} | v1.0 | [YYYY-MM-DD]
+- Sources: A01_authority_title_year.pdf, E01_empirical_title_year.pdf, R01_review_title_year.pdf, C01_critique_title_year.pdf
+- Saved Notes: N01_source_inventory, N02_key_definitions, N03_conflicts_C1_to_Cn, N04_gap_audit, N05_synthesis_outline
+
+Configuration defaults:
+- Turn on Learning Guide mode for comprehension and Feynman Technique teach-back steps.
+- Use Mind Map for theme structure and hidden connections.
+- Use Audio Overview for repetition or commuting review.`,
+      outputRequirements: "Formatted pinned note with all sections filled in, ready to paste into NotebookLM.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+      { name: "time_window", type: "text", required: false, description: "Time window (e.g., 2019-2026)", defaultValue: "2019-2026" },
+      { name: "goal", type: "text", required: false, description: "Research goal (e.g., decision memo, literature review)" },
+      { name: "include_rules", type: "multiline", required: false, description: "Inclusion criteria", defaultValue: "peer-reviewed, standards, official guidance, systematic reviews" },
+      { name: "exclude_rules", type: "multiline", required: false, description: "Exclusion criteria", defaultValue: "marketing pages, anonymous blogs (unless used as counter-claims)" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_a1_research_question",
+    title: "Research Question Set + Evaluation Rubric",
+    description:
+      "Frame 3 candidate research questions in different styles and select the strongest with an evaluation rubric, using NotebookLM sources.",
+    stages: ["design"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Scoping", "Research_Question"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Produce 3 candidate research questions in different styles and a 5-8 criteria evaluation rubric.",
+      context: "You are a research supervisor helping frame a rigorous research question using only uploaded NotebookLM sources.",
+      constraints: "Use only uploaded sources and cite them. Each question must be framed differently: causal/explanatory, descriptive/measurement, applied/decision-oriented.",
+      instructions: `Role: Research supervisor.
+Task: Help me frame a rigorous research question for {{topic}} aligned with {{goal}}.
+
+1) Propose 3 candidate main questions:
+   - causal/explanatory
+   - descriptive/measurement
+   - applied/decision-oriented
+2) For each, list:
+   - constructs to define
+   - what evidence counts as strong vs weak
+   - confounders or validity threats
+3) Recommend 1 question and provide a rubric (5-8 criteria).
+Use only my sources and cite them.`,
+      outputRequirements: "3 candidate questions with constructs, evidence criteria, confounders, plus 1 recommended question and evaluation rubric with 5-8 criteria.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+      { name: "goal", type: "text", required: false, description: "Research goal (e.g., decision memo, methods section)" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_a2_essential_subquestions",
+    title: "Essential Subquestions Map",
+    description:
+      "Generate the 10 most essential subquestions for a research topic from uploaded NotebookLM sources.",
+    stages: ["design"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Scoping", "Subquestions"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Identify the 10 most essential questions to ask about the topic.",
+      context: "Mapping a new corpus of sources in NotebookLM to understand its coverage.",
+      constraints: "Based only on uploaded sources. Cite sources for each question.",
+      instructions: `Based only on my sources, list the 10 most essential subquestions for {{topic}}.
+For each:
+- why it matters
+- which sources are most relevant
+- what evidence would answer it
+Cite sources.`,
+      outputRequirements: "Numbered list of 10 questions, each with rationale, relevant sources, and evidence type needed.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_b1_source_inventory",
+    title: "Source Inventory Table",
+    description:
+      "Create a structured inventory table of all uploaded NotebookLM sources with type, topics, and relevance across authoritative materials, industry reviews, papers, and blog posts.",
+    stages: ["design", "data_qc"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Corpus", "Inventory"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Build a source inventory table from uploaded documents.",
+      context: "Managing a NotebookLM notebook corpus for structured research on {{topic}}.",
+      constraints: "Cite sources where needed. Classify each source by type and flag whether it is an authoritative source, industry review, empirical paper, or blog post.",
+      instructions: `Create a source inventory for {{topic}} from my uploaded documents.
+Make sure the inventory distinguishes authoritative materials, industry reviews, research papers, and blog posts with opposing viewpoints when present.
+Return a table with columns:
+- Source name
+- Type: authoritative, industry_review, empirical_paper, review, critique, policy, blog_post, commentary
+- Key topics covered
+- Which subquestion(s) it supports
+- Relevance: high/medium/low
+Cite sources where needed.`,
+      outputRequirements: "Table with columns: Source name, Type, Key topics, Subquestion support, Relevance rating.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic for context" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_b2_mega_pdf_index",
+    title: "Mega PDF Internal Index",
+    description:
+      "Create an internal index for a merged multi-document PDF in NotebookLM to recover per-item granularity.",
+    stages: ["data_qc"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review"],
+    tags: ["NotebookLM", "Workflow", "Corpus", "PDF", "Indexing"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Recover per-document granularity inside a merged PDF.",
+      context: "A merged document has been uploaded to NotebookLM to work around source caps.",
+      constraints: "Cite the merged source. Detect boundaries via titles, headings, page breaks.",
+      instructions: `This is a merged document for {{topic}}. Create an internal index:
+- identify document boundaries (titles, headings, page breaks)
+- assign IDs D01, D02, ...
+- summarize each item in 3 bullets
+- map each item to page ranges
+Cite the merged source.`,
+      outputRequirements: "Internal index with IDs (D01, D02...), 3-bullet summaries, and item-to-page mapping.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: false, description: "Research topic for context" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_c1_feynman_teach_back",
+    title: "Feynman Technique Teach-Back Loop",
+    description:
+      "Use the NotebookLM Learning Guide and the Feynman Technique to diagnose understanding gaps through a teach-back exercise.",
+    stages: ["interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Learning", "Feynman", "Comprehension"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Diagnose gaps in understanding through a teach-back loop.",
+      context: "Using NotebookLM Learning Guide mode for active reading and comprehension.",
+      constraints: "Use ONLY uploaded sources. Cite sources for every correction.",
+      instructions: `Turn on Learning Guide mode and apply the Feynman Technique.
+Ask me to explain {{concept}} in 8-12 sentences.
+
+Then:
+1) Diagnose gaps and leaps using ONLY my sources.
+2) Ask 5 targeted follow-up questions.
+3) After I respond, produce:
+   - a corrected explanation
+   - a checklist of what I must be able to explain
+Cite sources for each correction.`,
+      outputRequirements: "Corrected explanation and checklist of must-explain items, all with citations.",
+    },
+    variables: [
+      { name: "concept", type: "text", required: true, description: "Concept to teach back" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_c2_deep_understanding_quiz",
+    title: "Deep Understanding Quiz",
+    description:
+      "Generate a 12-question quiz with conceptual, application, and trick questions from NotebookLM sources.",
+    stages: ["interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Learning", "Quiz", "Comprehension"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Test deep understanding with a source-grounded quiz.",
+      context: "Checking comprehension of materials uploaded to NotebookLM.",
+      constraints: "Based only on uploaded sources. Provide answer key with citations.",
+      instructions: `Create a quiz on {{topic}} based only on my sources:
+- 6 conceptual questions
+- 4 application questions
+- 2 trick questions that expose common misunderstandings
+Provide an answer key with citations.`,
+      outputRequirements: "12 questions (6 conceptual, 4 application, 2 trick) plus answer key with citations.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Topic to quiz on" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_d1_methods_extraction",
+    title: "Methods-First Evidence Extraction",
+    description:
+      "Extract claims, evidence, limitations, and boundary conditions from NotebookLM sources using a senior methods reviewer persona.",
+    stages: ["analysis", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical", "experimental"],
+    tags: ["NotebookLM", "Workflow", "Extraction", "Methods", "Evidence"],
+    framework: "COSTAR",
+    difficulty: "advanced",
+    content: {
+      goal: "Extract decision-critical evidence using a methods reviewer persona.",
+      context: "Acting as a senior methods reviewer extracting from NotebookLM sources.",
+      constraints: "No general commentary. Every bullet must cite a source.",
+      instructions: `Act as a senior methods reviewer.
+From the most relevant sources on {{topic}}, extract only:
+
+A) Claims (one sentence each)
+B) Evidence (study type, sample, setting, measures, key results)
+C) Limitations and validity threats
+D) Boundary conditions (where findings may not apply)
+
+Rules:
+- no general commentary
+- every bullet must cite a source`,
+      outputRequirements: "Sections: A) Claims, B) Evidence (study type/sample/setting/measures/results), C) Limitations, D) Boundary conditions. Every bullet cited.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic to extract evidence for" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_d2_decision_memo_extraction",
+    title: "Decision Memo Extraction",
+    description:
+      "Extract only decision-critical content from NotebookLM sources for a specific research goal using a ruthless PM persona.",
+    stages: ["analysis", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Extraction", "Decision_Memo"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Extract decision-critical content aligned to a specific research goal.",
+      context: "Acting as a ruthless research PM extracting actionable content from NotebookLM sources.",
+      constraints: "Ignore fluff. Cite everything.",
+      instructions: `Act as a ruthless research PM.
+Extract only decision-critical content for {{goal}}.
+
+Format:
+- Decision points
+- Supporting evidence (with citations)
+- Risks and uncertainties
+- Recommendations
+Ignore fluff. Cite everything.`,
+      outputRequirements: "Decision points, supporting evidence with citations, risks and uncertainties, recommendations.",
+    },
+    variables: [
+      { name: "goal", type: "text", required: true, description: "Research goal (e.g., decision memo, research brief)" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_e1_conflict_clusters",
+    title: "Conflict Clusters and Resolution Tests",
+    description:
+      "Identify contradictions across NotebookLM sources, compare multi-faceted arguments and supporting evidence, and map them into conflict clusters with resolution tests.",
+    stages: ["analysis", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Contradictions", "Conflict_Matrix"],
+    framework: "COSTAR",
+    difficulty: "advanced",
+    content: {
+      goal: "Create a conflict matrix mapping contradictions and their resolution tests.",
+      context: "Analyzing cross-source contradictions in a NotebookLM notebook.",
+      constraints: "Cite heavily. Include likely reason for disagreement.",
+      instructions: `Identify contradictions across sources about {{topic}}, including differences in opinions, supporting evidence, and reasoning logic.
+
+Return:
+1) Conflict clusters C1, C2, C3...
+2) For each:
+   - Claim A (who says it, cite)
+   - Claim B (who contradicts it, cite)
+   - Evidence used by each side (cite)
+   - Likely reason for disagreement (definitions, population, method, timeframe)
+   - Tests that would resolve the conflict
+Cite heavily.`,
+      outputRequirements: "Conflict clusters (C1, C2, C3...) with Claim A, Claim B, evidence, reason for disagreement, and resolution tests.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_f1_blind_spots_audit",
+    title: "Blind Spots and Missing Evidence Audit",
+    description:
+      "Identify missing perspectives, variables, assumptions, and counterarguments in the NotebookLM source corpus.",
+    stages: ["analysis", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Gap_Analysis", "Blind_Spots"],
+    framework: "COSTAR",
+    difficulty: "advanced",
+    content: {
+      goal: "Identify what is missing from the source corpus before writing.",
+      context: "Acting as a critical auditor reviewing NotebookLM sources.",
+      constraints: "Cite sources when referencing what is present or absent.",
+      instructions: `Act as a critical auditor.
+
+Review my sources on {{topic}} and identify:
+- missing perspectives or populations
+- missing variables or outcomes
+- assumptions without explicit evidence
+- counterarguments not addressed
+
+Output:
+1) Missing items with rationale
+2) Consequences if ignored
+3) Next-source plan (source types to collect)
+Cite sources when referencing what is present or absent.`,
+      outputRequirements: "Missing items with rationale, consequences if ignored, next-source plan (types of sources, not specific URLs).",
+    },
+    variables: [
+      { name: "topic", type: "text", required: false, description: "Research topic for context" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_g1_synthesis_outline",
+    title: "Synthesis Outline with Citation Anchors",
+    description:
+      "Draft a deliverable outline for a NotebookLM research project with citation anchors for each claim.",
+    stages: ["writing", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Synthesis", "Outline", "Writing"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Produce a structured outline with citation anchors for every claim.",
+      context: "Synthesizing NotebookLM sources into a deliverable.",
+      constraints: "Label any interpretation as interpretation, not fact. Use only sources.",
+      instructions: `Draft a {{deliverable_type}} outline for {{topic}}.
+
+For each bullet:
+- 1 sentence claim
+- citation anchors like: (CITE: Source Name)
+Label any interpretation as interpretation, not fact.
+Use only sources.`,
+      outputRequirements: "Outline with sections, 1-sentence claims per bullet, and (CITE: Source Name) tags. Interpretations labeled.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+      { name: "deliverable_type", type: "text", required: false, description: "Type of deliverable (e.g., decision memo, research brief)", defaultValue: "research brief" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_g2_hidden_connections",
+    title: "Hidden Connections Finder",
+    description:
+      "Surface 8 non-obvious cross-source connections in NotebookLM with hypotheses they suggest.",
+    stages: ["interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Synthesis", "Connections", "Discovery"],
+    framework: "COSTAR",
+    difficulty: "advanced",
+    content: {
+      goal: "Find non-obvious connections across sources.",
+      context: "Deep synthesis of a NotebookLM notebook looking for cross-source relationships.",
+      constraints: "Cite sources for both sides of each connection.",
+      instructions: `Find 8 non-obvious connections across sources about {{topic}}.
+For each:
+- what the connection is
+- why it matters
+- what hypothesis or research question it suggests
+Cite sources for both sides of each connection.`,
+      outputRequirements: "8 hidden links with what the connection is, why it matters, and what hypothesis it suggests. Both sides cited.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_h1_attribution_stress_test",
+    title: "Attribution Stress Test",
+    description:
+      "Audit a NotebookLM answer for interpretive overreach, flagging unsupported interpretations.",
+    stages: ["review", "writing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Verification", "Attribution"],
+    framework: "COSTAR",
+    difficulty: "advanced",
+    content: {
+      goal: "Audit the last AI answer for interpretive overreach.",
+      context: "Verifying NotebookLM outputs before export or reuse.",
+      constraints: "Every flagged sentence must be rewritten to be source-faithful or labeled as hypothesis.",
+      instructions: `Audit your last answer for overreach.
+
+For each paragraph:
+- list sentences directly supported by a cited passage
+- flag any sentence that is interpretation or not explicitly supported
+- rewrite flagged sentences to be strictly source-faithful or label as hypothesis
+Return:
+1) Audit
+2) Corrected version with citations`,
+      outputRequirements: "Audit table plus corrected version with citations.",
+    },
+    variables: [],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_h2_claim_citation_ledger",
+    title: "Claim-to-Citation Ledger",
+    description:
+      "Create a structured ledger mapping every claim in a NotebookLM draft to its supporting citations and confidence level.",
+    stages: ["review", "writing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Verification", "Claims", "Ledger"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Create a claim ledger with confidence ratings from a draft.",
+      context: "Auditing a draft produced in NotebookLM.",
+      constraints: "Only use uploaded sources.",
+      instructions: `Create a claim ledger from the draft.
+Return a table:
+- Claim ID
+- Claim text
+- Supporting citations
+- Confidence: high/medium/low
+- Notes on limitations or uncertainty
+Only use my sources.`,
+      outputRequirements: "Table: Claim ID, Claim text, Supporting citations, Confidence (high/medium/low), Notes on limitations.",
+    },
+    variables: [],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_i1_audio_overview_scripts",
+    title: "Audio Overview Scripts (3 Modes)",
+    description:
+      "Generate three NotebookLM Audio Overview scripts: brief core ideas, critique and uncertainty, and debate format.",
+    stages: ["writing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Audio", "Communication", "Studio"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Create three Audio Overview scripts for different communication modes.",
+      context: "Preparing NotebookLM Studio audio outputs.",
+      constraints: "Only use sources. Explicitly label uncertainty.",
+      instructions: `Create three Audio Overview scripts for {{topic}}:
+A) Brief core ideas (5-7 minutes)
+B) Critique and uncertainty
+C) Debate format with two sides
+
+Constraints:
+- only my sources
+- explicitly label uncertainty
+- end with a list of citations to review after listening`,
+      outputRequirements: "Three scripts (Brief, Critique, Debate) plus citations-to-review list.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_i2_mind_map_seed",
+    title: "Mind Map Seed Structure",
+    description:
+      "Propose a hierarchical mind map structure for a NotebookLM research topic with conflict and gap annotations.",
+    stages: ["interpretation", "visualization"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Mind_Map", "Visualization", "Studio"],
+    framework: "COSTAR",
+    difficulty: "beginner",
+    content: {
+      goal: "Create a mind map seed structure for synthesis visualization.",
+      context: "Preparing a NotebookLM Studio mind map.",
+      constraints: "Cite key sources per branch.",
+      instructions: `Propose a mind map structure for {{topic}}:
+- top-level branches (5-7)
+- second-level branches (3-6 each)
+- where major conflicts and gaps sit in the map
+Cite key sources per branch.`,
+      outputRequirements: "5-7 top-level branches, 3-6 second-level each, conflict and gap annotations, sources per branch.",
+    },
+    variables: [
+      { name: "topic", type: "text", required: true, description: "Research topic" },
+    ],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
+  },
+  {
+    id: "nlm_distill_technical_brief",
+    title: "Distill to Technical Brief",
+    description:
+      "Distill a NotebookLM notebook into a citation-rich technical brief suitable for the Ouroboros note-to-source conversion loop.",
+    stages: ["writing", "interpretation"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "systematic_review", "theoretical"],
+    tags: ["NotebookLM", "Workflow", "Distillation", "Brief", "Ouroboros"],
+    framework: "COSTAR",
+    difficulty: "intermediate",
+    content: {
+      goal: "Distill the current notebook into a comprehensive technical brief for reuse.",
+      context: "Preparing a distilled source for the Ouroboros loop in NotebookLM.",
+      constraints: "Every claim must have at least one citation. Separate strong evidence from tentative interpretation.",
+      instructions: `Distill the current notebook into a comprehensive technical brief.
+
+Constraints:
+- Use headings and numbered claims
+- Every claim must have at least one citation
+- Separate "strong evidence" vs "tentative interpretation"
+- Include a short glossary of key terms as defined in sources`,
+      outputRequirements: "Technical brief with headings, numbered claims, citations, evidence grading (strong vs tentative), and glossary.",
+    },
+    variables: [],
+    outputFormat: "markdown",
+    author: nlmAuthor,
+    createdAt: nlmTimestamp,
+    updatedAt: nlmTimestamp,
   },
 ]

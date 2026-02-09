@@ -424,6 +424,142 @@ const RAW_GUIDES: GuideDraft[] = [
     ],
     sourceNote: "AI in research report.md (Glossary)",
   },
+
+  // ── NotebookLM Research Workflow Guide ───────────────────────────────
+
+  {
+    id: "nlm-research-workflow",
+    title: "NotebookLM Research Workflow Guide",
+    summary:
+      "A comprehensive guide to using NotebookLM as a source-grounded research assistant with reproducible workflows, verification guardrails, and team-based quality control.",
+    group: "Methodology",
+    stages: ["design", "data_qc", "analysis", "interpretation", "writing", "review", "visualization"],
+    researchTypes: [
+      "qualitative",
+      "quantitative",
+      "mixed_methods",
+      "systematic_review",
+      "theoretical",
+    ],
+    tags: ["NotebookLM", "workflow", "verification", "source-grounded", "reproducibility"],
+    sections: [
+      {
+        id: "overview",
+        title: "Overview",
+        body: "This guide covers a reproducible, source-grounded research workflow built around Google NotebookLM. It is designed for literature reviews, policy scans, technical briefs, stakeholder memos, and early-stage research scoping. NotebookLM excels at answering questions grounded in your uploaded sources with clickable, inspectable citations and producing reusable research artifacts via Studio. See the [NotebookLM Research Workflow](/workflows/nlm-research-workflow) for the step-by-step procedure, and search the [Prompt Library](/library?q=NotebookLM) for all copy-paste prompts.",
+      },
+      {
+        id: "capabilities-and-limits",
+        title: "NotebookLM Capabilities and Practical Limits",
+        body: "Understanding what NotebookLM does well and where it has limitations is essential for planning your source strategy.",
+        bullets: [
+          "**Source-grounded answers** with clickable, inspectable citations you can verify.",
+          "**Studio outputs**: reports, mind maps, audio and video overviews exportable to Google Docs or Sheets.",
+          "**Per-notebook source cap** and per-source size cap require a deliberate source strategy (merge small docs, archive distilled notes).",
+          "**Best suited for**: literature reviews, policy scans, technical briefs, and research scoping.",
+          "**Not suitable for**: generating new facts without sources, or workflows where citations cannot be verified.",
+        ],
+      },
+      {
+        id: "reproducibility-framework",
+        title: "Reproducibility Framework",
+        body: "Before uploading any sources, define conventions in a pinned note called README - Notebook Protocol. This ensures every notebook is reproducible and traceable.",
+        bullets: [
+          "**Notebook naming**: `{{project}} | {{topic}} | v{{major.minor}} | {{YYYY-MM-DD}}`",
+          "**Source naming by type**: `A01_authority_title_year.pdf`, `E01_empirical_title_year.pdf`, `R01_review_title_year.pdf`, `C01_critique_title_year.pdf`",
+          "**Saved Notes naming**: `N01_source_inventory`, `N02_key_definitions`, `N03_conflicts_C1_to_Cn`, `N04_gap_audit`, `N05_synthesis_outline`",
+          "**Protocol fields**: topic name, time window, inclusion/exclusion rules, evidence grading (high/medium/low).",
+          "**Configuration defaults**: Turn on Learning Guide mode for comprehension, use the **Feynman Technique (teach-back)** to test understanding, use Mind Map for theme structure, and use Audio Overview for repetition during fragmented time or commuting.",
+        ],
+      },
+      {
+        id: "information-collision",
+        title: "The Information Collision Principle",
+        body: "Prevent shallow consensus summaries by deliberately mixing source types. This forces the model to compare claims and evidence rather than just paraphrase.",
+        bullets: [
+          "For every major claim area, upload at least **1 authoritative source** (guideline, standard, official report), include **industry reviews**, include **empirical papers** (studies or dataset reports), and include **blog posts** or critiques that present opposing viewpoints.",
+          "After uploading, ask NotebookLM to map conflicts in opinions, compare multi-faceted arguments and supporting evidence, and explain the logic behind each perspective.",
+          "**PDF Megazord strategy**: when hitting source caps, merge many short documents into one mega PDF. Maintain an external index mapping original titles to page ranges. Use the Mega PDF Internal Index prompt to recover granularity.",
+        ],
+      },
+      {
+        id: "lab-sop-roles",
+        title: "Lab SOP: Roles and Responsibilities",
+        body: "Standardized roles for team-based NotebookLM research.",
+        bullets: [
+          "**Research Lead (RL)**: defines question, scope, acceptance criteria, final sign-off.",
+          "**Analyst (AN)**: builds notebook, uploads sources, runs prompt pack, drafts outputs.",
+          "**Verifier (VR)**: clicks citations, checks claim fidelity, runs audit prompts, logs issues.",
+          "**Archivist (AR)**: manages naming, saved notes, exports, versioning.",
+          "**Small teams**: RL + AN, with VR as a second pass before anything is shared externally.",
+        ],
+      },
+      {
+        id: "required-artifacts",
+        title: "Required Artifacts",
+        body: "The following deliverables must be produced and stored in the project folder.",
+        bullets: [
+          "`00_readme_protocol.md` \u2014 this SOP filled in",
+          "`01_source_inventory.csv` \u2014 source inventory table",
+          "`02_conflict_matrix.md` \u2014 conflict clusters",
+          "`03_gap_audit.md` \u2014 blind spots and missing evidence",
+          "`04_synthesis_outline.md` \u2014 citation-anchored outline",
+          "`05_final_deliverable.docx` (or .md) \u2014 final output",
+          "`verification_log.md` \u2014 attribution audit trail",
+        ],
+      },
+      {
+        id: "qc-gates",
+        title: "Quality Control Gates",
+        body: "Each stage has a QC gate that must be passed before proceeding to the next. These are policy checkpoints, not procedural steps.",
+        bullets: [
+          "**Framing**: Question is specific, testable, and matches scope; rubric has 5-8 criteria.",
+          "**Source inventory**: Each source tagged by type and mapped to a subquestion.",
+          "**Comprehension**: Key terms defined with citations; misunderstandings documented and corrected.",
+          "**Extraction**: No filler summaries; every bullet cited; methods, sample, measures captured.",
+          "**Conflict matrix**: Each cluster has Claim A, Claim B, evidence, and reason; all claims traceable.",
+          "**Gap audit**: Missing data identified; next-source plan is concrete (source types, not random links).",
+          "**Synthesis**: Each outline bullet includes citation anchors; uncertainty labeled.",
+          "**Verification**: All key claims have verified citations; interpretive statements labeled.",
+          "**Export**: Deliverable includes a 'What to verify' checklist and notebook version.",
+        ],
+      },
+      {
+        id: "verification-principles",
+        title: "Verification Principles (Non-Negotiable)",
+        body: "Even in source-grounded tools, interpretive overconfidence and hallucinations remain major failure modes: turning attributed statements into universal claims, adding unsupported characterizations, or fabricating document intent. Verification must be part of the workflow, not an afterthought.",
+        bullets: [
+          "**Click citations** and read the original passage for every key claim. Do not trust summaries without checking the cited text.",
+          "Treat every AI summary as a draft: it can still hallucinate, omit context, or overstate certainty.",
+          "**Run an attribution stress test** before exporting anything.",
+          "If a cited passage cannot be found, **remove the claim** or label it as unverified.",
+          "Maintain a running list of **Known uncertainties** in every deliverable.",
+          "Any statement that is an interpretation must be **labeled as such**, never presented as fact.",
+        ],
+      },
+      {
+        id: "ouroboros-loop",
+        title: "The Ouroboros Loop: Distill and Reuse",
+        body: "The Ouroboros loop lets you distill high-value outputs into second-generation sources, improving slot efficiency without re-reading everything.",
+        bullets: [
+          "Save high-value outputs as **Notes**, then convert Notes into Sources for a distilled second-generation source.",
+          "Before converting, ensure every claim in the note has **citations back to originals**.",
+          "Mark converted sources as **derived** \u2014 do not treat them as primary evidence.",
+          "**Trade-off**: slot efficiency improves, but fine-grained provenance can be lost if notes are too abstract.",
+        ],
+      },
+      {
+        id: "saved-note-templates",
+        title: "Saved Note Templates",
+        body: "Standardized templates for consistent note-taking across the workflow.",
+        bullets: [
+          "**Evidence extraction note**: Title, key claims (with evidence and citations), methods/measures, limitations, uncertainty flags.",
+          "**Conflict cluster note**: Title, Claim A (with citation), Claim B (with citation), reason for disagreement, resolution tests.",
+        ],
+      },
+    ],
+    sourceNote: "NotebookLM Research Workflow Guide.md",
+  },
 ]
 
 const DEFAULT_GUIDE_LAST_UPDATED = "2026-02-06"
@@ -438,6 +574,7 @@ const GUIDE_LAST_UPDATED: Record<string, string> = {
   "focus-guide": "2026-02-04",
   quickstart: "2026-02-04",
   glossary: "2026-02-04",
+  "nlm-research-workflow": "2026-02-08",
 }
 
 export const EDITORIAL_POLICY = [
@@ -450,7 +587,8 @@ const buildGuideSources = (guide: GuideDraft): GuideSource[] => {
   const sources: GuideSource[] = []
 
   if (guide.sourceNote) {
-    sources.push({ title: guide.sourceNote })
+    const sourceTitle = guide.sourceNote.replace(/\.md\b/gi, "").trim()
+    sources.push({ title: sourceTitle })
   }
 
   if (guide.id === "ethics-policies") {
@@ -458,6 +596,21 @@ const buildGuideSources = (guide: GuideDraft): GuideSource[] => {
       title: "COPE: Authorship and AI tools guidance",
       url: "https://publicationethics.org/resources/discussion-documents/authorship-and-ai-tools",
     })
+  }
+
+  if (guide.id === "nlm-research-workflow") {
+    sources.push(
+      { title: "Google NotebookLM Help", url: "https://support.google.com/notebooklm/answer/16206563" },
+      { title: "NotebookLM FAQ", url: "https://support.google.com/notebooklm/answer/16269187" },
+      { title: "NotebookLM Enterprise Overview", url: "https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/overview" },
+      { title: "Learning Guide in NotebookLM", url: "https://workspaceupdates.googleblog.com/2025/09/learning-guide-notebook-lm-workspace-education.html" },
+      { title: "NotebookLM Studio Updates", url: "https://blog.google/innovation-and-ai/models-and-research/google-labs/notebooklm-video-overviews-studio-upgrades/" },
+      { title: "Notes in NotebookLM", url: "https://support.google.com/notebooklm/answer/16262519" },
+      { title: "Not Wrong, But Untrue: LLM Overconfidence in Document-Based Queries", url: "https://arxiv.org/abs/2509.25498" },
+      { title: "6 ways I circumvent NotebookLM source limitations", url: "https://www.xda-developers.com/dodge-notebooklm-source-limitations/" },
+      { title: "10 NotebookLM Super Prompts For Pro-Level Productivity - Analytics Vidhya", url: "https://www.analyticsvidhya.com/blog/2026/01/notebooklm-super-prompts-for-pro-level-productivity/" },
+      { title: "Audio Overview in NotebookLM", url: "https://support.google.com/notebooklm/answer/16212820" },
+    )
   }
 
   return sources
