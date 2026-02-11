@@ -4,7 +4,7 @@ import path from 'node:path'
 const distDir = path.resolve('dist')
 const manifestPath = path.join(distDir, 'prerender-manifest.json')
 const sitemapPath = path.join(distDir, 'sitemap.xml')
-const OG_IMAGE_URL = 'https://researchatlas.info/og/cover-1200x630.png'
+const OG_IMAGE_URL = 'https://researchatlas.info/og/cover-1200x630-v2.png'
 
 const getTitle = (html) => html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? ''
 const getDescription = (html) => html.match(/<meta[^>]+name="description"[^>]+content="([^"]+)"[^>]*>/i)?.[1]?.trim() ?? ''

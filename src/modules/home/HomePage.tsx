@@ -91,14 +91,14 @@ export function HomePage() {
                 <meta property="og:url" content="https://researchatlas.info/" />
                 <meta property="og:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
                 <meta property="og:description" content="Explore AI prompts, workflows, and method guides designed to strengthen academic research quality and speed." />
-                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content="https://researchatlas.info/" />
                 <meta name="twitter:title" content="Research Atlas | AI Prompts & Workflows for Academic Research" />
                 <meta name="twitter:description" content="Explore AI prompts, workflows, and method guides designed to strengthen academic research quality and speed." />
-                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
             </Helmet>
             {/* Hero Section */}
             <section className="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24">

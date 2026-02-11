@@ -73,14 +73,14 @@ export function GuidesPage() {
         <meta property="og:url" content={canonicalHref} />
         <meta property="og:title" content={socialTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+        <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={canonicalHref} />
         <meta name="twitter:title" content={socialTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+        <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
         {isNotFound && <meta name="robots" content="noindex, nofollow" />}
       </Helmet>
       <div className="flex gap-8 relative">

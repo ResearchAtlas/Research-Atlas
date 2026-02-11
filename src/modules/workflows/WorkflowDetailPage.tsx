@@ -63,14 +63,14 @@ export function WorkflowDetailPage() {
                     <meta property="og:url" content={canonical} />
                     <meta property="og:title" content={socialTitle} />
                     <meta property="og:description" content={description} />
-                    <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                    <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
                     <meta property="og:image:width" content="1200" />
                     <meta property="og:image:height" content="630" />
                     <meta name="twitter:card" content="summary_large_image" />
                     <meta name="twitter:url" content={canonical} />
                     <meta name="twitter:title" content={socialTitle} />
                     <meta name="twitter:description" content={description} />
-                    <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                    <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
                 </Helmet>
                 <h1 className="text-3xl font-bold tracking-tight">Workflow Not Found</h1>
                 <p className="mt-3 text-muted-foreground">
@@ -117,14 +117,14 @@ export function WorkflowDetailPage() {
                 <meta property="og:url" content={canonical} />
                 <meta property="og:title" content={socialTitle} />
                 <meta property="og:description" content={description} />
-                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta property="og:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content={canonical} />
                 <meta name="twitter:title" content={socialTitle} />
                 <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630.png" />
+                <meta name="twitter:image" content="https://researchatlas.info/og/cover-1200x630-v2.png" />
             </Helmet>
             {/* Header */}
             <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
