@@ -7,9 +7,7 @@ image/
 
 *.py
 
-Academic Use Toolkit - standardized.md
-AI in research report - standardized.md
-NotebookLM Research Workflow Guide.md
+.local/
 docs/plans/
 
 .agent/
@@ -22,8 +20,6 @@ docs/plans/
 
 # Local planning and scratch artifacts
 *_IMPLEMENTATION_PLAN.txt
-check-png-size.mjs
-nul
 public/og/preview*.html
 public/og/preview*.png
 public/og/temp-*.html
