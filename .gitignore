@@ -5,10 +5,12 @@ image/
 .env
 .env.*
 
-*.md
-!README.md
-
 *.py
+
+Academic Use Toolkit - standardized.md
+AI in research report - standardized.md
+NotebookLM Research Workflow Guide.md
+docs/plans/
 
 .agent/
 .agents/

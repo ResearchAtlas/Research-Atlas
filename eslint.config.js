@@ -6,7 +6,19 @@ import tseslint from "typescript-eslint"
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      ".agent/**",
+      ".agents/**",
+      ".claude/**",
+      ".codex/**",
+      ".cursor/**",
+      ".gemini/**",
+      ".shared/**",
+      "docs/plans/**",
+      "check-png-size.mjs",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -27,7 +39,7 @@ export default [
     },
   },
   {
-    files: ["scripts/**/*.{js,mjs,cjs}"],
+    files: ["scripts/**/*.{js,mjs,cjs}", "*.mjs"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -35,7 +47,7 @@ export default [
     },
   },
   {
-    files: ["*.config.js", "vite.config.ts", "postcss.config.js", "tailwind.config.js"],
+    files: ["**/*.config.js", "vite.config.ts"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

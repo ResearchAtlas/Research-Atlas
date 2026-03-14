@@ -1,86 +1,47 @@
 # Research Atlas 🔬
 
-**A curated atlas of research-ready prompts, workflows, and guides.**
+Research Atlas is a static hub of prompts, workflows, and guides for rigorous AI-assisted research.
 
-Research Atlas is a static web application designed to help researchers navigate AI-assisted workflows with rigor. It provides prompts, workflows, and educational guides mapped to each stage of the research lifecycle.
+Use the live site: [researchatlas.info](https://researchatlas.info)
 
-## Features
+The repository powers the website, but the website is the primary product surface for readers and researchers.
 
-*   **Static & Fast:** No database, no login. Just pure frontend code.
-*   **Prompts + Workflows + Guides:** Copy-ready assets mapped to stages and methods.
-*   **Research Lifecycle Support:** Organized by stages (Design, Measures, Data QC, Analysis, Interpretation, Writing).
-*   **Research Type Paths:** Qualitative, quantitative, mixed methods, and more.
+## What You’ll Find
 
-## Getting Started
+- **Library**: Copy-ready prompts organized by research stage and method.
+- **Workflows**: Step-by-step research pipelines for discovery, verification, writing, and reproducibility.
+- **Guides**: Editorial explanations of the frameworks and principles behind the workflows.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/YourRepo/research-atlas.git
-    cd research-atlas
-    ```
+## Website First
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+If you want to use Research Atlas, start on the website:
 
-3.  **Start the development server:**
-    ```bash
-    npm run dev
-    ```
+- Browse prompts in the Library
+- Follow complete procedures in Workflows
+- Read the supporting methodology in Guides
 
-4.  **Open your browser:**
-    Navigate to `http://localhost:5173` (or the port shown in your terminal).
+The repo is mainly for maintaining the site and its content source.
 
-## Usage
+## For Maintainers
 
-### Using the Library
-Browse the **Library** to find prompt templates. Use **Workflows** for step-by-step pipelines and **Guides** for educational resources.
+```bash
+npm install
+npm run dev
+npm run build
+```
 
 ## Contributing
 
-We welcome contributions! This project is designed as a "static-first" application, meaning the content drives the app.
-
-### How to Add a Prompt
-
-1.  Open `src/data/prompts.ts`.
-2.  Add a new `StaticPrompt` object to the `PROMPTS` array:
-    ```typescript
-    {
-        id: 'unique-id',
-        title: 'Prompt Title',
-        description: 'Brief description of what this prompt does.',
-        stages: ['analysis'], // design, measures, data_qc, analysis, interpretation, writing
-        researchTypes: ['quantitative'], // qualitative, quantitative, mixed_methods, ...
-        tags: ['statistics', 'python'],
-        content: {
-            goal: '...',
-            context: '...',
-            instructions: '...',
-            constraints: '...',
-            outputRequirements: '...'
-        },
-        variables: [
-            { name: 'dataset_name', type: 'text' }
-        ],
-        author: {
-            name: 'Your Name',
-            url: 'https://github.com/yourprofile' // Optional
-        },
-        createdAt: '2026-02-04T00:00:00Z',
-        updatedAt: '2026-02-04T00:00:00Z'
-    }
-    ```
-3.  Submit a Pull Request with your changes.
+Research Atlas remains website-first. If you want to suggest a prompt or workflow, use the contribution path linked on the live site.
 
 ## Tech Stack
 
-*   **Framework:** React + Vite
-*   **Language:** TypeScript
-*   **Styling:** Tailwind CSS + shadcn/ui
-*   **State Management:** TanStack Query
-*   **Icons:** Lucide React
+- **Framework:** React + Vite
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + shadcn/ui
+- **State Management:** TanStack Query
+- **Icons:** Lucide React
 
 ## License
 
-MIT License. Free to use and modify for academic and commercial purposes.
+Released under the MIT License. See [LICENSE](LICENSE).
