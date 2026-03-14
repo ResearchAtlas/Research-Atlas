@@ -18,6 +18,14 @@ image/
 .gemini/
 .shared/
 
+# Local planning and scratch artifacts
+*_IMPLEMENTATION_PLAN.txt
+check-png-size.mjs
+nul
+public/og/preview*.html
+public/og/preview*.png
+public/og/temp-*.html
+
 *.log
 .DS_Store
 Thumbs.db
