@@ -25,6 +25,18 @@ const MIRROR_TARGETS = [
 
 const MIRRORED_SKILLS = ['research-verification'];
 
+// Single-file mirrors: canonical source -> bundled copies needed by
+// distribution payloads. The plugin hook at plugin/hooks/ needs the
+// envelope validator at install time, when the repo's scripts/ tree
+// is not present. Keep this list small — anything larger should move
+// to a dedicated mirror step.
+const FILE_MIRRORS = [
+  {
+    src: join(repoRoot, 'scripts', 'validators', 'envelope.mjs'),
+    dst: join(repoRoot, 'plugin', 'hooks', 'envelope.mjs'),
+  },
+];
+
 const args = new Set(process.argv.slice(2));
 const checkOnly = args.has('--check');
 
@@ -95,6 +107,17 @@ function labelFor(target) {
   return relative(repoRoot, target).split('\\').join('/');
 }
 
+async function syncFile({ src, dst }) {
+  const srcBuf = await readFile(src);
+  let dstBuf = null;
+  if (existsSync(dst)) dstBuf = await readFile(dst);
+  const drift = dstBuf === null || hash(srcBuf) !== hash(dstBuf);
+  if (!drift || checkOnly) return drift;
+  await mkdir(dirname(dst), { recursive: true });
+  await writeFile(dst, srcBuf);
+  return drift;
+}
+
 async function main() {
   const results = [];
   for (const target of MIRROR_TARGETS) {
@@ -104,28 +127,42 @@ async function main() {
     }
   }
 
+  const fileResults = [];
+  for (const mirror of FILE_MIRRORS) {
+    const drifted = await syncFile(mirror);
+    fileResults.push({ mirror, drifted });
+  }
+
   if (checkOnly) {
-    const stale = results.filter((r) => r.drift.length > 0);
-    if (stale.length === 0) {
+    const staleSkills = results.filter((r) => r.drift.length > 0);
+    const staleFiles = fileResults.filter((r) => r.drifted);
+    if (staleSkills.length === 0 && staleFiles.length === 0) {
       console.log('mirror-skills: in sync');
       return;
     }
     console.error('mirror-skills: mirror is out of date. Run `npm run mirror:skills`.');
-    for (const { target, skill, drift } of stale) {
+    for (const { target, skill, drift } of staleSkills) {
       console.error(`  ${labelFor(target)}/${skill}:`);
       for (const line of drift) console.error(`    ${line}`);
+    }
+    for (const { mirror } of staleFiles) {
+      console.error(`  ${labelFor(mirror.dst)} drifts from ${labelFor(mirror.src)}`);
     }
     process.exit(1);
   }
 
   const changed = results.filter((r) => r.drift.length > 0);
-  if (changed.length === 0) {
+  const fileChanged = fileResults.filter((r) => r.drifted);
+  if (changed.length === 0 && fileChanged.length === 0) {
     console.log('mirror-skills: already in sync, no changes written');
     return;
   }
   for (const { target, skill, drift } of changed) {
     console.log(`mirror-skills: synced ${labelFor(target)}/${skill} (${drift.length} change${drift.length === 1 ? '' : 's'})`);
     for (const line of drift) console.log(`  ${line}`);
+  }
+  for (const { mirror } of fileChanged) {
+    console.log(`mirror-skills: synced ${labelFor(mirror.dst)} from ${labelFor(mirror.src)}`);
   }
 }
 

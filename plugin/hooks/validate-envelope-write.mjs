@@ -19,31 +19,12 @@
 //   - exit 0: all good (or not an envelope write)
 //   - exit 2: envelope invalid — Claude re-reads stderr as feedback
 
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const scriptDir = dirname(fileURLToPath(import.meta.url));
-
-async function loadValidator() {
-  // The validator lives in the repo at scripts/validators/envelope.mjs.
-  // When the hook runs from an installed plugin, $CLAUDE_PROJECT_DIR
-  // points at the repo root; when it runs in-place during dev, we
-  // resolve relative to the hook file.
-  const projectDir = process.env.CLAUDE_PROJECT_DIR;
-  const candidates = [
-    projectDir ? resolve(projectDir, 'scripts/validators/envelope.mjs') : null,
-    resolve(scriptDir, '../../scripts/validators/envelope.mjs'),
-  ].filter(Boolean);
-
-  for (const p of candidates) {
-    try {
-      return (await import(`file://${p.replace(/\\/g, '/')}`)).validateEnvelope;
-    } catch {
-      // keep trying
-    }
-  }
-  throw new Error(`could not locate scripts/validators/envelope.mjs (tried: ${candidates.join(', ')})`);
-}
+// The validator is bundled alongside this hook as ./envelope.mjs via
+// scripts/mirror-skills.mjs. Importing from a sibling file means the
+// hook works identically in a monorepo checkout and an installed
+// plugin, without relying on CLAUDE_PROJECT_DIR or a relative
+// scripts/ layout that only exists in this repo.
+import { validateEnvelope } from './envelope.mjs';
 
 async function readStdin() {
   let data = '';
@@ -86,7 +67,6 @@ async function main() {
     process.exit(2);
   }
 
-  const validateEnvelope = await loadValidator();
   const { ok, errors } = validateEnvelope(parsed);
   if (ok) process.exit(0);
 
