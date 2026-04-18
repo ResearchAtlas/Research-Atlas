@@ -89,16 +89,26 @@ setup.
 
 Goal: one working hook proves the pattern. Not required to ship.
 
-- [ ] Add `plugin/hooks/validate-resolver-response.mjs` — PostToolUse
-      hook that runs envelope validator on resolver tool outputs.
-- [ ] Add hook config in `plugin/.claude-plugin/plugin.json`, default
-      OFF. User opts in via Claude Code settings.
-- [ ] Document opt-in procedure in `AGENTS.md` §Hooks.
-- [ ] Add one acceptance corpus entry that exercises the hook. Save
-      as `docs/references/acceptance-runs/hook-validation.md`.
-- [ ] Do NOT mirror to Codex `[features] codex_hooks` path for Phase
-      1 — Codex hooks are experimental and Windows-disabled. Leave
-      a note in `AGENTS.md` explaining.
+- [x] Add PostToolUse hook at
+      `plugin/hooks/validate-envelope-write.mjs` (renamed from
+      `validate-resolver-response.mjs` — the hook matches `Write`
+      tool calls targeting `*.envelope.json`, which is the
+      actionable surface; "resolver response" was a misnomer for
+      what we can actually hook). (landed 2026-04-18)
+- [x] Default-OFF posture: ship no `hooks/hooks.json` in the plugin
+      (Claude Code plugin hooks live there, not in `plugin.json`;
+      presence == auto-register, absence == default-OFF). Users opt
+      in by adding the documented snippet to their
+      `.claude/settings.json`. (landed 2026-04-18)
+- [x] Document opt-in procedure in `AGENTS.md` §Hooks. (landed 2026-04-18)
+- [x] Add acceptance corpus entry at
+      `docs/references/acceptance-runs/hook-validation.md` with one
+      live-session prompt + four scripted stdin smoke tests covering
+      all branches. (landed 2026-04-18)
+- [x] Codex `[features] codex_hooks` is documented as opt-in in
+      AGENTS.md but the plugin does not ship a codex hook — the same
+      Node script is harness-portable if Codex users want to wire
+      their own. (landed 2026-04-18)
 
 ## T5 — Prompt caching discipline doc
 
