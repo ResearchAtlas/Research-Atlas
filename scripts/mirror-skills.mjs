@@ -61,6 +61,14 @@ function hash(buf) {
   return createHash('sha256').update(buf).digest('hex');
 }
 
+// Content hash for drift detection: collapse CRLF to LF so a working-
+// tree copy that Git autocrlf'd on checkout still compares equal to
+// its canonical source. We still write raw source bytes on sync.
+function contentHash(buf) {
+  const normalized = Buffer.from(buf.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
+  return hash(normalized);
+}
+
 async function snapshot(root, skill) {
   const base = join(root, skill);
   const files = await walk(base);
@@ -68,7 +76,7 @@ async function snapshot(root, skill) {
   for (const file of files) {
     const rel = relative(base, file).split('\\').join('/');
     const buf = await readFile(file);
-    map.set(rel, { buf, digest: hash(buf) });
+    map.set(rel, { buf, digest: contentHash(buf) });
   }
   return map;
 }
@@ -111,7 +119,7 @@ async function syncFile({ src, dst }) {
   const srcBuf = await readFile(src);
   let dstBuf = null;
   if (existsSync(dst)) dstBuf = await readFile(dst);
-  const drift = dstBuf === null || hash(srcBuf) !== hash(dstBuf);
+  const drift = dstBuf === null || contentHash(srcBuf) !== contentHash(dstBuf);
   if (!drift || checkOnly) return drift;
   await mkdir(dirname(dst), { recursive: true });
   await writeFile(dst, srcBuf);
