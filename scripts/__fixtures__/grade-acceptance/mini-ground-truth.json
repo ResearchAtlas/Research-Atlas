@@ -6,7 +6,7 @@
   "pass_conditions": [
     {
       "id": "recall",
-      "spec": "flag the 1 fabricated item",
+      "spec": "correctly classify the 1 trap item (expected_verdict match required when set)",
       "threshold": 1
     },
     {

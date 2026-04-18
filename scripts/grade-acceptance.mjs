@@ -147,21 +147,54 @@ function indexVerdicts(envelope) {
 }
 
 function checkRecall(groundTruth, byRef) {
+  // Trap items: ground_truth declares either an exact expected_verdict
+  // or a class that maps to FLAG_VERDICTS.
   const flagItems = groundTruth.items.filter((i) => {
     const expected = i.ground_truth?.expected_verdict;
     const cls = i.ground_truth?.class;
     return FLAG_VERDICTS.has(expected) || FLAG_VERDICTS.has(cls);
   });
-  const hit = flagItems.filter((i) => {
-    const v = byRef.get(String(i.id));
-    return v && FLAG_VERDICTS.has(v.verdict);
-  });
+
+  // A hit requires:
+  //   - if expected_verdict is set, the actual verdict must match it
+  //     exactly (fabricated_doi ≠ metadata_mismatch_year even though
+  //     both are in FLAG_VERDICTS)
+  //   - otherwise, any FLAG_VERDICTS member counts
+  // Anything that fails either test is a miss, with a specific reason
+  // so the failure message is actionable.
+  const hits = [];
+  const misses = [];
+  for (const item of flagItems) {
+    const v = byRef.get(String(item.id));
+    const expected = item.ground_truth?.expected_verdict;
+    if (!v) {
+      misses.push({ id: item.id, reason: 'no verdict returned' });
+      continue;
+    }
+    if (typeof expected === 'string') {
+      if (v.verdict === expected) {
+        hits.push(item);
+      } else {
+        misses.push({ id: item.id, reason: `got ${v.verdict}, expected ${expected}` });
+      }
+      continue;
+    }
+    if (FLAG_VERDICTS.has(v.verdict)) {
+      hits.push(item);
+    } else {
+      misses.push({ id: item.id, reason: `got ${v.verdict}, expected any of ${[...FLAG_VERDICTS].join('|')}` });
+    }
+  }
+
   const threshold = findThreshold(groundTruth, 'recall') ?? Math.max(1, flagItems.length - 1);
+  const missSummary = misses.length
+    ? ` [misses: ${misses.map((m) => `${m.id}(${m.reason})`).join('; ')}]`
+    : '';
   return {
     name: 'recall',
-    pass: hit.length >= threshold,
-    actual: `${hit.length}/${flagItems.length} flagged correctly`,
-    expected: `>= ${threshold}/${flagItems.length}`,
+    pass: hits.length >= threshold,
+    actual: `${hits.length}/${flagItems.length} correctly classified${missSummary}`,
+    expected: `>= ${threshold}/${flagItems.length} with expected_verdict match when specified`,
   };
 }
 

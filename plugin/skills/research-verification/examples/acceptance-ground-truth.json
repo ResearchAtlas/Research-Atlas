@@ -6,7 +6,7 @@
   "pass_conditions": [
     {
       "id": "recall",
-      "spec": "flags >= 4/5 fabricated or metadata-mismatch items (26-30)",
+      "spec": "correctly classifies >= 4/5 trap items (26-30); when ground_truth.expected_verdict is set the actual verdict must match it exactly (fabricated_doi != metadata_mismatch_year)",
       "threshold": 4
     },
     {

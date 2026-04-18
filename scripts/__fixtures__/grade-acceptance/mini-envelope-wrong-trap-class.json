@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.1.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000012",
+    "timestamp": "2026-04-18T12:10:00Z",
+    "input_count": 2
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "citations_checked": 2,
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" }
+        }
+      },
+      {
+        "reference_id": "smith-2024-fabricated",
+        "verdict": "metadata_mismatch_year",
+        "confidence": 0.5,
+        "evidence": {
+          "parsed": { "doi": "10.1038/nonexistent-2024-99999" },
+          "resolved": null,
+          "notes": "resolver couldn't find DOI, guessing year mismatch (wrong classification — it's a fabricated DOI, not a metadata mismatch)"
+        }
+      }
+    ]
+  }
+}
