@@ -64,7 +64,10 @@ silently shipping stale mirrors.
   against schema_version 2 (+ `verdicts_complete` invariant). Part
   of `prebuild`; tolerant when no envelopes are committed yet.
 - `npm run grade:acceptance:fixtures` — smoke-test the acceptance
-  grader on the mini fixtures. For a real run, invoke
+  grader across all mini fixtures (passing, wrong-trap-class,
+  precision-fail) and assert each exits with the expected code. The
+  wrong-trap-class case guards the P1-A regression (exact
+  `expected_verdict` match). For a real run, invoke
   `node scripts/grade-acceptance.mjs <envelope.json>
   <ground-truth.json> --elapsed-minutes=N` (or `--parity` with 3+
   envelopes). See
