@@ -21,10 +21,13 @@ still prove the hook's four branches.
   from [`../../../AGENTS.md`](../../../AGENTS.md) §Hooks. Without the
   snippet the hook is inert — installing the plugin does not register
   it.
-- The shared validator lives at
+- The canonical validator lives at
   [`../../../scripts/validators/envelope.mjs`](../../../scripts/validators/envelope.mjs).
-  The hook resolves it via `$CLAUDE_PROJECT_DIR` first, then falls
-  back to a sibling path for dev checkouts.
+  It is mirrored into
+  [`../../../plugin/hooks/envelope.mjs`](../../../plugin/hooks/envelope.mjs)
+  by `scripts/mirror-skills.mjs`; the hook imports the bundled sibling
+  so it works identically from a monorepo checkout and an installed
+  plugin (no `$CLAUDE_PROJECT_DIR` dependency).
 
 ## Live-session prompt
 
@@ -84,33 +87,28 @@ the template in [`README.md`](README.md).
 
 ## Scripted smoke test (no live session)
 
-Each line is a self-contained payload piped to the hook from the repo
-root. Expected exit codes noted; run all four in sequence to confirm
-each branch.
+The four branches are encoded as a runnable harness:
+[`../../../scripts/test-hook-smoke.mjs`](../../../scripts/test-hook-smoke.mjs).
+Run from the repo root:
 
 ```sh
-# 1. Non-envelope write — should exit 0 silently
-echo '{"tool_name":"Write","tool_input":{"file_path":"/tmp/readme.md","content":"hi"}}' \
-  | node plugin/hooks/validate-envelope-write.mjs
-# expect: exit 0, no stderr
-
-# 2. Non-Write tool — should exit 0 silently
-echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' \
-  | node plugin/hooks/validate-envelope-write.mjs
-# expect: exit 0, no stderr
-
-# 3. Valid envelope write — should exit 0 silently
-printf '%s' "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"/tmp/demo.envelope.json\",\"content\":$(cat scripts/validators/__fixtures__/valid-reference-level.json | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>process.stdout.write(JSON.stringify(d)))')}}" \
-  | node plugin/hooks/validate-envelope-write.mjs
-# expect: exit 0, no stderr
-
-# 4. Invalid envelope write (verdicts_complete violation) — should exit 2
-printf '%s' "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"/tmp/demo.envelope.json\",\"content\":$(cat scripts/validators/__fixtures__/invalid-verdicts-incomplete.json | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>process.stdout.write(JSON.stringify(d)))')}}" \
-  | node plugin/hooks/validate-envelope-write.mjs
-# expect: exit 2, stderr with verdicts_complete error
+npm run test:hook:smoke
 ```
 
-All four branches behave as specified: **pass**.
+Expected output:
+
+```
+ok  — non-envelope write
+ok  — non-Write tool
+ok  — valid envelope write
+ok  — invalid envelope write (verdicts_complete)
+
+All 4 smoke branches passed.
+```
+
+The harness asserts both exit codes (0 / 0 / 0 / 2) and the stderr
+shape (`verdicts_complete` substring on the failing branch). A diverging
+branch exits 1 with a per-case diagnostic.
 
 ## Why this is only a PoC
 
@@ -121,11 +119,6 @@ All four branches behave as specified: **pass**.
   `data.citations_checked`) in the error message.
 - No Codex or Gemini parity. Codex hooks are experimental and
   Windows-disabled as of 2026-04; porting is deferred to Phase 2+.
-- The hook requires the validator file on disk. A sandboxed or
-  network-isolated install would need the validator bundled into
-  `${CLAUDE_PLUGIN_ROOT}/hooks/` instead of pulled from
-  `scripts/validators/`. That's a packaging follow-up, not a
-  correctness issue.
 
 ## Related
 
