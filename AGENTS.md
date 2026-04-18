@@ -63,6 +63,12 @@ silently shipping stale mirrors.
   `*.envelope.json` under `docs/references/acceptance-runs/`
   against schema_version 2 (+ `verdicts_complete` invariant). Part
   of `prebuild`; tolerant when no envelopes are committed yet.
+- `npm run grade:acceptance:fixtures` — smoke-test the acceptance
+  grader on the mini fixtures. For a real run, invoke
+  `node scripts/grade-acceptance.mjs <envelope.json>
+  <ground-truth.json> --elapsed-minutes=N` (or `--parity` with 3+
+  envelopes). See
+  [`docs/references/eval-harness/README.md`](docs/references/eval-harness/README.md).
 
 ## Prompt caching
 

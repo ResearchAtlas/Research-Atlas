@@ -80,10 +80,13 @@ setup.
 - [x] Define grader signatures: inputs (envelope + ground truth),
       outputs (pass conditions as booleans + failure explanations).
       (landed 2026-04-18, documented in eval-harness README)
-- [ ] Write `scripts/grade-acceptance.mjs` that takes a transcript
-      + ground-truth file, emits a pass/fail per condition. Use it
-      as a sanity check on the three Phase 0 transcripts after the
-      fact.
+- [x] Write `scripts/grade-acceptance.mjs` that takes an envelope
+      + ground-truth file, emits a pass/fail per condition.
+      Single-envelope mode covers 5 conditions; `--parity` mode
+      covers cross-agent parity. Fixture smoke tested via
+      `npm run grade:acceptance:fixtures`.
+      (landed 2026-04-18; sanity check on the three Phase 0
+      transcripts is deferred until those exist.)
 
 ## T4 — Opt-in PostToolUse validator hook (PoC)
 

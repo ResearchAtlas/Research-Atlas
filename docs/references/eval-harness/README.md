@@ -34,9 +34,11 @@ As of 2026-04-18 the flagship ships these bundle artifacts:
 
 Still missing (Phase 1 T3 remainder): the three live-run per-agent
 transcripts + saved `*.envelope.json` files in
-[`../acceptance-runs/`](../acceptance-runs/), and the
-`scripts/grade-acceptance.mjs` grader that consumes them. Those land
-alongside the release gate.
+[`../acceptance-runs/`](../acceptance-runs/). The grader
+([`../../../scripts/grade-acceptance.mjs`](../../../scripts/grade-acceptance.mjs))
+is wired and fixture-smoke-tested via
+`npm run grade:acceptance:fixtures`, but has not yet run against a
+real envelope. That happens alongside the release gate.
 
 Plus, per-agent transcripts land in
 [`../acceptance-runs/`](../acceptance-runs/):
@@ -84,10 +86,13 @@ Any skill claiming Tier 1 ships all five:
    before the skill can be promoted. Transcripts preserve the raw
    envelope, elapsed time, and any operator notes.
 
-5. **Grader.** A `node scripts/grade-acceptance.mjs` invocation that
-   ingests (envelope, ground-truth) and emits a pass/fail per
-   condition. Used as a sanity check on saved transcripts and as a
-   regression canary in CI once the skill is stable.
+5. **Grader.** The shared
+   [`scripts/grade-acceptance.mjs`](../../../scripts/grade-acceptance.mjs)
+   invocation that ingests (envelope, ground-truth) and emits a
+   pass/fail per condition. Single-envelope mode covers five
+   conditions; `--parity` mode takes 3+ envelopes and scores
+   cross-agent parity. Used as a sanity check on saved transcripts
+   and as a regression canary in CI once the skill is stable.
 
 ## Corpus authoring rules
 
@@ -107,20 +112,28 @@ Any skill claiming Tier 1 ships all five:
 
 ## Grader signatures
 
-Every grader implements:
+The shared grader exports two functions:
 
 ```
-grade(envelope, groundTruth) -> {
+grade(envelope, groundTruth, opts?) -> {
   conditions: [
-    { name: string, pass: boolean, actual: string, expected: string }
+    { name: string, pass: boolean | null, actual: string, expected: string }
   ],
   passed_all: boolean
 }
+
+gradeParity(envelopes, groundTruth) -> {
+  conditions: [...same shape...],
+  passed_all: boolean,
+  misses: [{ id, verdicts }]   // items where agents disagreed
+}
 ```
 
-Each condition is a boolean check. The grader does not tie-break or
-interpret — it reports. Interpretation lives in the acceptance-runs
-review step.
+Each condition is a boolean check. A `pass: null` value means the
+condition could not be evaluated (e.g. latency without
+`--elapsed-minutes=N`) and is treated as not-passing. The grader does
+not tie-break or interpret — it reports. Interpretation lives in the
+acceptance-runs review step.
 
 ## Cross-agent parity check
 
@@ -163,5 +176,7 @@ for the promotion criteria.
   [`../acceptance-runs/RUN-COMMANDS.md`](../acceptance-runs/RUN-COMMANDS.md)
 - Envelope validator:
   [`../../../scripts/validators/envelope.mjs`](../../../scripts/validators/envelope.mjs)
+- Acceptance grader:
+  [`../../../scripts/grade-acceptance.mjs`](../../../scripts/grade-acceptance.mjs)
 - Phase 1 T3 (this doc's source):
   [`../../tasks/phase-1-harden.md`](../../tasks/phase-1-harden.md)
