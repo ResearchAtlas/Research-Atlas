@@ -1,0 +1,67 @@
+{
+  "corpus": "research-verification acceptance corpus v1",
+  "corpus_version": "1",
+  "locked": "2026-04-17",
+  "total_items": 30,
+  "pass_conditions": [
+    {
+      "id": "recall",
+      "spec": "flags >= 4/5 fabricated or metadata-mismatch items (26-30)",
+      "threshold": 4
+    },
+    {
+      "id": "precision",
+      "spec": "flags <= 1/25 real items (1-25) as fabricated_doi or fabricated",
+      "threshold": 1
+    },
+    {
+      "id": "evidence_present",
+      "spec": "every flagged item has at least one resolver check in its evidence block"
+    },
+    {
+      "id": "envelope_conforms",
+      "spec": "schema_version == 2, verdicts_complete (len == 30)"
+    },
+    {
+      "id": "latency",
+      "spec": "wall-clock <= 5 minutes at verification_depth=detailed",
+      "threshold_minutes": 5
+    },
+    {
+      "id": "cross_agent_parity",
+      "spec": "verdict class (coarse) matches across Claude / Codex / Gemini on >= 28/30 items"
+    }
+  ],
+  "items": [
+    { "id": "1",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "2",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "3",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "4",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "5",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "6",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "7",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "8",  "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "9",  "ground_truth": { "class": "real_old_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "Watson-Crick 1953 — older DOI schema; some resolvers index inconsistently" } },
+    { "id": "10", "ground_truth": { "class": "real_old_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "Shannon 1948" } },
+    { "id": "11", "ground_truth": { "class": "real_old_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "Turing 1950" } },
+    { "id": "12", "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "13", "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "14", "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "15", "ground_truth": { "class": "real", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "16", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "GAN paper — NeurIPS 2014, no DOI; exercises no-DOI path" } },
+    { "id": "17", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "GPT-3 paper — arXiv preprint only" } },
+    { "id": "18", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "VAE paper — ICLR 2014" } },
+    { "id": "19", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "20", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "21", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "22", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "23", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "24", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "25", "ground_truth": { "class": "real_no_doi", "acceptable_verdicts": ["verified", "partially_supported", "unverifiable"], "must_not_be": ["fabricated", "fabricated_doi"] } },
+    { "id": "26", "ground_truth": { "class": "fabricated_doi", "expected_verdict": "fabricated_doi", "must_include_evidence": ["resolved == null", "DOI 404 from CrossRef + OpenAlex"], "notes": "Smith & Zhang 2024 — fabricated DOI with real-looking Nature MI prefix" } },
+    { "id": "27", "ground_truth": { "class": "fabricated_doi", "expected_verdict": "fabricated_doi", "must_include_evidence": ["resolved == null", "DOI 404 from CrossRef + OpenAlex"], "notes": "Doe 2023 — fabricated DOI on Physical Review Letters" } },
+    { "id": "28", "ground_truth": { "class": "fabricated_doi", "expected_verdict": "fabricated_doi", "must_include_evidence": ["resolved == null", "DOI 404 from CrossRef + OpenAlex"], "notes": "Patel et al. 2024 — fabricated DOI on Cell" } },
+    { "id": "29", "ground_truth": { "class": "metadata_mismatch_author", "expected_verdict": "metadata_mismatch_author", "must_include_evidence": ["cross_check.author.pass == false"], "notes": "Author listed as \"Smith, J.\" on Vaswani 2017 DOI — real DOI, wrong author" } },
+    { "id": "30", "ground_truth": { "class": "metadata_mismatch_year", "expected_verdict": "metadata_mismatch_year", "must_include_evidence": ["cross_check.year.pass == false"], "notes": "Year listed as 2020 on LeCun 2015 DOI — real DOI, wrong year" } }
+  ]
+}
