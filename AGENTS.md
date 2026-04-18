@@ -81,6 +81,51 @@ for where to place cache breakpoints so SKILL.md bodies and loaded
 breakpoint directly after the skill body; per-query references go
 after it; corpus inputs always in `messages`, never `system`.
 
+## Hooks
+
+The plugin ships one **opt-in** PostToolUse hook script at
+[`plugin/hooks/validate-envelope-write.mjs`](plugin/hooks/validate-envelope-write.mjs).
+It fires after any `Write` tool call whose path ends in
+`.envelope.json`, runs the shared envelope validator, and (on
+failure) exits with code 2 so Claude Code feeds the validator errors
+back to the model as a blocking message.
+
+The hook is **not** auto-registered. The plugin manifest ships no
+`hooks/hooks.json`, so installing the plugin does not silently add a
+PostToolUse handler. To enable it, add this block to your
+`.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/validate-envelope-write.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+For a local dev checkout (not installed as a plugin), swap
+`${CLAUDE_PLUGIN_ROOT}` for `${CLAUDE_PROJECT_DIR}/plugin`.
+
+Not mirrored to Codex: Codex hooks (`[features] codex_hooks`) are
+experimental and disabled on Windows as of 2026-04. The canonical
+Node script is hostable by any harness that can pipe a PostToolUse
+payload to stdin — Gemini CLI included — so porting is an opt-in
+exercise per-harness, not a mirror step.
+
+See
+[`docs/references/acceptance-runs/hook-validation.md`](docs/references/acceptance-runs/hook-validation.md)
+for the one-item corpus that exercises the hook end-to-end.
+
 ## Testing
 
 - Website: verify visually (`npm run dev`) — no automated UI tests yet.
