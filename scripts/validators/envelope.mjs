@@ -13,6 +13,7 @@
 //   - envelope shape + required fields (meta, status, data, errors array)
 //   - types + format on well-known fields (UUID v4 run_id, ISO-8601
 //     timestamp, SemVer version, status enum)
+//   - errors: always required at the envelope root (use [] when none)
 //   - data.content: required when status is success|partial AND
 //     data.verdicts is present (prevents "I emitted JSON but no report")
 //   - the `verdicts_complete` invariant whenever `data.verdicts` is present:
@@ -23,13 +24,15 @@
 //     and must contain `verdicts_complete` as one of its keys; all values
 //     must be "pass" or "fail"
 //   - evidence structural presence: each verdict's evidence block must
-//     contain `parsed` (required), `resolved`, `cross_check`, `candidates`
-//     as structurally present keys (nullable scalar/object, or array).
-//     `notes` and `abstract_snippet` are optional — they're truly
-//     informational, not signals consumers key on.
+//     contain `parsed` (required, object). Skills in SKILL_RULES additionally
+//     require every listed evidence key to be structurally present with a
+//     matching shape (nullable object, array, or nullable string).
 //   - verdict_summary: when present, must be a flat object of
 //     { string -> non-negative integer }. When meta.skill is in the
-//     SKILL_RULES table, keys must be from that skill's closed set.
+//     SKILL_RULES table, keys must be from that skill's closed set AND
+//     counts must match a rollup of data.verdicts under the skill's
+//     verdict_rollup map (catches drift between summary totals and the
+//     actual verdict list; also flags unknown verdict classes).
 //
 // It does NOT enforce the verdict enum, task whitelist, or evidence
 // contents beyond structural presence — deeper semantic contracts belong
@@ -79,13 +82,47 @@ const SKILL_RULES = {
       'fabricated',
       'unverifiable',
     ]),
+    // Closed set of allowed verdict classes. Anything outside this set is
+    // a typo or a hallucinated category — flag it.
+    verdict_enum: new Set([
+      'verified',
+      'partially_supported',
+      'unsupported',
+      'contradicted',
+      'fabricated',
+      'fabricated_doi',
+      'metadata_mismatch_title',
+      'metadata_mismatch_author',
+      'metadata_mismatch_year',
+      'unverifiable',
+    ]),
+    // Rollup from fine-grained verdicts to verdict_summary buckets. The
+    // validator recomputes expected bucket totals from data.verdicts and
+    // asserts they equal data.verdict_summary[bucket].
+    verdict_rollup: {
+      verified: new Set(['verified']),
+      partially_supported: new Set(['partially_supported']),
+      unsupported: new Set(['unsupported']),
+      contradicted: new Set(['contradicted']),
+      fabricated: new Set([
+        'fabricated',
+        'fabricated_doi',
+        'metadata_mismatch_title',
+        'metadata_mismatch_author',
+        'metadata_mismatch_year',
+      ]),
+      unverifiable: new Set(['unverifiable']),
+    },
     // Keys that must be structurally present on every verdict's evidence
     // block. Scalar/object entries may be null; array entries must be an
-    // array (possibly empty). Shapes (when non-null) are checked below.
+    // array (possibly empty); string entries may be null. Shapes (when
+    // non-null) are checked below.
     evidence_required_keys: {
       resolved: { shape: 'object-or-null' },
       cross_check: { shape: 'object-or-null' },
       candidates: { shape: 'array' },
+      abstract_snippet: { shape: 'string-or-null' },
+      notes: { shape: 'string-or-null' },
     },
   },
 };
@@ -200,6 +237,43 @@ function validateData(obj, push) {
 
   const skillRules = SKILL_RULES[meta?.skill];
   data.verdicts.forEach((v, i) => validateVerdict(v, i, skillRules, push));
+  validateVerdictSummaryCounts(meta, data, push);
+}
+
+function validateVerdictSummaryCounts(meta, data, push) {
+  const rules = SKILL_RULES[meta?.skill];
+  if (!rules?.verdict_rollup) return;
+  const summary = data.verdict_summary;
+  if (!summary || typeof summary !== 'object' || Array.isArray(summary)) return;
+  if (!Array.isArray(data.verdicts)) return;
+
+  // Start all canonical buckets at zero so the comparison loop below sees
+  // the full key set, even if summary omits some keys (already flagged by
+  // validateVerdictSummary, but we still want matching-count diagnostics).
+  const expected = {};
+  for (const key of rules.verdict_summary_keys) expected[key] = 0;
+
+  data.verdicts.forEach((v) => {
+    if (typeof v?.verdict !== 'string') return;
+    for (const [bucket, members] of Object.entries(rules.verdict_rollup)) {
+      if (members.has(v.verdict)) {
+        expected[bucket] += 1;
+        return;
+      }
+    }
+    // Unknown verdict — flagged separately by validateVerdict's enum check.
+  });
+
+  for (const key of rules.verdict_summary_keys) {
+    const actual = summary[key];
+    if (!Number.isInteger(actual)) continue; // already flagged upstream
+    if (actual !== expected[key]) {
+      push(
+        `data.verdict_summary.${key}`,
+        `count ${actual} does not match rollup from data.verdicts (expected ${expected[key]})`,
+      );
+    }
+  }
 }
 
 function validateVerdictSummary(meta, summary, push) {
@@ -248,7 +322,12 @@ function validateVerdict(v, i, skillRules, push) {
     push(at('reference_id'), 'must be a non-empty string');
   }
   if (typeof v.verdict !== 'string' || v.verdict.length === 0) {
-    push(at('verdict'), 'must be a non-empty string (skill-specific enum enforced elsewhere)');
+    push(at('verdict'), 'must be a non-empty string');
+  } else if (skillRules?.verdict_enum && !skillRules.verdict_enum.has(v.verdict)) {
+    push(
+      at('verdict'),
+      `unknown verdict class "${v.verdict}"; allowed: ${[...skillRules.verdict_enum].join(', ')}`,
+    );
   }
   if (typeof v.confidence !== 'number' || v.confidence < 0 || v.confidence > 1) {
     push(at('confidence'), 'must be a number in [0, 1]');
@@ -267,25 +346,32 @@ function validateVerdict(v, i, skillRules, push) {
   if (!skillRules?.evidence_required_keys) return;
   for (const [key, spec] of Object.entries(skillRules.evidence_required_keys)) {
     if (!(key in v.evidence)) {
-      const hint = spec.shape === 'array'
-        ? 'use [] when not populated'
-        : 'use null when not populated';
+      const hint = spec.shape === 'array' ? 'use [] when not populated' : 'use null when not populated';
       push(at(`evidence.${key}`), `key is structurally required (${hint})`);
       continue;
     }
     const value = v.evidence[key];
-    if (spec.shape === 'array' && !Array.isArray(value)) {
-      push(at(`evidence.${key}`), 'must be an array (possibly empty)');
-    } else if (spec.shape === 'object-or-null' && value !== null && (typeof value !== 'object' || Array.isArray(value))) {
-      push(at(`evidence.${key}`), 'must be an object or null');
+    if (spec.shape === 'array') {
+      if (!Array.isArray(value)) push(at(`evidence.${key}`), 'must be an array (possibly empty)');
+    } else if (spec.shape === 'object-or-null') {
+      if (value !== null && (typeof value !== 'object' || Array.isArray(value))) {
+        push(at(`evidence.${key}`), 'must be an object or null');
+      }
+    } else if (spec.shape === 'string-or-null') {
+      if (value !== null && typeof value !== 'string') {
+        push(at(`evidence.${key}`), 'must be a string or null');
+      }
     }
   }
 }
 
 function validateErrors(errs, push) {
-  if (errs === undefined) return;
+  if (errs === undefined) {
+    push('errors', 'required at envelope root (use [] when there are no errors)');
+    return;
+  }
   if (!Array.isArray(errs)) {
-    push('errors', 'must be an array when present');
+    push('errors', 'must be an array');
     return;
   }
   errs.forEach((e, i) => {

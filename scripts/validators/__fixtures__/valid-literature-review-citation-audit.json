@@ -36,5 +36,6 @@
       "all_evaluated": "pass",
       "verdicts_complete": "pass"
     }
-  }
+  },
+  "errors": []
 }
