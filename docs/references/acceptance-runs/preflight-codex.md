@@ -77,35 +77,64 @@ tolerance for edge cases per pass condition 6.
 
 ## L2-level findings that need resolution before retry
 
-### Finding A — `/skills` lists `research-verification` twice
+### Finding A — `/skills` listed `research-verification` twice (root cause identified, fix applied)
 
-Screenshot of the Codex `/skills` panel shows **two rows** both
+Screenshot of the Codex `/skills` panel showed **two rows** both
 attributed to `research-verification` with identical description text.
-Almost certainly an artifact of Codex's native discovery walking both
-`.claude/skills/research-verification/` AND
-`.agents/skills/research-verification/` (the mechanical mirror) and
-listing them as independent skills.
 
-Why this matters:
-- It makes discovery non-deterministic from the user's POV (which
-  entry do they pick?).
-- If Codex's skill loader has dedup-by-name behavior, only one is
-  actually executable; the other is a phantom.
-- If both are independently loadable, an edit to `.claude/skills/` that
-  hasn't been mirrored via `npm run mirror:skills` could produce
-  split-brain behavior in a fresh Codex session.
+**Initial (incorrect) hypothesis.** My first read was that Codex was
+walking both `.claude/skills/` and `.agents/skills/` and listing the
+mirrored copy alongside the canonical.
 
-Needs investigation before L2 retry:
-- Does Codex's skill loader treat `.claude/skills/` and
-  `.agents/skills/` as sibling roots and list both?
-- If yes, what's the dedup precedence? Workspace project scope first?
-  Alphabetical? Filesystem order?
-- Does this affect the other 10 shipped skills too (literature-review,
-  manuscript-review, etc.)? Screenshot shows they DON'T appear twice —
-  only `research-verification` — which suggests this is specific to the
-  skills that have been through `scripts/mirror-skills.mjs`. Need to
-  confirm whether the other skills are NOT mirrored or whether Codex
-  deduplicated them and missed this one.
+**Corrected diagnosis (via Codex P1 review, 2026-04-19).** The
+duplicate was `.codex/skills/research-verification/` (stale, at
+`version: 2.0.0`) being surfaced alongside
+`.agents/skills/research-verification/` (mirrored from the canonical
+`.claude/skills/research-verification/`, at `version: 2.1.0`). Codex
+CLI's native discovery walks `.codex/` AND `.agents/` as sibling
+workspace roots, so both entries appeared in `/skills`. This was not
+merely cosmetic: depending on which row Codex's loader ultimately
+picked, an L2 run could have executed **against stale v2.0.0
+instructions** (no resolver pipeline spec, no cross-check requirement,
+older envelope schema), which would have silently invalidated the run
+even if the skill had been triggered.
+
+**Verified file states at diagnosis time:**
+
+| Path | `version:` frontmatter | Role |
+|---|---|---|
+| `.claude/skills/research-verification/SKILL.md` | 2.1.0 | Canonical source (tracked in git) |
+| `.agents/skills/research-verification/SKILL.md` | 2.1.0 | Mechanical mirror (tracked, produced by `scripts/mirror-skills.mjs`) |
+| `.codex/skills/research-verification/SKILL.md` | 2.0.0 | Legacy local scratch (pre-mirror; `.codex/` is blanket-ignored in `.gitignore` line 26) |
+
+**Why only `research-verification` duplicated in the screenshot.**
+`.codex/skills/` contains nine other legacy v2.0.0 research skills
+(`academic-writing`, `data-analysis`, `figure-table-craft`,
+`latex-polish`, `literature-review`, `manuscript-review`,
+`research-discovery`, `research-ideation`,
+`research-reproducibility`). **None** of them exist in
+`.agents/skills/` — the mirror script's `MIRRORED_SKILLS` array is
+scoped to `['research-verification']` for v1. So only
+`research-verification` lives in both trees, and only
+`research-verification` shows a duplicate row.
+
+**Fix applied (local, 2026-04-19).** Removed
+`.codex/skills/research-verification/` so Codex's native walk has a
+single source of truth for this skill. No git impact — the `.codex/`
+tree is gitignored and never tracked. The mirror strategy documented
+in `scripts/mirror-skills.mjs` (canonical `.claude/` → `.agents/` +
+`plugin/`) is unchanged; `.codex/` is not and was never a mirror
+target.
+
+**Follow-up (post-v1, non-blocking for L2).** The other nine legacy
+v2.0.0 skills under `.codex/skills/` are abandoned local scratch that
+predates the v2.1.0 Atlas-envelope rewrite. They do not ship, they
+are not mirrored, and they are not gated by the acceptance corpus.
+Decide in a post-v1 pass whether to delete the whole `.codex/skills/`
+tree or migrate any still-useful content into `.claude/skills/` under
+the current schema. For now they stay untouched because they do not
+produce `/skills` duplicates (nothing else is mirrored into
+`.agents/skills/`), so they do not affect the L2 retry.
 
 ### Finding B — auto-trigger did not fire
 
