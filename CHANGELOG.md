@@ -40,8 +40,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   `.agents/skills/research-verification/`, and the current milestone plan are
   published; the rest of `.claude/`, `.agents/`, `.codex/`, `.gemini/`, and
   `docs/plans/` stays private.
-- **Acceptance-run protocol doc** at `docs/references/acceptance-runs/README.md` —
-  the six pass conditions, per-agent invocation steps, and a transcript template.
+- **Acceptance-run protocol** — the six pass conditions, per-agent invocation
+  steps, and transcript conventions that govern the release gate.
 
 ### Changed
 
@@ -65,8 +65,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 - Track B7 live acceptance run on Claude Code is pending — the corpus and harness
   are locked, the run itself is the release gate.
-- Track C6 cross-agent acceptance runs on Codex and Gemini CLI are pending. Results
-  land in `docs/references/acceptance-runs/{codex,gemini}.md`.
+- Track C6 cross-agent acceptance runs on Codex and Gemini CLI are pending in the
+  local release-workflow materials.
 - Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills` under a
   future GitHub org) has not been created yet; until then, the plugin installs
   from the monorepo at `HaroldZhong/Research-Atlas`, which is registered as a

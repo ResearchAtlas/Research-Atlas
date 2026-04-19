@@ -31,8 +31,7 @@ before editing.
 ├── scripts/mirror-skills.mjs                  # canonical -> mirrors; runs in `prebuild`
 ├── src/                                       # website source (React/TS/Tailwind)
 ├── scripts/prerender.mjs                      # SSR prerender into dist/
-├── docs/plans/                                # milestone plans (mostly private)
-└── docs/references/                           # audit + review memos (mostly private)
+└── docs/                                      # local/private working notes (not published)
 ```
 
 ## The "one source of truth" rule for skills
@@ -59,27 +58,24 @@ silently shipping stale mirrors.
 - `npm run lint` — ESLint
 - `npm run mirror:skills` — rewrite skill mirrors
 - `npm run mirror:skills:check` — assert mirrors are in sync
-- `npm run validate:envelopes` — validate any saved
-  `*.envelope.json` under `docs/references/acceptance-runs/`
-  against schema_version 2 (+ `verdicts_complete` invariant). Part
-  of `prebuild`; tolerant when no envelopes are committed yet.
+- `npm run validate:envelopes` — validate canonical saved
+  `*.envelope.json` artifacts under `scripts/acceptance/envelopes/`
+  against schema_version 2 (+ `verdicts_complete` invariant). Part of
+  `prebuild`; tolerant when no envelopes are present.
 - `npm run grade:acceptance:fixtures` — smoke-test the acceptance
   grader across all mini fixtures (passing, wrong-trap-class,
   precision-fail) and assert each exits with the expected code. The
   wrong-trap-class case guards the P1-A regression (exact
   `expected_verdict` match). For a real run, invoke
   `node scripts/grade-acceptance.mjs <envelope.json>
-  <ground-truth.json> --elapsed-minutes=N` (or `--parity` with 3+
-  envelopes). See
-  [`docs/references/eval-harness/README.md`](docs/references/eval-harness/README.md).
+  scripts/acceptance/ground-truth.json --elapsed-minutes=N` (or
+  `--parity` with 3+ envelopes).
 
 ## Prompt caching
 
-Harness authors: see [docs/references/caching.md](docs/references/caching.md)
-for where to place cache breakpoints so SKILL.md bodies and loaded
-`references/` stay warm across a session. Short version: one
-breakpoint directly after the skill body; per-query references go
-after it; corpus inputs always in `messages`, never `system`.
+Cache breakpoint rule of thumb: place one breakpoint directly after the
+skill body; put per-query references after it; keep corpus inputs in
+`messages`, never `system`.
 
 ## Hooks
 
@@ -122,9 +118,7 @@ Node script is hostable by any harness that can pipe a PostToolUse
 payload to stdin — Gemini CLI included — so porting is an opt-in
 exercise per-harness, not a mirror step.
 
-See
-[`docs/references/acceptance-runs/hook-validation.md`](docs/references/acceptance-runs/hook-validation.md)
-for the one-item corpus that exercises the hook end-to-end.
+Use a one-item envelope write as the local smoke test for this hook.
 
 ## Testing
 
@@ -200,4 +194,6 @@ If you were dropped into this repo to work on a task, the task is likely one of:
    via `.claude-plugin/marketplace.json`, or (b) be copied into a dedicated
    `researchatlas/plugins` marketplace repo when that exists.
 
-When in doubt about scope, check `docs/plans/` for the current milestone plan.
+When in doubt about scope, inspect the tracked skill tree, website
+source, and recent git history. Local planning docs may exist, but they
+are not part of the published repo.

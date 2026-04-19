@@ -7,7 +7,7 @@
     "dev": "vite",
     "mirror:skills": "node scripts/mirror-skills.mjs",
     "mirror:skills:check": "node scripts/mirror-skills.mjs --check",
-    "validate:envelopes": "node scripts/validators/envelope.mjs --glob \"docs/references/acceptance-runs/**/*.envelope.json\" --allow-empty",
+    "validate:envelopes": "node scripts/validators/envelope.mjs --glob \"scripts/acceptance/envelopes/**/*.envelope.json\" --allow-empty",
     "validate:envelopes:fixtures": "node scripts/validators/envelope.mjs --glob \"scripts/validators/__fixtures__/valid-*.json\"",
     "grade:acceptance:fixtures": "node scripts/test-grade-smoke.mjs",
     "test:hook:smoke": "node scripts/test-hook-smoke.mjs",

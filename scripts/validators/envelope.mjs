@@ -46,7 +46,7 @@
 //
 // Usage:
 //   node scripts/validators/envelope.mjs <path-to-envelope.json>
-//   node scripts/validators/envelope.mjs --glob "docs/references/**/*.envelope.json"
+//   node scripts/validators/envelope.mjs --glob "scripts/acceptance/envelopes/**/*.envelope.json"
 //   node scripts/validators/envelope.mjs --glob "..." --allow-empty   # exit 0 when zero files match
 //
 // Exit codes: 0 all valid, 1 any invalid, 2 usage error.

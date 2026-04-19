@@ -2,8 +2,9 @@
 // Runnable smoke harness for plugin/hooks/validate-envelope-write.mjs.
 //
 // Pipes four canonical PostToolUse payloads to the hook and asserts the
-// exit code + stderr shape of each branch. Matches the four scenarios
-// documented in docs/references/acceptance-runs/hook-validation.md.
+// exit code + stderr shape of each branch. Covers the four core hook
+// branches: non-envelope writes, non-Write tools, valid envelopes, and
+// invalid envelopes that should block on validator output.
 //
 // Exit 0: all branches behave as expected. Exit 1: at least one branch
 // diverged (full diagnostic printed).

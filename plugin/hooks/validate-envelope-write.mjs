@@ -12,7 +12,7 @@
 // AGENTS.md §Hooks to your `.claude/settings.json`. It is not
 // auto-registered by the plugin.
 //
-// Wire-up contract (see docs/references/eval-harness/README.md):
+// Wire-up contract:
 //   - PostToolUse matcher: "Write"
 //   - stdin: Claude Code PostToolUse payload (JSON)
 //   - stderr on invalid envelope: one line per validator error
@@ -75,7 +75,7 @@ async function main() {
     process.stderr.write(`  ${err.path || '<root>'}: ${err.msg}\n`);
   }
   process.stderr.write(
-    '\nFix the envelope to satisfy the schema and re-write. See docs/roadmap/architecture.md §3 for the envelope contract.\n',
+    '\nFix the envelope to satisfy the schema and re-write. The contract is the schema_version 2 envelope expected by the bundled validator.\n',
   );
   process.exit(2);
 }

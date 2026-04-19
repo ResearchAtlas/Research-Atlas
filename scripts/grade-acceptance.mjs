@@ -3,8 +3,9 @@
 //
 // Consumes (envelope, ground_truth) and emits one boolean per pass
 // condition defined in the ground-truth file. This is the mechanical
-// sanity check described in docs/references/eval-harness/README.md —
-// interpretation of failures lives in the acceptance-runs review step.
+// sanity check for the public acceptance gate. It turns an envelope +
+// ground-truth pair into explicit PASS / FAIL conditions; interpretation
+// of failures still lives in the operator review step.
 //
 // Single-envelope mode covers recall, precision, evidence_present,
 // envelope_conforms, latency. Latency is only graded when the operator
@@ -122,7 +123,7 @@ export function gradeParity(envelopes, groundTruth) {
     }
   }
 
-  // Thresholds from eval-harness README: >= 90% exact, >= 95% coarse.
+  // Cross-agent parity thresholds: >= 90% exact, >= 95% coarse.
   const total = ids.length;
   const exactThreshold = Math.ceil(total * 0.9);
   const coarseThreshold = Math.ceil(total * 0.95);

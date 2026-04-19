@@ -36,7 +36,7 @@ These hold on every run, without exception:
 
 2. **Never consult grader oracles or prior acceptance transcripts during a run.** Files of these shapes exist in the surrounding harness and leak expected verdicts:
    - `acceptance-ground-truth.json` (under any path) — the grader's answer key.
-   - `docs/references/acceptance-runs/*.md` (or any file containing a committed verdict tally for a corpus you are about to verify) — prior per-agent preflight or public-run transcripts.
+   - Any committed acceptance-run transcript (for example `*.md`) or any file containing a prior verdict tally for a corpus you are about to verify — prior per-agent preflight or public-run transcripts.
    Reading either during a run contaminates the result. The only legitimate reason to read them is post-run, when the operator explicitly asks you to compare your output against prior evidence.
 
 3. **Do not echo verdicts from a prior run.** If you notice a previous verdict for a reference (in a transcript, commit message, or external context), still run the resolver pipeline against the current input and report what the resolvers say today. Prior verdicts can inform spot-checks or tie-breaks but never replace a live resolver pass.
