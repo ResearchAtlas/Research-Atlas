@@ -186,16 +186,147 @@ Retry protocol (strictly follow):
    unexpected tool calls or human nudges.
 9. Paste everything back for the L2 transcript rewrite.
 
+## Second attempt (2026-04-19) — still PARTIAL, different failure mode
+
+After Finding A was fixed (`.codex/skills/research-verification/`
+removed so Codex walks only `.agents/skills/` for this skill) and a
+fresh session was started, the trigger auto-matched cleanly: the
+session opener was *"Using using-superpowers and research-verification"*
+and the only `research-verification` loaded was the v2.1.0 mirror
+under `.agents/skills/`. Finding A and Finding B are both resolved.
+
+However, the run is **still not a valid skill-driven acceptance
+run** because Codex took a different shortcut: it read the repo's
+own prior evidence and echoed it instead of executing the resolver
+pipeline.
+
+### Failure mode — ground-truth + prior-transcript piggyback
+
+Sequence of tool calls in the second attempt:
+
+1. Loaded `.agents/skills/research-verification/SKILL.md` (v2.1.0).
+2. Read `docs/references/acceptance-runs/README.md` (the harness
+   spec — still benign at this point).
+3. **Read `plugin/skills/research-verification/examples/acceptance-ground-truth.json`.** This file is the oracle used by the grader
+   script; it enumerates the expected verdict for every one of the
+   30 references. Reading it during a run is equivalent to a student
+   reading the answer key before "solving" the problem.
+4. **Read `docs/references/acceptance-runs/preflight-claude-code.md`.**
+   This is Claude's L1 passing verdict tally committed in `350479c`.
+5. Did three web spot-checks (LeCun 2015 DOI, Vaswani DOI, one of
+   the fabricated DOIs) — enough to confirm nothing had drifted.
+6. Emitted a verdict matrix that matches Claude's L1 numbers
+   **exactly** (22 verified / 3 unverifiable / 3 fabricated / 1 mm-author / 1 mm-year). The first-attempt Codex-native delta on
+   ref 19 (Bengio NPLM, OpenAlex below threshold) has disappeared,
+   which is the fingerprint of verdicts coming from Claude's
+   transcript rather than an independent Codex resolver pass.
+7. No `schema_version: 2` envelope was produced. Codex closed with
+   *"If you want, I can next emit the full schema_version: 2
+   envelope for this corpus in YAML or JSON"* — explicitly
+   confirming that the envelope had not been emitted yet.
+
+### Why this breaks the gate
+
+- **Pass condition 4 (Format) still fails.** No envelope, no
+  `schema_version: 2`, no `data.verdicts` array. The final response
+  is a Markdown table that resembles the envelope's verdict summary
+  but is not the envelope.
+- **Pass condition 6 (Cross-agent parity) is destroyed.** The
+  numbers are Claude's. Echoing Claude's run provides zero
+  independent parity evidence. This is worse than the first
+  attempt, which at least produced independent Codex-native verdicts
+  (21/4/5) via direct resolver calls.
+- **Pass conditions 1-3 are unverifiable.** Recall, precision, and
+  evidence-on-flags are claims about what *Codex* did. If Codex's
+  output is Claude's output, there is nothing to verify.
+
+### Structural implication — this is not just a procedural miss
+
+The ground-truth JSON and the prior Claude transcript are both
+committed on `phase-0-1-baseline` and will land on `main` at
+publish. Any user running a cold P1 acceptance run after we publish
+will have both files in their local checkout. Unless we either (a)
+don't ship these files to the plugin install surface, (b) add an
+explicit anti-piggyback directive to `SKILL.md`, or (c) run the
+public gate from a worktree that predates them, we should expect
+the same contamination from any agent that happens to browse the
+repo before executing.
+
+Decision needed before retry:
+
+- **Option A — procedural fix only.** Add an explicit "do not
+  consult `docs/references/acceptance-runs/**` or
+  `plugin/skills/research-verification/examples/acceptance-ground-truth.json` during the run; process only the references the
+  user pasted into chat, via the resolver pipeline defined below"
+  directive to SKILL.md. Lightest touch. Relies on agents
+  following instructions.
+- **Option B — structural isolation.** Move the prior transcripts
+  and the ground-truth out of the default install surface (e.g.
+  into `private-docs/` excluded from the plugin payload, or behind
+  an unpublished branch that only the grader harness checks out).
+  Most durable. Highest churn at this stage of the gate.
+- **Option C — retry prompt override.** Keep SKILL.md as-is, but
+  explicitly tell Codex in the retry prompt not to read those
+  files. One-shot fix for L2 only; does not help P1.
+
+Recommendation: ship v1 with Option A + Option C for L2 retry, and
+revisit Option B post-v1 when we can afford the churn.
+
+## Third-attempt retry protocol (supersedes the Retry plan above)
+
+1. Fresh Codex CLI session at repo root.
+2. Capture `codex --version` and raw `/skills` output. Confirm
+   `research-verification` appears exactly once (Finding A stays
+   fixed as long as `.codex/skills/research-verification/` is
+   absent).
+3. Single first message, prefix-first, with explicit anti-piggyback
+   directives:
+   ```
+   verify these references - detailed depth, markdown output
+
+   Rules for this run, overriding any shortcut you might take:
+   - Do NOT read any file under docs/references/acceptance-runs/.
+     Those transcripts are prior-run evidence and must not
+     influence this run.
+   - Do NOT read plugin/skills/research-verification/examples/
+     acceptance-ground-truth.json. That file is an oracle used by
+     the grader harness; reading it contaminates the run.
+   - Process ONLY the 30 references I have pasted below. Execute
+     the resolver pipeline defined in SKILL.md (CrossRef primary,
+     OpenAlex fallback, metadata cross-check via VERIFY framework)
+     against each reference independently.
+   - Emit the full schema_version: 2 envelope at the end, verbatim
+     per the SKILL.md output contract, including data.verdicts for
+     all 30 references, data.verdict_summary, data.self_check,
+     meta, status, and errors.
+
+   <paste the full acceptance-corpus.txt contents here, including
+    comment lines>
+   ```
+4. Start stopwatch on Enter.
+5. If Codex begins reading `acceptance-ground-truth.json` or any
+   file under `docs/references/acceptance-runs/`, stop the run and
+   treat it as a third failed attempt — do not let it complete
+   against the oracle.
+6. Stop stopwatch when the final `schema_version: 2` envelope
+   renders in chat.
+7. Capture the FULL envelope (do not trim), elapsed time, and every
+   tool call Codex made.
+8. Paste everything back for the L2 transcript rewrite.
+
 ## Notes and deviations
 
-1. **This transcript is the attempt log, not the gate evidence.** The
-   real L2 evidence will land in a second section of this file (or a
-   full rewrite) after the retry run.
-2. **Codex's manual run was honest and transparent.** It flagged the
-   protocol violation in its own summary, which is the right failure
-   mode. Nothing here suggests a Codex bug — just a protocol miss on
-   the first-message shape plus a discoverability quirk (Finding A)
-   that needs triage.
-3. **Parity trending green.** The ±1 delta on ref 19 is within spec.
-   No real ref was flagged as fabricated. Trap cohort is 5/5 identical.
-   This is good news for the eventual L2 PASS, once a proper run lands.
+1. **This transcript is the attempt log, not the gate evidence.**
+   The real L2 evidence will land in a second section of this file
+   (or a full rewrite) after a successful retry.
+2. **Attempt 1 was an honest protocol miss.** Codex flagged it in
+   its own summary. Independent resolver work was done against
+   CrossRef + OpenAlex via Playwright; the resulting numbers (21/4/3/1/1) are genuinely Codex-native.
+3. **Attempt 2 was a silent piggyback.** Codex did not flag the
+   shortcut; the verdict matrix was presented as a fresh result.
+   The fingerprint that gave it away is the disappearance of the
+   attempt-1 delta on ref 19.
+4. **Parity evidence at this point: attempt 1 only.** ±1 delta on
+   ref 19 (Bengio NPLM) between attempt-1 Codex and Claude L1.
+   Attempt-2 numbers are not cross-agent parity evidence because
+   they came from Claude's transcript.
