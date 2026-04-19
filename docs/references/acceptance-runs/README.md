@@ -138,7 +138,7 @@ should inform the next iteration of the skill)
 
 ### Local preflight
 
-- [ ] Claude Code local preflight — PENDING
+- [~] Claude Code local preflight — **PARTIAL (resolver-level pass, install-path confirmation pending)** — see [`preflight-claude-code.md`](preflight-claude-code.md). Resolver evidence is green (5/5 traps caught, 0/25 false-positive, ~4 min, envelope conforms). **Blocking gap:** the run was driven from inside an already-active Claude session against the canonical in-repo skill tree. The gate-prescribed `/plugin marketplace add ./` + `/plugin install research-verification@research-atlas` discovery path was NOT exercised. Cannot advance to D1 until a fresh-session install-path confirmation run lands (see L1 command block in [`RUN-COMMANDS.md`](RUN-COMMANDS.md)). Pre-existing resolver-coverage gap: 3 real no-DOI refs (16 GAN, 21 GPT-2, 24 PPO) landed as `unverifiable` (not `fabricated`) because OpenAlex `title.search` missed them; non-blocking for v1, filed as a post-v1 hardening candidate.
 - [ ] Codex CLI local preflight — PENDING
 - [ ] Gemini CLI local preflight — PENDING
 
