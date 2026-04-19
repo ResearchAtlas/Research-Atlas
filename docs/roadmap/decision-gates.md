@@ -27,8 +27,9 @@ ships).
 2. Maintenance cost of two plugins in one repo. Did mirror syncs slow
    down? Did CI get slower?
 3. Any end-user confusion about the install URL
-   (`researchatlas/researcher-prompt-hub` → marketplace identifier
-   `research-atlas`).
+   (the current monorepo slug — `HaroldZhong/Research-Atlas` pre-org
+   transfer, or `researchatlas/<slug>` post-transfer — resolving to
+   marketplace identifier `research-atlas`).
 4. Any pull requests from external contributors. Is the monorepo
    scaring them off?
 

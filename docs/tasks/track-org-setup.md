@@ -1,38 +1,57 @@
 # Task — GitHub Organization Setup
 
-**Track:** parallel (runs any time between Phase 0 and Phase 3).
-**Goal:** stand up the `researchatlas` GitHub organization so Atlas
-can grow into multi-repo territory cleanly.
-**Status:** ACTIVE, 2026-04-17. Blocked on user account-admin action.
+**Track:** post-v1-release-gate. This is the first work item that
+fires after RG1–RG5 in
+[`../plans/2026-04-17-next-milestone-plan.md`](../plans/2026-04-17-next-milestone-plan.md)
+close green.
+**Goal:** stand up the `researchatlas` GitHub organization and
+transfer `HaroldZhong/Research-Atlas` into it, so Atlas can grow into
+multi-repo territory under the product brand.
+**Status:** ACTIVE, 2026-04-18. Blocked on v1 release gate closing.
 
 ## Why this track exists as its own doc
 
-Atlas's shipped install URLs already reference
-`github.com/researchatlas/researcher-prompt-hub`. That means the
-`researchatlas` namespace is already in use as a user or org account.
-This task is about making it a proper **organization** with the
-structure described in
-[`../roadmap/github-organization.md`](../roadmap/github-organization.md) —
-or, if `researchatlas` is already an org, formalizing the settings and
-migration plan.
+Research Atlas currently ships from `github.com/HaroldZhong/Research-Atlas`
+— a **personal GitHub account**, not an org. The target is a dedicated
+`researchatlas` org hosting the monorepo and all future Atlas repos
+(see [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
+for layout and rationale, including the 2026-04-18 decision to defer
+the transfer until v1 has shipped).
 
-This track **does not gate any phase.** The current monorepo is fine
-through Phase 2. Do the setup when convenient.
+**Order of operations:**
+1. v1 (`research-verification`) finishes the release gate on the
+   current slug.
+2. This task runs: create the org, transfer the repo, update shipped
+   surfaces, verify cold install.
+3. Future phase-gate work creates additional repos (`skills`,
+   `evidence-runtime`, `mcp`, `corpora`) directly in the org.
 
-## Step 1 — Verify current state
+This track **does not gate v1.** It is the first post-gate cleanup.
 
-- [ ] Check whether `github.com/researchatlas` is currently a
-      **user account** or an **organization**. Go to the profile
-      page; user accounts have a "Follow" button, orgs have
-      "Subscribe" or "Invite".
-- [ ] If it's a user account, verify that the user owns it (not
-      squatted by someone else). If squatted, escalate to GitHub
-      support for a trademark-backed reclamation or pick an
-      alternative org name (e.g. `research-atlas` with a hyphen). A
-      rename cascades into the landing page install commands,
-      announce copy, and CHANGELOG — expensive, so resolve this
-      before shipping v1.
-- [ ] If it's already an org, skip to Step 2.
+## Step 1 — Verify target namespace availability
+
+- [ ] Check whether `github.com/researchatlas` is claimed today. Visit
+      the URL in an incognito window. Three possible outcomes:
+      - **Available (404 / "not found").** Proceed to Step 2 and
+        create the org under this login.
+      - **Already a user account.** Someone registered the handle.
+        Two sub-cases:
+        - Owned by the user / someone the user trusts: coordinate
+          the handle transfer per GitHub's process, then create the
+          org. Alternatively, the user can rename their personal
+          account off `researchatlas` to free it.
+        - Owned by a squatter: either file a GitHub username-squatting
+          report (trademark-backed if a mark exists), or pick an
+          alternative org login (`research-atlas` with a hyphen, or
+          `atlas-research`). Record the chosen login in the
+          Decisions log in
+          [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
+          and update shipped prose in the same transfer commit.
+      - **Already an org.** Unlikely (we have not created it) but
+        worth ruling out. If found, confirm ownership; if it's
+        squatted, fall back to the alternative-login path above.
+- [ ] Lock in the final org login before running any of the steps
+      below. Every downstream step references that string.
 
 ## Step 2 — Create or reconfigure the organization
 
@@ -77,20 +96,58 @@ If already exists:
 - [ ] Add default issue templates: bug report, feature request,
       acceptance-run failure.
 
-## Step 5 — Transfer or rename the monorepo (only if needed)
+## Step 5 — Transfer the monorepo into the org
 
-If the current repo is under a personal account and needs to move:
+Source: `github.com/HaroldZhong/Research-Atlas` (personal account).
+Destination: `github.com/<final-org-login>/<final-slug>` (final slug
+locked here; candidates are `Research-Atlas`, `research-atlas`, or
+`atlas` — pick and record in the
+[`../roadmap/github-organization.md`](../roadmap/github-organization.md)
+Decisions log before executing).
 
-- [ ] Back up: ensure the full git history is pushed.
-- [ ] Transfer via Settings → Danger Zone → Transfer ownership.
-- [ ] Verify CI (if any), webhooks, and Vercel project still point at
-      the new path. Vercel will auto-detect the transfer, but verify
-      production deploys still run.
-- [ ] Verify the shipped plugin install URL
-      (`researchatlas/researcher-prompt-hub`) resolves. Test cold in
-      a fresh agent session.
-
-If the current repo is already under the org, skip this step.
+- [ ] **Gate check.** Confirm v1 release gate is green: RG1, RG2, RG3
+      transcripts committed under `docs/references/acceptance-runs/`
+      and CHANGELOG `[Unreleased]` has been promoted to a dated tag.
+      Do not transfer before the gate closes.
+- [ ] **Back up.** `git push --all && git push --tags` to
+      `HaroldZhong/Research-Atlas`. Confirm every branch and tag is
+      up on the remote.
+- [ ] **Transfer.** On `HaroldZhong/Research-Atlas` → Settings → Danger
+      Zone → Transfer ownership → target org + optional new name.
+      GitHub creates an automatic redirect at the old slug so existing
+      URLs continue to resolve.
+- [ ] **Update `origin`.** On local clones,
+      `git remote set-url origin git@github.com:<org>/<slug>.git`.
+- [ ] **Vercel.** Confirm the Vercel project auto-detects the move and
+      production deploys still run. If Vercel lost the GitHub link,
+      re-connect it. Trigger a redeploy and confirm the live site still
+      matches.
+- [ ] **Update shipped surfaces to the new slug in one commit.**
+      Everything that hardcodes `HaroldZhong/Research-Atlas`:
+      - `plugin/.claude-plugin/plugin.json` `repository` field.
+      - Landing page install tabs in
+        `src/modules/home/HomePage.tsx`.
+      - `CHANGELOG.md` (the newly promoted dated entry + the Known
+        gaps paragraph).
+      - `docs/announce-draft-2026-04.md` install snippets.
+      - `docs/tasks/release-gate-v1.md` and
+        `docs/references/acceptance-runs/RUN-COMMANDS.md` command
+        blocks.
+      - `AGENTS.md` install examples.
+      The redirect at `HaroldZhong/Research-Atlas` keeps old URLs
+      resolving; we still prefer the canonical new slug everywhere
+      new copy ships.
+- [ ] **Cold-install verification (post-transfer).** In a fresh agent
+      session on a clean machine, run the Claude Code install command
+      with the new slug:
+      `/plugin marketplace add <org>/<slug>` then
+      `/plugin install research-verification@research-atlas`. Confirm
+      the skill lists, loads, and executes the worked example without
+      errors. Repeat for Codex (`gh repo clone <org>/<slug>` path) and
+      Gemini (`gemini skills install <url> --path .agents/skills/research-verification`).
+- [ ] **Announce follow-up.** Post a short note in the original
+      announce thread(s) with the new install URL. Flag that the old
+      URL continues to work via redirect.
 
 ## Step 6 — Teams and CODEOWNERS
 
@@ -117,11 +174,15 @@ On the Research Atlas monorepo (and every future repo):
 
 ## Step 8 — Document it
 
-- [ ] Update [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
-      "Decisions log" (add at bottom of the doc) with the org name
-      finalized and any deviations from the plan.
-- [ ] Note the setup date in this task file so we know when it
-      landed.
+- [ ] Append a dated entry to the
+      [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
+      "Decisions log" recording: final org login, final post-transfer
+      slug, transfer date, and any deviations from the plan (e.g. if
+      the fallback login was used).
+- [ ] Note the setup date at the top of this task file and flip
+      **Status** from `ACTIVE` to `COMPLETE, YYYY-MM-DD`.
+- [ ] Open a docs-only follow-up ticket if any surface was missed in
+      the Step 5 "Update shipped surfaces" commit.
 
 ## When to revisit
 
@@ -141,10 +202,11 @@ initial setup.
 - Creating stub repos for `skills`, `mcp`, `evidence-runtime`,
   `corpora`. These do not exist until their triggering phase fires.
   Empty stub repos are premature structure.
-- Renaming the Research Atlas monorepo's slug (`researcher-prompt-hub`)
-  to something else. Not worth the churn — install URLs are shipped
-  and stable. The user-facing brand is already "Research Atlas"; the
-  historical slug can keep resolving.
+- Pre-v1 repo moves. Transferring `HaroldZhong/Research-Atlas`
+  before the release gate closes is out of scope — see the
+  2026-04-18 decision in
+  [`../roadmap/github-organization.md`](../roadmap/github-organization.md).
+  This track is explicitly post-gate.
 
 ## Related
 

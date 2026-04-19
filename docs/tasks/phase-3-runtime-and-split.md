@@ -28,10 +28,11 @@ Only if the gate fires "split now".
       `main`). Branch protection + CODEOWNERS per
       [`../roadmap/github-organization.md`](../roadmap/github-organization.md).
 - [ ] Copy the relevant paths from the Research Atlas monorepo with
-      a `Forked from researcher-prompt-hub @ <sha>` note in the new
-      repo's README (the slug stays in the provenance note because
-      that's the literal source repo). `git subtree split` is fragile
-      on Windows (user's primary env); clean copy + note is fine.
+      a `Forked from <monorepo-slug> @ <sha>` note in the new repo's
+      README (use whatever slug the monorepo has at fork time — today
+      that's `HaroldZhong/Research-Atlas`; post-org-transfer it will be
+      `researchatlas/<final-slug>`). `git subtree split` is fragile on
+      Windows (user's primary env); clean copy + note is fine.
 - [ ] Move:
       `.claude/skills/`, `.agents/skills/`, `plugin/`,
       `.claude-plugin/`, `scripts/mirror-skills.mjs`,
