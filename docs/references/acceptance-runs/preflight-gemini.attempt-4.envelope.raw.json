@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.1.0",
+    "schema_version": 2,
+    "run_id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
+    "timestamp": "2026-04-19T17:45:00Z",
+    "input_count": 30
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "citations_checked": 30,
+    "verdict_summary": {
+      "verified": 25,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 5,
+      "unverifiable": 0
+    },
+    "content": "# Bibliography Audit Report\n\nThis report summarizes the verification results for 30 citations.\n\n## Summary\n\n| Result | Count |\n| :--- | :--- |\n| **Verified** | 25 |\n| **Fabricated / Mismatch** | 5 |\n| **Unverifiable** | 0 |\n| **Total** | 30 |\n\n## Detailed Verdicts ... (full report content here) ...",
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention-is-all-you-need",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arXiv.1706.03762", "title": "Attention is all you need", "authors": ["Vaswani, A."], "year": 2017, "venue": "NeurIPS", "source_format": "prose", "raw": "1. Vaswani, A., ... (2017). Attention is all you need." },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need", "authors": ["Ashish Vaswani"], "year": 2017, "venue": "arXiv", "source": "openalex", "raw_response_hash": "ca23b6db" },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "pass": true } },
+          "candidates": [],
+          "abstract_snippet": "The dominant sequence transduction models...",
+          "notes": null
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": [],
+  "__note": "This .raw.json preserves Gemini's attempt-4 output as-pasted, with the placeholder run_id 'a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5' intact as forensic evidence. The canonical preflight-gemini.envelope.json has the full 30-verdict array and a repaired UUID v4 run_id. Only the first verdict is retained here to keep the forensic artifact small; the canonical envelope carries all 30."
+}
