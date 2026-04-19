@@ -48,7 +48,7 @@ claude
 Then inside the Claude Code session:
 
 ```
-/plugin marketplace add researchatlas/researcher-prompt-hub
+/plugin marketplace add HaroldZhong/Research-Atlas
 /plugin install research-verification@research-atlas
 /skills
 ```
@@ -129,7 +129,7 @@ Target transcript: `docs/references/acceptance-runs/gemini.md`.
 ### One-time install (if not already installed)
 
 ```bash
-gemini skills install https://github.com/researchatlas/researcher-prompt-hub \
+gemini skills install https://github.com/HaroldZhong/Research-Atlas \
   --path .agents/skills/research-verification
 gemini skills list
 ```

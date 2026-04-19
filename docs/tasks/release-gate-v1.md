@@ -26,7 +26,7 @@ Gemini with a live acceptance-run gate.
 
 - [ ] Open a fresh `claude` session in the repo root.
 - [ ] (Recommended) Install via plugin:
-      `/plugin marketplace add researchatlas/researcher-prompt-hub` then
+      `/plugin marketplace add HaroldZhong/Research-Atlas` then
       `/plugin install research-verification@research-atlas`.
 - [ ] Run `/skills` to confirm the plugin is active.
 - [ ] Paste the full contents of
@@ -52,7 +52,7 @@ Gemini with a live acceptance-run gate.
 ### RG3 — Gemini CLI acceptance run
 
 - [ ] One-time install if not already:
-      `gemini skills install https://github.com/researchatlas/researcher-prompt-hub --path .agents/skills/research-verification`.
+      `gemini skills install https://github.com/HaroldZhong/Research-Atlas --path .agents/skills/research-verification`.
 - [ ] Verify `gemini skills list` shows `research-verification`.
 - [ ] Fresh `gemini` session in repo root.
 - [ ] Paste corpus + trigger. Approve consent prompt.

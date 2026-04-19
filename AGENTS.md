@@ -140,7 +140,7 @@ for the one-item corpus that exercises the hook end-to-end.
 - Installed locally: the skill at `.claude/skills/research-verification/` is
   auto-discovered. Invoke by prompt ("verify these references") or via `/skills`.
 - Installed by others: via the plugin marketplace ->
-  `/plugin marketplace add researchatlas/researcher-prompt-hub` then
+  `/plugin marketplace add HaroldZhong/Research-Atlas` then
   `/plugin install research-verification@research-atlas`.
 
 ### Codex CLI
@@ -174,7 +174,7 @@ for the one-item corpus that exercises the hook end-to-end.
   `reload`. It is not an activation selector.
 - For a remote install pointing at this monorepo:
   ```sh
-  gemini skills install https://github.com/researchatlas/researcher-prompt-hub \
+  gemini skills install https://github.com/HaroldZhong/Research-Atlas \
     --path .agents/skills/research-verification
   ```
   The `--path` flag is required — without it, Gemini tries to install the whole

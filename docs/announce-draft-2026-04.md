@@ -32,7 +32,7 @@
 > Install on Claude Code:
 >
 > ```
-> /plugin marketplace add researchatlas/researcher-prompt-hub
+> /plugin marketplace add HaroldZhong/Research-Atlas
 > /plugin install research-verification@research-atlas
 > ```
 >
@@ -64,7 +64,7 @@ honest pass rates on the acceptance corpus before submitting.
 - [ ] Codex CLI transcript similarly green.
 - [ ] Gemini CLI transcript similarly green.
 - [ ] CHANGELOG `[Unreleased]` section promoted to a dated tag and semver bumped.
-- [ ] `researchatlas/researcher-prompt-hub` (or the dedicated plugins repo) is
+- [ ] `HaroldZhong/Research-Atlas` (or the future dedicated plugins repo) is
       public and the install commands in this post actually work from a cold machine.
       The marketplace identifier resolved by `/plugin install … @research-atlas`
       matches the `name` field in `.claude-plugin/marketplace.json`.

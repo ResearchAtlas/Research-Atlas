@@ -26,7 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - **Claude Code plugin manifest** — `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json` at the repo root make this repo installable as
   its own single-plugin marketplace (named `research-atlas`) via
-  `/plugin marketplace add researchatlas/researcher-prompt-hub` →
+  `/plugin marketplace add HaroldZhong/Research-Atlas` →
   `/plugin install research-verification@research-atlas`. The marketplace
   identifier is `research-atlas` regardless of the hosting repo name.
 - **Repo-root `AGENTS.md`** — onboarding guide for Codex / Cursor / Aider / Copilot /
@@ -67,10 +67,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   are locked, the run itself is the release gate.
 - Track C6 cross-agent acceptance runs on Codex and Gemini CLI are pending. Results
   land in `docs/references/acceptance-runs/{codex,gemini}.md`.
-- Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills`) has not
-  been created yet; until then, the plugin installs from the monorepo at
-  `researchatlas/researcher-prompt-hub`, which is registered as a single-plugin
-  marketplace identified as `research-atlas`.
+- Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills` under a
+  future GitHub org) has not been created yet; until then, the plugin installs
+  from the monorepo at `HaroldZhong/Research-Atlas`, which is registered as a
+  single-plugin marketplace identified as `research-atlas`.
 
 ---
 
