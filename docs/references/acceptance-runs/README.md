@@ -1,9 +1,21 @@
 # Acceptance Runs — Cross-Agent Protocol
 
-This directory holds the transcripts of the 30-reference acceptance test
-(see [`.claude/skills/research-verification/examples/acceptance-corpus.txt`](../../../.claude/skills/research-verification/examples/acceptance-corpus.txt))
-run against the three supported agents. All three must pass before the milestone
-ships (Track C6 + §7 Definition of Done in the [milestone plan](../../plans/2026-04-17-next-milestone-plan.md)).
+This directory holds the transcripts of the 30-reference acceptance
+test (see
+[`.claude/skills/research-verification/examples/acceptance-corpus.txt`](../../../.claude/skills/research-verification/examples/acceptance-corpus.txt))
+run against the three supported agents.
+
+Two transcript families live here:
+
+- **Local preflight** transcripts:
+  `preflight-claude-code.md`, `preflight-codex.md`,
+  `preflight-gemini.md`
+- **Public cold-install** transcripts:
+  `claude-code.md`, `codex.md`, `gemini.md`
+
+The local preflight validates the artifact before publish. The public
+cold-install gate is the release-signoff evidence that must be green
+before the milestone ships.
 
 ## The six pass conditions
 
@@ -22,7 +34,28 @@ Reproduced here for convenience. Every run must hold all six:
 2. Copy-paste the full contents of `acceptance-corpus.txt` (comment lines included; the skill's parser ignores them) into the chat.
 3. Prefix with: `verify these references — detailed depth, markdown output`.
 4. Start a stopwatch. Let the agent run to completion without manual intervention.
-5. Save the full transcript into this directory as `<agent>.md` using the template below.
+5. Save the full transcript into this directory using the template
+   below. Use the `preflight-*.md` filenames for local preflight and
+   the bare agent filenames for the public cold-install gate.
+
+## Stage split
+
+### Local preflight
+
+- Claude Code: local marketplace add from the repo root
+- Codex CLI: native `.agents/skills/` discovery from the repo root
+- Gemini CLI: `gemini skills link ... --scope workspace`, then fresh
+  session
+
+### Public cold-install gate
+
+- Claude Code: `/plugin marketplace add <canonical-repo>`
+- Codex CLI: fresh checkout of the canonical public repo
+- Gemini CLI:
+  `gemini skills install https://github.com/<canonical-repo> --path .agents/skills/research-verification`
+
+See [`RUN-COMMANDS.md`](RUN-COMMANDS.md) for the exact stage-by-stage
+commands.
 
 ## Agent-specific invocation
 
@@ -30,14 +63,20 @@ Reproduced here for convenience. Every run must hold all six:
 
 - Expected discovery: auto-loaded from `.claude/skills/research-verification/SKILL.md`.
 - Expected trigger: the skill's description matches "verify these references"; Claude selects it automatically. If not, run `/skills` and pick `research-verification`.
-- Save transcript to: `docs/references/acceptance-runs/claude-code.md`.
+- Save transcripts to:
+  `docs/references/acceptance-runs/preflight-claude-code.md` for local
+  preflight and `docs/references/acceptance-runs/claude-code.md` for
+  the public gate.
 
 ### Codex CLI
 
 - Expected discovery: `.agents/skills/research-verification/SKILL.md` via native walk from the repo root.
 - Sanity check: in a fresh session, run `/skills` — `research-verification` should appear in the list.
 - Expected trigger: issue the prompt; Codex auto-matches on description, or invoke explicitly with `$research-verification`.
-- Save transcript to: `docs/references/acceptance-runs/codex.md`.
+- Save transcripts to:
+  `docs/references/acceptance-runs/preflight-codex.md` for local
+  preflight and `docs/references/acceptance-runs/codex.md` for the
+  public gate.
 - Note: hooks are NOT enabled by default. Do not set `codex_hooks = true` for the acceptance run — we want the clean invocation path.
 
 ### Gemini CLI
@@ -46,7 +85,10 @@ Reproduced here for convenience. Every run must hold all six:
 - Sanity check: `gemini skills list` — `research-verification` should be listed.
 - Expected trigger: issue the prompt. Gemini calls `activate_skill` and presents a consent prompt. Approve.
 - Do NOT expect `/skills` to activate the skill — that surface is management-only in Gemini. Activation is prompt-driven.
-- Save transcript to: `docs/references/acceptance-runs/gemini.md`.
+- Save transcripts to:
+  `docs/references/acceptance-runs/preflight-gemini.md` for local
+  preflight and `docs/references/acceptance-runs/gemini.md` for the
+  public gate.
 
 ## Transcript template
 
@@ -56,6 +98,7 @@ When saving an acceptance run, use this structure:
 # Acceptance Run — <Agent>
 
 - Date: <YYYY-MM-DD>
+- Gate stage: local-preflight | public-cold-install
 - Agent version: <output of `<agent> --version`>
 - Skill version: 2.1.0 (from canonical SKILL.md)
 - Start time: <HH:MM:SS>
@@ -91,10 +134,19 @@ When saving an acceptance run, use this structure:
 should inform the next iteration of the skill)
 ```
 
-## Status as of 2026-04-17
+## Status as of 2026-04-18
 
-- [ ] Claude Code run — PENDING (execute after the canonical SKILL.md is final).
-- [ ] Codex CLI run — PENDING (blocked on Claude Code pass).
-- [ ] Gemini CLI run — PENDING (blocked on Claude Code pass).
+### Local preflight
 
-The Claude Code run is the B7 gate. Codex + Gemini runs are the C6 gate. All three gate the Launch track (L1-L2).
+- [ ] Claude Code local preflight — PENDING
+- [ ] Codex CLI local preflight — PENDING
+- [ ] Gemini CLI local preflight — PENDING
+
+### Public cold-install gate
+
+- [ ] Claude Code public run — PENDING
+- [ ] Codex CLI public run — PENDING
+- [ ] Gemini CLI public run — PENDING
+
+The local preflight is a prerequisite to publish. The public runs are
+the release-signoff evidence.

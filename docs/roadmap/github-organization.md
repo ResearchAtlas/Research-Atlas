@@ -6,11 +6,10 @@ that will host all Atlas-related repos. Execution checklist in
 
 ## Current state vs. target state (read this first)
 
-**Current (as of 2026-04-18):** Research Atlas ships from a single
-monorepo at `github.com/HaroldZhong/Research-Atlas` — a **personal
-GitHub account**, not an org. All shipped install URLs, acceptance-run
-commands, and the `plugin/.claude-plugin/plugin.json` `repository`
-field point at this slug.
+**Current (as of 2026-04-18):** Research Atlas is being prepared in a
+single monorepo at `github.com/HaroldZhong/Research-Atlas` — a
+**personal GitHub account**, not an org. The local release branch and
+the current install surfaces in this repo point at that slug.
 
 **Target:** a dedicated GitHub organization at
 `github.com/researchatlas` hosting Atlas's repos under the product
@@ -18,14 +17,16 @@ brand. The monorepo transfers there; additional repos are created as
 the roadmap's phase gates fire (see
 [Target repo inventory](#target-repo-inventory) below).
 
-**Why we are not there yet.** v1 (`research-verification`) is already
-published and pre-announced from the `HaroldZhong/Research-Atlas` slug.
-Moving the repo before the v1 release gate (RG1–RG5) would invalidate
-every URL in the announce draft, the landing page install tabs, and
-the CHANGELOG. The cost outweighs the benefit for a rename that can
-happen cleanly once v1 has shipped. **The transfer is the first
-post-release-gate work item** — see the [Decisions log](#decisions-log)
-at the bottom of this doc.
+**Why we are not there yet.** The artifact is ready locally, but the
+public cold-install gate has not run yet. That creates a cleaner
+decision point than we had earlier: run the **local preflight** first,
+then decide whether the first public publish should happen from the
+personal-account slug or from a freshly-created `researchatlas` org
+slug. **Default bias:** transfer first if the admin work is acceptable,
+so v1 launches from its permanent canonical URL. Explicit deferral is
+allowed, but it should be recorded before the public cold-install gate
+starts. See the [Decisions log](#decisions-log) at the bottom of this
+doc.
 
 ## Why an org
 
@@ -49,14 +50,14 @@ Keeping all of that under one org gives us:
   `researchatlas/runtime` all read obviously. Today the monorepo lives
   on a personal account (`HaroldZhong/Research-Atlas`) and mixes website
   + skills + plan docs because there's nowhere else to put them.
-- **Migration story for consumers.** When the monorepo transfers to
-  `researchatlas/<slug>` (post-v1), the marketplace identifier
-  (`research-atlas`) stays stable — only the install URL changes, and
-  we ship the new URL together with the existing one in the announce
-  follow-up. When we later split Research Atlas Skills out (Phase 3
-  decision gate), the install command moves from the monorepo slug to
-  `researchatlas/skills` — within the same org, easy to alias and
-  redirect.
+- **Migration story for consumers.** If the monorepo transfers to
+  `researchatlas/<slug>` before first public publish, v1 launches from
+  the canonical org URL immediately. If the transfer is deferred, the
+  marketplace identifier (`research-atlas`) stays stable and GitHub's
+  redirect covers the old slug until the org move lands. When we later
+  split Research Atlas Skills out (Phase 3 decision gate), the install
+  command moves from the monorepo slug to `researchatlas/skills` —
+  within the same org, easy to alias and redirect.
 
 ## Org name and identity
 
@@ -81,7 +82,7 @@ empty repos in advance — that's premature structure.
 
 | Repo slug | Product name | Layer | Phase created | Contents |
 |---|---|---|---|---|
-| `Research-Atlas` (target slug TBD) | Research Atlas (monorepo) | 1 + 2 | exists at `HaroldZhong/Research-Atlas`; transfers to the org post-v1 | The Vite/React website + canonical `.claude/skills/` sources. Today this is the v1 monorepo on a personal account. Post-v1 release gate, it transfers to `researchatlas/<final-slug>` (the final slug is locked in the dated transfer task; candidates are `Research-Atlas`, `research-atlas`, or `atlas`). After Phase 3, this narrows to just the Research Atlas website. |
+| `Research-Atlas` (target slug TBD) | Research Atlas (monorepo) | 1 + 2 | exists at `HaroldZhong/Research-Atlas`; transfers to the org at D1 (default) or is explicitly deferred | The Vite/React website + canonical `.claude/skills/` sources. Today this is the v1 monorepo on a personal account. At the D1 canonical-publish decision (see [`../tasks/release-gate-v1.md`](../tasks/release-gate-v1.md)), the default path transfers it to `researchatlas/<final-slug>` (final slug locked in the transfer task; candidates are `Research-Atlas`, `research-atlas`, or `atlas`); deferral keeps it at the personal-account slug until a later transfer. After Phase 3, this narrows to just the Research Atlas website. |
 | `skills` | Research Atlas Skills | 2 | Phase 3 decision gate | Dedicated skill + plugin distribution repo. Claude Code marketplace identifier stays `research-atlas`. Install URL changes to `researchatlas/skills`. |
 | `evidence-runtime` | Research Atlas Evidence Runtime | 3 | Phase 3 | The shared envelope + validator + harness package. Published to npm as `@research-atlas/evidence-runtime`. |
 | `mcp` | Research Atlas MCP | 4 | Phase 5+ | The Research Atlas MCP service. Deployed on Vercel with Fluid Compute. |
@@ -129,15 +130,16 @@ confused users, stale install commands). Trigger a migration when one
 of these lands:
 
 0. **`HaroldZhong/Research-Atlas` → `researchatlas/<slug>`.**
-   Triggered by the v1 release gate closing green (RG1–RG5 in
-   [`../plans/2026-04-17-next-milestone-plan.md`](../plans/2026-04-17-next-milestone-plan.md)).
-   This is the first post-gate work item. Execution checklist in
+   Triggered by the D1 canonical-publish decision in
+   [`../tasks/release-gate-v1.md`](../tasks/release-gate-v1.md), after
+   local preflight passes and before the public cold-install gate
+   begins if we choose the org-first path. Execution checklist in
    [`../tasks/track-org-setup.md`](../tasks/track-org-setup.md). GitHub
    transfers preserve history and auto-create a redirect at the old
-   slug, so previously-shipped install URLs continue to resolve; we
-   still update the landing page, CHANGELOG, announce copy, and
-   `plugin/.claude-plugin/plugin.json` `repository` field to the new
-   slug in the same commit as the transfer.
+   slug, so old URLs keep resolving if the transfer is deferred until
+   after first publish; we still update the landing page, CHANGELOG,
+   announce copy, and `plugin/.claude-plugin/plugin.json` `repository`
+   field to the new slug in the same commit as the transfer.
 1. **Monorepo → split the website out from the skills repo.**
    Triggered by the Phase 3 decision gate. After split, the website
    stays at the post-transfer org slug (URL stable because researchers
@@ -160,25 +162,25 @@ Each migration is a dedicated task checklist in
 - **Do not host third-party skills in the org.**
   `vercel-react-best-practices` and `web-design-guidelines` stay out of
   the org. Atlas publishes only what Atlas owns.
-- **Do not block the release gate on org setup.** v1 ships from
-  `HaroldZhong/Research-Atlas`. The org transfer is the first
-  post-release-gate work item, not a v1 blocker. GitHub's automatic
-  redirect on repo transfer means v1's shipped install URLs keep
-  resolving even after the move.
+- **Do not block local preflight on org setup.** The artifact should be
+  validated locally first. The public cold-install stage does require a
+  canonical public repo, but that can be either the final org slug
+  (preferred) or the current personal-account slug if transfer is
+  explicitly deferred and recorded.
 
 ## Decisions log
 
-- **2026-04-18 — Keep v1 at `HaroldZhong/Research-Atlas`; transfer to
-  a `researchatlas` org is the first post-release-gate work item.**
-  Rationale: v1's announce draft, landing page install tabs,
-  CHANGELOG, and plugin manifest already point at the current slug.
-  Moving pre-gate invalidates every URL and forces a second
-  acceptance-run pass to re-verify the cold install. Moving post-gate
-  lets GitHub's transfer redirect handle backwards compatibility for
-  existing consumers while we update shipped surfaces in a single
-  coordinated commit. Target org login is `researchatlas`, pending
-  the Step 1 availability check in
-  [`../tasks/track-org-setup.md`](../tasks/track-org-setup.md).
+- **2026-04-18 — Revise the gate so local preflight happens before the
+  canonical publish decision.** This supersedes the earlier
+  "post-release transfer only" assumption from the same day. Rationale:
+  the plugin and marketplace files exist only on the local
+  `phase-0-1-baseline` branch, so a public cold-install gate is invalid
+  until a real public `main` contains them. The clean sequence is:
+  local preflight -> choose canonical public URL -> publish there ->
+  run public cold-install gate. Default bias is transfer first if the
+  org-admin work is acceptable, so v1 launches from its permanent URL.
+  Explicit deferral remains allowed, but it must be recorded before the
+  public gate starts.
 
 ## Related docs
 

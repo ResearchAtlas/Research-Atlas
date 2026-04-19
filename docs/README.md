@@ -61,15 +61,16 @@ docs/
 - `.claude-plugin/marketplace.json` — the single-plugin marketplace
   (identifier: `research-atlas`).
 
-## Status snapshot (2026-04-17)
+## Status snapshot (2026-04-18)
 
 - Flagship skill `research-verification` v2.1.0 is **staged for release**:
   plugin manifest, mirrors, landing page install block, and announce
   draft are in place. **Not yet released** — `CHANGELOG.md` still under
   `[Unreleased]`, no `v1.0.0` tag, live acceptance gate open.
-- Release gate pending: RG1–RG5 in
-  [tasks/release-gate-v1.md](tasks/release-gate-v1.md) — the live
-  30-reference acceptance run on Claude Code, Codex, and Gemini.
+- Release gate pending in
+  [tasks/release-gate-v1.md](tasks/release-gate-v1.md) — local
+  preflight (Claude Code, Codex, Gemini), then canonical publish,
+  then the public cold-install gate, then release + announce.
 - Skill library: 10 skills in canonical tree. `research-verification` is
   at the publish bar (pending the gate above). `literature-review` is
   the active Tier 2 promotion target (Phase 2). The remaining eight stay

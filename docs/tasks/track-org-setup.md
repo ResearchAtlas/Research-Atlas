@@ -1,32 +1,36 @@
 # Task — GitHub Organization Setup
 
-**Track:** post-v1-release-gate. This is the first work item that
-fires after RG1–RG5 in
-[`../plans/2026-04-17-next-milestone-plan.md`](../plans/2026-04-17-next-milestone-plan.md)
-close green.
+**Track:** canonical-publish support. This can run after local
+preflight and before the public cold-install gate if we choose the
+org-first path, or after v1 if we explicitly defer the transfer.
 **Goal:** stand up the `researchatlas` GitHub organization and
 transfer `HaroldZhong/Research-Atlas` into it, so Atlas can grow into
 multi-repo territory under the product brand.
-**Status:** ACTIVE, 2026-04-18. Blocked on v1 release gate closing.
+**Status:** ACTIVE, 2026-04-18. Blocked on local preflight finishing and
+the D1 canonical-publish decision.
 
 ## Why this track exists as its own doc
 
-Research Atlas currently ships from `github.com/HaroldZhong/Research-Atlas`
+The current v1 public target is `github.com/HaroldZhong/Research-Atlas`
 — a **personal GitHub account**, not an org. The target is a dedicated
 `researchatlas` org hosting the monorepo and all future Atlas repos
 (see [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
-for layout and rationale, including the 2026-04-18 decision to defer
-the transfer until v1 has shipped).
+for layout and rationale, including the 2026-04-18 gate revision that
+moves the transfer decision to the point between local preflight and
+public cold-install).
 
 **Order of operations:**
-1. v1 (`research-verification`) finishes the release gate on the
-   current slug.
-2. This task runs: create the org, transfer the repo, update shipped
-   surfaces, verify cold install.
-3. Future phase-gate work creates additional repos (`skills`,
+1. Local preflight finishes on the current local branch.
+2. If we choose the org-first path, this task runs: create the org,
+   transfer the repo, update shipped surfaces, then continue to the
+   public cold-install gate on the new slug.
+3. If we defer the transfer, this task stays pending and v1 ships from
+   the personal-account slug.
+4. Future phase-gate work creates additional repos (`skills`,
    `evidence-runtime`, `mcp`, `corpora`) directly in the org.
 
-This track **does not gate v1.** It is the first post-gate cleanup.
+This track does **not** block local artifact validation. It only gates
+the public cold-install stage if we choose the org-first path.
 
 ## Step 1 — Verify target namespace availability
 
@@ -105,10 +109,9 @@ locked here; candidates are `Research-Atlas`, `research-atlas`, or
 [`../roadmap/github-organization.md`](../roadmap/github-organization.md)
 Decisions log before executing).
 
-- [ ] **Gate check.** Confirm v1 release gate is green: RG1, RG2, RG3
-      transcripts committed under `docs/references/acceptance-runs/`
-      and CHANGELOG `[Unreleased]` has been promoted to a dated tag.
-      Do not transfer before the gate closes.
+- [ ] **Gate check.** Confirm local preflight is green and the D1
+      canonical-publish decision is "transfer first". If D1 records
+      explicit deferral, stop here and leave this task pending.
 - [ ] **Back up.** `git push --all && git push --tags` to
       `HaroldZhong/Research-Atlas`. Confirm every branch and tag is
       up on the remote.
@@ -202,11 +205,9 @@ initial setup.
 - Creating stub repos for `skills`, `mcp`, `evidence-runtime`,
   `corpora`. These do not exist until their triggering phase fires.
   Empty stub repos are premature structure.
-- Pre-v1 repo moves. Transferring `HaroldZhong/Research-Atlas`
-  before the release gate closes is out of scope — see the
-  2026-04-18 decision in
-  [`../roadmap/github-organization.md`](../roadmap/github-organization.md).
-  This track is explicitly post-gate.
+- Blind preflight rewrites before local validation exists. We do not
+  set up the org before the artifact has passed local preflight, and we
+  do not force the transfer if D1 explicitly chooses to defer it.
 
 ## Related
 
