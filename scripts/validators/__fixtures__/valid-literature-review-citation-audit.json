@@ -10,6 +10,7 @@
   "status": "success",
   "data": {
     "task": "citation_audit",
+    "content": "## Citation audit\n\n- cite-001: supports claim\n- cite-002: cited for an unsupported claim\n",
     "citations_checked": 2,
     "verdicts": [
       {
@@ -30,6 +31,10 @@
           "notes": "Cited for a claim it does not support."
         }
       }
-    ]
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "verdicts_complete": "pass"
+    }
   }
 }

@@ -544,3 +544,22 @@ continues to pass after both fixes.
    identical on coarse classes, so either can serve as the Codex
    column in the three-way parity tally — but the canonical
    record is attempt 3 because it comes with a full envelope.
+
+## Schema-upgrade backfill (post-L3 hardening)
+
+After the L3 Gemini attempt surfaced a stale skill spec, SKILL.md
+and `scripts/validators/envelope.mjs` were tightened in one pass:
+`run_id` is now UUID v4 hex-only, `self_check.verdicts_complete`
+is required, `verdict_summary` is pinned to the coarse-6 key set,
+evidence keys (`resolved`, `cross_check`, `candidates`) are
+required structurally, and `data.content` is required when
+verdicts are present.
+
+The archived Codex envelope predates that hardening and was
+missing a single key: `self_check.verdicts_complete`. The value
+is 100% derivable from the envelope itself — 30 verdicts for 30
+inputs, which is what `verdicts_complete: pass` asserts — so the
+key was backfilled mechanically. No other field was altered. The
+backfill is one line added to
+`docs/references/acceptance-runs/preflight-codex.envelope.json`,
+immediately after `verify_framework: "pass"`.

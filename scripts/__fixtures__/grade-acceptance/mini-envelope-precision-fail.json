@@ -10,7 +10,16 @@
   "status": "success",
   "data": {
     "task": "verify_citations",
+    "content": "## Mini verification report\n\n- vaswani-2017-attention: fabricated_doi (false positive; paper is real)\n- smith-2024-fabricated: fabricated_doi\n",
     "citations_checked": 2,
+    "verdict_summary": {
+      "verified": 0,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 2,
+      "unverifiable": 0
+    },
     "verdicts": [
       {
         "reference_id": "vaswani-2017-attention",
@@ -19,6 +28,9 @@
         "evidence": {
           "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
           "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
           "notes": "resolver timed out — flagged as fabricated (this is wrong; the paper is real)"
         }
       },
@@ -29,9 +41,22 @@
         "evidence": {
           "parsed": { "doi": "10.1038/nonexistent-2024-99999" },
           "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
           "notes": "DOI 404 from CrossRef + OpenAlex"
         }
       }
-    ]
-  }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
 }

@@ -12,14 +12,14 @@
     "task": "verify_citations",
     "verification_depth": "detailed",
     "output_format": "markdown",
+    "content": "## Verification report\n\n- vaswani-2017-attention: **verified**\n- smith-2024-fabricated: **fabricated_doi** (404 from both resolvers)\n",
     "citations_checked": 2,
     "verdict_summary": {
       "verified": 1,
       "partially_supported": 0,
       "unsupported": 0,
       "contradicted": 0,
-      "fabricated": 0,
-      "fabricated_doi": 1,
+      "fabricated": 1,
       "unverifiable": 0
     },
     "verdicts": [
@@ -29,7 +29,15 @@
         "confidence": 1.0,
         "evidence": {
           "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
-          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" }
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": {
+            "title":  { "parsed": "Attention is all you need", "resolved": "Attention Is All You Need", "similarity": 1.0, "pass": true },
+            "author": { "parsed": "Vaswani", "resolved": "Vaswani", "pass": true },
+            "year":   { "parsed": 2017, "resolved": 2017, "pass": true }
+          },
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
         }
       },
       {
@@ -39,6 +47,9 @@
         "evidence": {
           "parsed": { "doi": "10.1038/nonexistent-2024-99999" },
           "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
           "notes": "DOI 404 from CrossRef + OpenAlex"
         }
       }
@@ -46,6 +57,10 @@
     "self_check": {
       "all_evaluated": "pass",
       "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
       "verdicts_complete": "pass"
     }
   },

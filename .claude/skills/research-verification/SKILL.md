@@ -313,57 +313,230 @@ CHECK verdicts_complete:  (reference-level tasks only) data.verdicts has one ent
 
 ## Output Envelope
 
+The envelope is the machine-readable contract. Two invariants govern
+every field:
+
+- **Structural presence over prose.** Keys listed below are present
+  on every run, never omitted. When a field does not apply, emit it
+  with an explicit null (for scalar/object fields) or `[]` (for array
+  fields). Do not push "we tried X but got 404" into `notes` and drop
+  the matching `resolved` key — set `resolved: null` instead, so
+  downstream validators and graders see the structural signal.
+- **Machine over human.** When the human-readable `content` string
+  disagrees with the machine fields (`verdicts`, `verdict_summary`,
+  `self_check`), the machine fields are authoritative. Consumers of
+  this skill parse JSON, not prose.
+
 ```yaml
 meta:
   skill: research-verification
   version: 2.1.0
   schema_version: 2
-  run_id: <generated_uuid>
-  timestamp: <iso8601>
-status: success | partial | error
+  run_id: <UUID v4>                        # REQUIRED; hex digits only (0-9, a-f) in the 8-4-4-4-12 shape. If the
+                                           # runtime cannot generate one, use "00000000-0000-4000-8000-000000000000".
+  timestamp: <iso8601>                     # REQUIRED; UTC with offset (e.g. "2026-04-19T14:35:00Z")
+  input_count: <integer>                   # OPTIONAL but RECOMMENDED; number of references or claims the user supplied.
+                                           # When present, verdicts.length MUST equal input_count (see self_check.verdicts_complete).
+status: success | partial | error          # REQUIRED
 data:
-  task: <task_type>
+  task: <task_type>                        # REQUIRED; e.g. verify_citations, verify_claims, bibliography_audit
   verification_depth: quick | detailed | expert
   output_format: markdown | latex | json
-  content: <the_output>                    # human-readable report matching output_format
+  content: <string>                        # REQUIRED when status is success or partial; the human-readable report
+                                           # matching output_format. May be the empty string only when output_format
+                                           # is json AND all machine-readable data lives in verdicts/claims.
   claims_evaluated: <integer>              # populated for claim-level tasks
-  citations_checked: <integer>             # populated for reference-level tasks; len(data.verdicts)
-  verdict_summary:
+  citations_checked: <integer>             # populated for reference-level tasks; equals len(data.verdicts)
+  verdict_summary:                         # REQUIRED when data.verdicts is present. Closed set of exactly six keys;
+                                           # integer value on each. Keys outside this set are invalid.
     verified: <integer>
     partially_supported: <integer>
     unsupported: <integer>
     contradicted: <integer>
-    fabricated: <integer>
+    fabricated: <integer>                  # FLAGGED ROLLUP: sum of verdicts in the flag set
+                                           # { fabricated, fabricated_doi, metadata_mismatch_title,
+                                           #   metadata_mismatch_author, metadata_mismatch_year }.
+                                           # Fine-grained counts live in data.verdicts, not here.
     unverifiable: <integer>
-  verdicts:                                # REQUIRED for reference-level tasks (verify_citations, bibliography_audit)
+  verdicts:                                # REQUIRED for reference-level tasks (verify_citations, bibliography_audit).
+                                           # One entry per input reference, in input order. See "Worked examples" below.
     - reference_id: <string>               # stable id assigned in Step 0.5
-      verdict: verified | partially_supported | unsupported | contradicted | fabricated | metadata_mismatch_title | metadata_mismatch_author | metadata_mismatch_year | fabricated_doi | unverifiable
-      confidence: <float 0.0-1.0>          # 1.0 = resolver confirmed + all cross-checks pass; lower = partial match or no-DOI guess
-      evidence:
-        parsed: { doi, title, authors, year, venue, source_format, raw }
-        resolved: { doi, title, authors, year, venue, source, raw_response_hash }    # null if verdict is fabricated_doi or unverifiable
-        cross_check:                       # null for resolver_only path
-          title: { parsed, resolved, similarity, pass }
-          author: { parsed, resolved, pass }
-          year: { parsed, resolved, pass }
-        candidates: []                     # populated only by no-DOI path (Step 3c); up to 3 items, each {source, score, title, authors, year, doi, url}
-        abstract_snippet: <string | null>  # populated only when verification_depth == detailed and verdict == verified
-        notes: <string | null>             # free-form reason or human-verification guidance
-  self_check:
+      verdict: verified | partially_supported | unsupported | contradicted
+             | fabricated | fabricated_doi
+             | metadata_mismatch_title | metadata_mismatch_author | metadata_mismatch_year
+             | unverifiable
+      confidence: <float 0.0-1.0>          # 1.0 = resolver confirmed + all cross-checks pass; lower = partial match
+      evidence:                            # All six keys below are structurally REQUIRED (present, possibly null).
+                                           # Never omit a key — downstream validators key on presence.
+        parsed: { doi, title, authors, year, venue, source_format, raw }   # object; always populated from Step 0.5
+        resolved: <object | null>          # {doi, title, authors, year, venue, source, raw_response_hash} when resolved.
+                                           # null when CrossRef AND OpenAlex both 404 (fabricated_doi path) or when
+                                           # the no-DOI title search returned no confident match (unverifiable path).
+        cross_check: <object | null>       # {title:{parsed,resolved,similarity,pass}, author:{parsed,resolved,pass},
+                                           # year:{parsed,resolved,pass}} when Step 4 (VERIFY cross-check) ran.
+                                           # null on the resolver-only path (authoritative DOI match, no parsed authors/title
+                                           # to cross-check against) and on the fabricated_doi path (nothing to compare).
+        candidates: <array>                # array; populated only by the no-DOI path (Step 3c), up to 3 entries each
+                                           # {source, score, title, authors, year, doi, url}. Empty array [] otherwise.
+        abstract_snippet: <string | null>  # populated only when verification_depth == detailed AND verdict == verified.
+                                           # null otherwise.
+        notes: <string | null>             # free-form reason or human-verification guidance. null when no note applies.
+                                           # Reserved for context the structural fields cannot express — not a substitute
+                                           # for setting resolved/cross_check/candidates.
+  self_check:                              # REQUIRED when data.verdicts is present. All seven keys listed; each is
+                                           # "pass" or "fail". verdicts_complete mirrors the validator's length check.
     all_evaluated: pass | fail
     no_false_verified: pass | fail
     contradictions: pass | fail
     unverifiable_noted: pass | fail
     format_match: pass | fail
     verify_framework: pass | fail
-errors:                                    # parse failures, duplicate references, resolver outages
+    verdicts_complete: pass | fail         # pass iff len(data.verdicts) == meta.input_count (or data.citations_checked
+                                           # when input_count is absent). Self-reported signal paired with the
+                                           # shared envelope validator's independent length assertion.
+errors:                                    # REQUIRED (may be empty array); parse failures, duplicate references,
+                                           # resolver outages. A valid run with no errors emits `errors: []`.
   - reference_id: <string | null>
     stage: parse | resolve | cross_check
     reason: <string>
     raw: <string | null>
 ```
 
-The `verdicts` array is the machine-readable contract for downstream pipelines (e.g. `literature-review` receiving `flagged` references, or an editor surfacing per-reference status). It must be populated for every reference in the input, in input order. When the human-readable `content` disagrees with `verdicts`, `verdicts` is authoritative.
+### Worked examples — one per verdict class
+
+The four blocks below show the exact structural shape for the four
+most common verdict classes. Every `evidence` key is present; fields
+that do not apply are explicit `null` or `[]`, never omitted.
+
+**verified** (resolver + cross-check both green, detailed depth):
+
+```json
+{
+  "reference_id": "vaswani-2017-attention-is-all-you-need",
+  "verdict": "verified",
+  "confidence": 1.0,
+  "evidence": {
+    "parsed": {
+      "doi": "10.48550/arXiv.1706.03762",
+      "title": "Attention is all you need",
+      "authors": ["Vaswani, A.", "Shazeer, N."],
+      "year": 2017,
+      "venue": "NeurIPS",
+      "source_format": "prose",
+      "raw": "1. Vaswani, A., et al. (2017). Attention is all you need..."
+    },
+    "resolved": {
+      "doi": "10.48550/arxiv.1706.03762",
+      "title": "Attention Is All You Need",
+      "authors": ["Ashish Vaswani", "Noam Shazeer"],
+      "year": 2017,
+      "venue": "NeurIPS",
+      "source": "openalex",
+      "raw_response_hash": "ca23b6db..."
+    },
+    "cross_check": {
+      "title":  { "parsed": "Attention is all you need", "resolved": "Attention Is All You Need", "similarity": 1.0, "pass": true },
+      "author": { "parsed": "Vaswani", "resolved": "Vaswani", "pass": true },
+      "year":   { "parsed": 2017, "resolved": 2017, "pass": true }
+    },
+    "candidates": [],
+    "abstract_snippet": "The dominant sequence transduction models...",
+    "notes": null
+  }
+}
+```
+
+**fabricated_doi** (DOI returned 404 from both resolvers):
+
+```json
+{
+  "reference_id": "smith-2024-quantum-emergence",
+  "verdict": "fabricated_doi",
+  "confidence": 0.99,
+  "evidence": {
+    "parsed": {
+      "doi": "10.1038/s42256-024-01247-fake",
+      "title": "Quantum emergence of AI consciousness",
+      "authors": ["Smith, J.", "Zhang, W."],
+      "year": 2024,
+      "venue": "Nature Machine Intelligence",
+      "source_format": "prose",
+      "raw": "26. Smith, J., & Zhang, W. (2024)..."
+    },
+    "resolved": null,
+    "cross_check": null,
+    "candidates": [],
+    "abstract_snippet": null,
+    "notes": "DOI returned 404 from both CrossRef and OpenAlex. VERIFY pre-scan flags: invented_doi_pattern."
+  }
+}
+```
+
+**metadata_mismatch_author** (DOI resolves but parsed first author does not match):
+
+```json
+{
+  "reference_id": "smith-2017-attention-is-all-you-need",
+  "verdict": "metadata_mismatch_author",
+  "confidence": 0.98,
+  "evidence": {
+    "parsed": {
+      "doi": "10.48550/arXiv.1706.03762",
+      "title": "Attention is all you need",
+      "authors": ["Smith, J."],
+      "year": 2017,
+      "venue": "NeurIPS",
+      "source_format": "prose",
+      "raw": "29. Smith, J. (2017). Attention is all you need..."
+    },
+    "resolved": {
+      "doi": "10.48550/arxiv.1706.03762",
+      "title": "Attention Is All You Need",
+      "authors": ["Ashish Vaswani", "Noam Shazeer"],
+      "year": 2017,
+      "venue": null,
+      "source": "openalex",
+      "raw_response_hash": "ca23b6db..."
+    },
+    "cross_check": {
+      "title":  { "parsed": "Attention is all you need", "resolved": "Attention Is All You Need", "similarity": 1.0, "pass": true },
+      "author": { "parsed": "Smith", "resolved": "Vaswani", "pass": false },
+      "year":   { "parsed": 2017, "resolved": 2017, "pass": true }
+    },
+    "candidates": [],
+    "abstract_snippet": null,
+    "notes": "VERIFY pre-scan flags: author_doi_pair_suspicious."
+  }
+}
+```
+
+**unverifiable** (no-DOI title search returned no confident match):
+
+```json
+{
+  "reference_id": "goodfellow-2014-gan",
+  "verdict": "unverifiable",
+  "confidence": 0.0,
+  "evidence": {
+    "parsed": {
+      "doi": null,
+      "title": "Generative adversarial nets",
+      "authors": ["Goodfellow, I.", "Pouget-Abadie, J."],
+      "year": 2014,
+      "venue": "NeurIPS",
+      "source_format": "prose",
+      "raw": "16. Goodfellow, I., Pouget-Abadie, J., et al. (2014)..."
+    },
+    "resolved": null,
+    "cross_check": null,
+    "candidates": [
+      { "source": "openalex", "score": 0.62, "title": "Generative Adversarial Networks", "authors": ["Goodfellow"], "year": 2014, "doi": "10.48550/arxiv.1406.2661", "url": "https://openalex.org/W2964307815" }
+    ],
+    "abstract_snippet": null,
+    "notes": "Top OpenAlex title-search candidate below 0.7 confidence threshold; resolver-only verdict withheld. Human-verifiable via the candidate URL."
+  }
+}
+```
 
 ## Pipeline Interfaces
 

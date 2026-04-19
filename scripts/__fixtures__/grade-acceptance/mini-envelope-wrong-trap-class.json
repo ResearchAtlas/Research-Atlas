@@ -10,7 +10,16 @@
   "status": "success",
   "data": {
     "task": "verify_citations",
+    "content": "## Mini verification report\n\n- vaswani-2017-attention: verified\n- smith-2024-fabricated: metadata_mismatch_year (wrong classification; actually a fabricated DOI)\n",
     "citations_checked": 2,
+    "verdict_summary": {
+      "verified": 1,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 1,
+      "unverifiable": 0
+    },
     "verdicts": [
       {
         "reference_id": "vaswani-2017-attention",
@@ -18,7 +27,11 @@
         "confidence": 0.98,
         "evidence": {
           "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
-          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" }
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
         }
       },
       {
@@ -28,9 +41,22 @@
         "evidence": {
           "parsed": { "doi": "10.1038/nonexistent-2024-99999" },
           "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
           "notes": "resolver couldn't find DOI, guessing year mismatch (wrong classification — it's a fabricated DOI, not a metadata mismatch)"
         }
       }
-    ]
-  }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
 }

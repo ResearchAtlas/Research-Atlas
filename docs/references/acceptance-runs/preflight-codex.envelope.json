@@ -1757,7 +1757,8 @@
       "contradictions": "pass",
       "unverifiable_noted": "pass",
       "format_match": "pass",
-      "verify_framework": "pass"
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
     }
   },
   "errors": []

@@ -4,18 +4,35 @@
 // Validates a single output envelope against the schema_version 2 shape
 // that every Atlas skill (flagship + future runtime consumers) agrees on:
 //
-//   { meta, status, data, errors?, self_check? }
+//   { meta, status, data, errors? }
+//   data: { task, content?, verdicts?, verdict_summary?, self_check?, ... }
 //
-// This validator is INTENTIONALLY SKILL-AGNOSTIC. It enforces:
-//   - envelope shape + required fields
-//   - types on well-known fields (status, verdict confidence, etc.)
+// This validator is SKILL-AGNOSTIC by default with a small dispatch table
+// for skills whose contract is tight enough to assert structurally here
+// (currently: research-verification). It enforces:
+//   - envelope shape + required fields (meta, status, data, errors array)
+//   - types + format on well-known fields (UUID v4 run_id, ISO-8601
+//     timestamp, SemVer version, status enum)
+//   - data.content: required when status is success|partial AND
+//     data.verdicts is present (prevents "I emitted JSON but no report")
 //   - the `verdicts_complete` invariant whenever `data.verdicts` is present:
 //       data.verdicts.length === meta.input_count      (preferred signal)
 //       data.verdicts.length === data.citations_checked (fallback)
 //       (skipped only when neither signal is set)
+//   - self_check: when data.verdicts is present, self_check is required
+//     and must contain `verdicts_complete` as one of its keys; all values
+//     must be "pass" or "fail"
+//   - evidence structural presence: each verdict's evidence block must
+//     contain `parsed` (required), `resolved`, `cross_check`, `candidates`
+//     as structurally present keys (nullable scalar/object, or array).
+//     `notes` and `abstract_snippet` are optional — they're truly
+//     informational, not signals consumers key on.
+//   - verdict_summary: when present, must be a flat object of
+//     { string -> non-negative integer }. When meta.skill is in the
+//     SKILL_RULES table, keys must be from that skill's closed set.
 //
-// It does NOT enforce the verdict enum, task whitelist, or evidence shape
-// beyond "must be an object with a `parsed` block" — those contracts belong
+// It does NOT enforce the verdict enum, task whitelist, or evidence
+// contents beyond structural presence — deeper semantic contracts belong
 // in per-skill validators layered on top of this one (Phase 3 runtime).
 //
 // The envelope is JSON. Human-readable transcripts often embed abbreviated
@@ -43,6 +60,35 @@ const SKILL_SLUG = /^[a-z][a-z0-9-]*[a-z0-9]$/;
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const ISO_8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SUMMARY_KEY = /^[a-z][a-z0-9_]*$/;
+
+// Per-skill structural assertions that are tight enough to bake into the
+// shared validator. Keep this small — one entry per Tier 1 skill. Deeper
+// skill-specific logic (verdict enum, evidence semantics) belongs in a
+// dedicated per-skill validator loaded in Phase 3 runtime.
+const SKILL_RULES = {
+  'research-verification': {
+    // Closed set of verdict_summary keys. Fine-grained verdict classes
+    // (fabricated_doi, metadata_mismatch_*) live in data.verdicts[*].verdict;
+    // they roll up into the `fabricated` bucket here.
+    verdict_summary_keys: new Set([
+      'verified',
+      'partially_supported',
+      'unsupported',
+      'contradicted',
+      'fabricated',
+      'unverifiable',
+    ]),
+    // Keys that must be structurally present on every verdict's evidence
+    // block. Scalar/object entries may be null; array entries must be an
+    // array (possibly empty). Shapes (when non-null) are checked below.
+    evidence_required_keys: {
+      resolved: { shape: 'object-or-null' },
+      cross_check: { shape: 'object-or-null' },
+      candidates: { shape: 'array' },
+    },
+  },
+};
 
 export function validateEnvelope(obj) {
   const errors = [];
@@ -65,7 +111,7 @@ export function validateEnvelope(obj) {
 
   validateData(obj, push);
   validateErrors(obj.errors, push);
-  validateSelfCheck(obj.self_check, push);
+  validateSelfCheck(obj, push);
 
   return { ok: errors.length === 0, errors };
 }
@@ -99,7 +145,7 @@ function validateMeta(meta, push) {
 }
 
 function validateData(obj, push) {
-  const { meta, data } = obj;
+  const { meta, data, status } = obj;
 
   if (typeof data.task !== 'string' || data.task.length === 0) {
     push('data.task', 'must be a non-empty string');
@@ -116,11 +162,26 @@ function validateData(obj, push) {
     }
   }
 
+  validateVerdictSummary(meta, data.verdict_summary, push);
+
   if (data.verdicts === undefined) return;
 
   if (!Array.isArray(data.verdicts)) {
     push('data.verdicts', 'must be an array when present');
     return;
+  }
+
+  // When we're producing verdicts and the run is not an outright error,
+  // consumers rely on `content` as the human-readable twin of the
+  // machine output. Missing content means the agent synthesized JSON
+  // without the prose report the task advertised.
+  if (status === 'success' || status === 'partial') {
+    if (typeof data.content !== 'string') {
+      push(
+        'data.content',
+        `required when status is "${status}" and data.verdicts is present (may be empty string only for output_format=json)`,
+      );
+    }
   }
 
   const expectedFromInputCount = Number.isInteger(meta?.input_count) ? meta.input_count : null;
@@ -137,10 +198,47 @@ function validateData(obj, push) {
     );
   }
 
-  data.verdicts.forEach((v, i) => validateVerdict(v, i, push));
+  const skillRules = SKILL_RULES[meta?.skill];
+  data.verdicts.forEach((v, i) => validateVerdict(v, i, skillRules, push));
 }
 
-function validateVerdict(v, i, push) {
+function validateVerdictSummary(meta, summary, push) {
+  if (summary === undefined) return;
+  if (!summary || typeof summary !== 'object' || Array.isArray(summary)) {
+    push('data.verdict_summary', 'must be an object when present');
+    return;
+  }
+  const rules = SKILL_RULES[meta?.skill];
+  for (const [key, value] of Object.entries(summary)) {
+    if (!SUMMARY_KEY.test(key)) {
+      push(`data.verdict_summary.${key}`, 'key must match /^[a-z][a-z0-9_]*$/');
+    } else if (rules && !rules.verdict_summary_keys.has(key)) {
+      push(
+        `data.verdict_summary.${key}`,
+        `key not allowed for skill "${meta.skill}"; allowed: ${[...rules.verdict_summary_keys].join(', ')}`,
+      );
+    }
+    if (!Number.isInteger(value) || value < 0) {
+      push(`data.verdict_summary.${key}`, `must be a non-negative integer, got ${JSON.stringify(value)}`);
+    }
+  }
+  // When a closed-key skill is identified, require ALL canonical keys to
+  // be present. A skill that lists only the keys it happens to have
+  // non-zero counts for makes downstream rollup code branch on presence
+  // vs. absence — structural presence is easier to reason about.
+  if (rules) {
+    for (const key of rules.verdict_summary_keys) {
+      if (!(key in summary)) {
+        push(
+          `data.verdict_summary.${key}`,
+          `required key for skill "${meta.skill}" (may be 0, but must be structurally present)`,
+        );
+      }
+    }
+  }
+}
+
+function validateVerdict(v, i, skillRules, push) {
   const at = (field) => `data.verdicts[${i}].${field}`;
   if (!v || typeof v !== 'object' || Array.isArray(v)) {
     push(`data.verdicts[${i}]`, 'must be an object');
@@ -159,8 +257,28 @@ function validateVerdict(v, i, push) {
     push(at('evidence'), 'missing or not an object');
     return;
   }
+  // `evidence.parsed` is the one key all Atlas skills agree on — Step 0.5
+  // (or its equivalent) always populates it before dispatch. Beyond that,
+  // evidence shape is skill-specific and checked from the SKILL_RULES
+  // table. Skills without a rules entry get only the parsed check.
   if (!v.evidence.parsed || typeof v.evidence.parsed !== 'object' || Array.isArray(v.evidence.parsed)) {
     push(at('evidence.parsed'), 'required; must be an object');
+  }
+  if (!skillRules?.evidence_required_keys) return;
+  for (const [key, spec] of Object.entries(skillRules.evidence_required_keys)) {
+    if (!(key in v.evidence)) {
+      const hint = spec.shape === 'array'
+        ? 'use [] when not populated'
+        : 'use null when not populated';
+      push(at(`evidence.${key}`), `key is structurally required (${hint})`);
+      continue;
+    }
+    const value = v.evidence[key];
+    if (spec.shape === 'array' && !Array.isArray(value)) {
+      push(at(`evidence.${key}`), 'must be an array (possibly empty)');
+    } else if (spec.shape === 'object-or-null' && value !== null && (typeof value !== 'object' || Array.isArray(value))) {
+      push(at(`evidence.${key}`), 'must be an object or null');
+    }
   }
 }
 
@@ -184,16 +302,34 @@ function validateErrors(errs, push) {
   });
 }
 
-function validateSelfCheck(sc, push) {
-  if (sc === undefined) return;
+function validateSelfCheck(obj, push) {
+  // self_check lives under data (see SKILL.md output envelope). Older
+  // examples put it at the envelope root; tolerate that for read but
+  // assert the canonical location for write.
+  const hasVerdicts = Array.isArray(obj?.data?.verdicts);
+  const sc = obj?.data?.self_check ?? obj?.self_check;
+  const scPath = obj?.data?.self_check !== undefined ? 'data.self_check' : 'self_check';
+
+  if (sc === undefined) {
+    if (hasVerdicts) {
+      push('data.self_check', 'required when data.verdicts is present');
+    }
+    return;
+  }
   if (!sc || typeof sc !== 'object' || Array.isArray(sc)) {
-    push('self_check', 'must be an object when present');
+    push(scPath, 'must be an object when present');
     return;
   }
   for (const [key, value] of Object.entries(sc)) {
     if (value !== 'pass' && value !== 'fail') {
-      push(`self_check.${key}`, `must be "pass" or "fail", got ${JSON.stringify(value)}`);
+      push(`${scPath}.${key}`, `must be "pass" or "fail", got ${JSON.stringify(value)}`);
     }
+  }
+  if (hasVerdicts && !('verdicts_complete' in sc)) {
+    push(
+      `${scPath}.verdicts_complete`,
+      'required when data.verdicts is present (self-reported twin of the validator length check)',
+    );
   }
 }
 
