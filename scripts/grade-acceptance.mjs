@@ -136,13 +136,35 @@ export function gradeParity(envelopes, groundTruth) {
 }
 
 function indexVerdicts(envelope) {
+  // The grader keys verdicts by the ground-truth item id (a stable
+  // corpus-position string like "1", "2", ..., "30"). The skill's
+  // SKILL.md Step 0.5 emits slug-style reference_ids like
+  // "vaswani-2017-attention-is-all-you-need" by default, which do not
+  // collide with the ground-truth keys. To tolerate both schemes, we
+  // index by every reasonable handle:
+  //   - the verdict's own reference_id (slug or numeric)
+  //   - the 1-indexed position of the verdict in data.verdicts[]
+  //     (mirrors the corpus's numeric enumeration, which is the
+  //     contract the ground-truth file uses)
+  // Ordinal fallback is safe because the skill processes references
+  // in input order and emits one verdict per input chunk (Step 0.5
+  // de-dup keeps first occurrence, so ordinality matches corpus
+  // position as long as no dedup fires; when dedup fires the
+  // duplicate is recorded in errors, not verdicts). When both a slug
+  // and an ordinal resolve to the same verdict, the slug wins because
+  // it was set first.
   const out = new Map();
   const verdicts = envelope?.data?.verdicts ?? [];
-  for (const v of verdicts) {
-    if (v && typeof v.reference_id === 'string') {
+  verdicts.forEach((v, i) => {
+    if (!v) return;
+    if (typeof v.reference_id === 'string' && !out.has(v.reference_id)) {
       out.set(v.reference_id, v);
     }
-  }
+    const ordinal = String(i + 1);
+    if (!out.has(ordinal)) {
+      out.set(ordinal, v);
+    }
+  });
   return out;
 }
 
@@ -216,7 +238,9 @@ function checkPrecision(groundTruth, byRef) {
 }
 
 function checkEvidencePresent(byRef) {
-  const flagged = [...byRef.values()].filter((v) => FLAG_VERDICTS.has(v.verdict));
+  // byRef indexes by multiple handles (slug + ordinal fallback) so the
+  // same verdict can appear under two keys; dedup by object identity.
+  const flagged = [...new Set(byRef.values())].filter((v) => FLAG_VERDICTS.has(v.verdict));
   const missing = flagged.filter((v) => !hasResolverCheck(v.evidence));
   return {
     name: 'evidence_present',
