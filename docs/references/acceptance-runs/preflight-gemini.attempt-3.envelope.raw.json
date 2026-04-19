@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.1.0",
+    "schema_version": 2,
+    "run_id": "8b2d4e1a-c5f3-4a1b-9e2d-7c5f3a1b9e2d",
+    "timestamp": "2026-04-19T15:10:00Z",
+    "input_count": 30
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "citations_checked": 30,
+    "verdict_summary": {
+      "verified": 25,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 5,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention-is-all-you-need",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arXiv.1706.03762", "title": "Attention is all you need", "authors": ["Vaswani, A."], "year": 2017, "venue": "NeurIPS", "source_format": "prose" },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need", "authors": ["Ashish Vaswani"], "year": 2017, "venue": "NeurIPS", "source": "openalex" },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "pass": true } },
+          "candidates": [],
+          "abstract_snippet": "The dominant sequence transduction models...",
+          "notes": null
+        }
+      },
+      {
+        "reference_id": "smith-2024-quantum-emergence",
+        "verdict": "fabricated_doi",
+        "confidence": 0.99,
+        "evidence": {
+          "parsed": { "doi": "10.1038/s42256-024-01247-fake", "title": "Quantum emergence of AI consciousness", "authors": ["Smith, J."], "year": 2024, "venue": "Nature Machine Intelligence", "source_format": "prose" },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex."
+        }
+      },
+      {
+        "reference_id": "smith-2017-attention-is-all-you-need",
+        "verdict": "metadata_mismatch_author",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arXiv.1706.03762", "title": "Attention is all you need", "authors": ["Smith, J."], "year": 2017, "venue": "NeurIPS", "source_format": "prose" },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need", "authors": ["Ashish Vaswani"], "year": 2017, "venue": "NeurIPS", "source": "openalex" },
+          "cross_check": { "title": { "pass": true }, "author": { "parsed": "Smith", "resolved": "Vaswani", "pass": false }, "year": { "pass": true } },
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "Author mismatch on real DOI."
+        }
+      },
+      {
+        "reference_id": "lecun-2020-deep-learning",
+        "verdict": "metadata_mismatch_year",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": "10.1038/nature14539", "title": "Deep learning", "authors": ["LeCun, Y."], "year": 2020, "venue": "Nature", "source_format": "prose" },
+          "resolved": { "doi": "10.1038/nature14539", "title": "Deep Learning", "authors": ["Yann LeCun"], "year": 2015, "venue": "Nature", "source": "crossref" },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "parsed": 2020, "resolved": 2015, "pass": false } },
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "Year mismatch on real DOI."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}
