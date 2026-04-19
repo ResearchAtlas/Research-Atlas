@@ -273,7 +273,7 @@ node scripts/grade-acceptance.mjs --parity \
   docs/references/acceptance-runs/claude-code.envelope.json \
   docs/references/acceptance-runs/codex.envelope.json \
   docs/references/acceptance-runs/gemini.envelope.json \
-  .claude/skills/research-verification/examples/acceptance-ground-truth.json
+  docs/references/eval-harness/acceptance-ground-truth.json
 ```
 
 ## P5 - Release mechanics

@@ -252,25 +252,38 @@ public gate from a worktree that predates them, we should expect
 the same contamination from any agent that happens to browse the
 repo before executing.
 
-Decision needed before retry:
+### Remediation landed (2026-04-19, before attempt 3)
 
-- **Option A — procedural fix only.** Add an explicit "do not
-  consult `docs/references/acceptance-runs/**` or
-  `plugin/skills/research-verification/examples/acceptance-ground-truth.json` during the run; process only the references the
-  user pasted into chat, via the resolver pipeline defined below"
-  directive to SKILL.md. Lightest touch. Relies on agents
-  following instructions.
-- **Option B — structural isolation.** Move the prior transcripts
-  and the ground-truth out of the default install surface (e.g.
-  into `private-docs/` excluded from the plugin payload, or behind
-  an unpublished branch that only the grader harness checks out).
-  Most durable. Highest churn at this stage of the gate.
-- **Option C — retry prompt override.** Keep SKILL.md as-is, but
-  explicitly tell Codex in the retry prompt not to read those
-  files. One-shot fix for L2 only; does not help P1.
+Both Option A (structural) and Option B (directive) from the earlier
+triage were applied:
 
-Recommendation: ship v1 with Option A + Option C for L2 retry, and
-revisit Option B post-v1 when we can afford the churn.
+- **Oracle moved out of the shipped skill bundle.** The
+  `acceptance-ground-truth.json` file was relocated from
+  `.claude/skills/research-verification/examples/` to
+  `docs/references/eval-harness/acceptance-ground-truth.json`. The
+  mirror script re-ran and dropped the now-orphaned copies from
+  `.agents/skills/research-verification/examples/` and
+  `plugin/skills/research-verification/examples/`. Cold P1 installs
+  will no longer have the oracle in their checkout of the plugin
+  payload. The grader continues to read the file via CLI arg from
+  its new location; `RUN-COMMANDS.md` and
+  `docs/references/eval-harness/README.md` were updated to match.
+- **SKILL.md anti-piggyback invariants added.** A new "Execution
+  Invariants" section near the top of the canonical `SKILL.md`
+  forbids reading grader oracles or prior acceptance transcripts
+  during a run, forbids echoing prior verdicts, and requires the
+  full envelope. The change propagated to `.agents/` and `plugin/`
+  via the mirror. This travels with the skill to every install
+  surface.
+- **Retry prompt still carries explicit forbid-rules as belt and
+  suspenders**, because neither the structural nor the directive
+  fix can prevent an agent from reading `docs/` if it decides to
+  browse the workspace. The prompt is one more signal.
+
+The eval-harness README's "five mandatory components" section was
+also updated so future Tier 1 skills inherit this layout by default:
+ground-truth lives under `docs/references/eval-harness/`, never
+inside a skill's `examples/` directory.
 
 ## Third-attempt retry protocol (supersedes the Retry plan above)
 
@@ -280,7 +293,8 @@ revisit Option B post-v1 when we can afford the churn.
    fixed as long as `.codex/skills/research-verification/` is
    absent).
 3. Single first message, prefix-first, with explicit anti-piggyback
-   directives:
+   directives (redundant with SKILL.md Execution Invariants, kept
+   in the prompt as belt and suspenders):
    ```
    verify these references - detailed depth, markdown output
 
@@ -288,9 +302,10 @@ revisit Option B post-v1 when we can afford the churn.
    - Do NOT read any file under docs/references/acceptance-runs/.
      Those transcripts are prior-run evidence and must not
      influence this run.
-   - Do NOT read plugin/skills/research-verification/examples/
-     acceptance-ground-truth.json. That file is an oracle used by
-     the grader harness; reading it contaminates the run.
+   - Do NOT read docs/references/eval-harness/acceptance-ground-truth.json. That file is the grader oracle;
+     reading it contaminates the run. (Note: it no longer lives
+     under the shipped skill bundle; do not search for it in
+     .claude/skills/ or .agents/skills/ or plugin/skills/ either.)
    - Process ONLY the 30 references I have pasted below. Execute
      the resolver pipeline defined in SKILL.md (CrossRef primary,
      OpenAlex fallback, metadata cross-check via VERIFY framework)
@@ -304,10 +319,10 @@ revisit Option B post-v1 when we can afford the churn.
     comment lines>
    ```
 4. Start stopwatch on Enter.
-5. If Codex begins reading `acceptance-ground-truth.json` or any
-   file under `docs/references/acceptance-runs/`, stop the run and
-   treat it as a third failed attempt — do not let it complete
-   against the oracle.
+5. If Codex begins reading `docs/references/eval-harness/acceptance-ground-truth.json` or any file under
+   `docs/references/acceptance-runs/`, stop the run and treat it as
+   a third failed attempt — do not let it complete against the
+   oracle.
 6. Stop stopwatch when the final `schema_version: 2` envelope
    renders in chat.
 7. Capture the FULL envelope (do not trim), elapsed time, and every

@@ -11,26 +11,48 @@ implementation. New skills follow the same pattern.
 ## What an eval-harness bundle looks like
 
 A skill that reaches Tier 1 status ships a locked evaluation bundle
-co-located with the skill source:
+split across two trees: the **user-facing examples bundle**
+co-located with the skill source (which ships via the plugin
+payload), and the **maintainer-only grader bundle** under
+`docs/references/eval-harness/` (which does NOT ship to installers).
 
 ```
-.claude/skills/<skill-name>/
+.claude/skills/<skill-name>/                  # ships in the plugin payload
 ├── SKILL.md                                  # canonical body (progressive disclosure)
 ├── references/                               # on-demand-loaded sub-docs
 └── examples/
     ├── acceptance-corpus.<ext>               # the locked input corpus
-    ├── acceptance-ground-truth.json          # expected verdicts / checks
     └── acceptance-test-transcript.md         # reference transcript (one agent)
+
+docs/references/eval-harness/                 # maintainer-only, not mirrored to .agents/ or plugin/
+└── acceptance-ground-truth.json              # expected verdicts / checks (the grader oracle)
 ```
+
+**Why the oracle lives outside the skill bundle.** Any file that
+enumerates the expected verdicts for the acceptance corpus is an
+answer key, and shipping it next to the skill lets any agent running
+the corpus read it during the run and echo its contents back as
+"verification." The L2 Codex preflight failed on exactly this
+contamination path on 2026-04-19 — see
+[`../acceptance-runs/preflight-codex.md`](../acceptance-runs/preflight-codex.md)
+attempt 2. The oracle stays with the grader script under
+`docs/references/eval-harness/` so maintainers can run grading against
+saved envelopes without exposing the answers to an in-session agent.
+The skill's `SKILL.md` Execution Invariants section also explicitly
+forbids reading oracle or prior-transcript files during a run as a
+belt-and-suspenders defense.
 
 ### Current state of `research-verification` (the reference skill)
 
-As of 2026-04-18 the flagship ships these bundle artifacts:
+As of 2026-04-19 the flagship ships these bundle artifacts:
 
 - [`SKILL.md`](../../../.claude/skills/research-verification/SKILL.md)
 - [`examples/acceptance-corpus.txt`](../../../.claude/skills/research-verification/examples/acceptance-corpus.txt) (locked 2026-04-17, 30 items)
-- [`examples/acceptance-ground-truth.json`](../../../.claude/skills/research-verification/examples/acceptance-ground-truth.json) (the machine-readable labels file that maps each corpus item to its expected verdict class and evidence requirements)
 - [`examples/acceptance-test-transcript.md`](../../../.claude/skills/research-verification/examples/acceptance-test-transcript.md) (reference Claude Code transcript, abbreviated)
+
+Maintainer-only grader artifacts (NOT shipped):
+
+- [`acceptance-ground-truth.json`](./acceptance-ground-truth.json) (the machine-readable labels file that maps each corpus item to its expected verdict class and evidence requirements; consumed only by the grader at `scripts/grade-acceptance.mjs`)
 
 Still missing (Phase 1 T3 remainder): the three live-run per-agent
 transcripts + saved `*.envelope.json` files in
@@ -61,7 +83,14 @@ Any skill claiming Tier 1 ships all five:
    must be comparing the same inputs.
 
 2. **Ground truth.** A machine-readable labels file that says what
-   the correct output should be for every input item. Format:
+   the correct output should be for every input item. **Lives under
+   `docs/references/eval-harness/`, NOT inside the skill's
+   `examples/` directory** — the mirror script (`scripts/mirror-skills.mjs`)
+   would otherwise copy the oracle into `.agents/` and `plugin/`,
+   where a running agent can read it during a verification pass and
+   silently echo the expected verdicts. This split was introduced
+   2026-04-19 after the L2 Codex preflight caught an agent doing
+   exactly that. Format:
 
    ```json
    {
