@@ -37,6 +37,26 @@ verify these references - detailed depth, markdown output
 Start the stopwatch when you press Enter on the prompt. Stop it when
 the agent emits the final envelope.
 
+**Track human approval wait separately.** Interactive agents (Claude
+Code, Codex, Gemini) pause for per-tool permission prompts. That pause
+is operator reaction time, not agent compute. While the run is going,
+count every approval prompt you clear. At the end, multiply by a
+conservative per-prompt estimate (~10 s each; longer if you stepped
+away) and record it as `approval_seconds` in the transcript.
+
+Pass both numbers to the grader:
+
+```bash
+node scripts/grade-acceptance.mjs <env.json> <ground-truth.json> \
+    --elapsed-minutes=<wall_clock> \
+    --approval-seconds=<approval_wait>
+```
+
+The grader computes `active = wall_clock - approval_seconds/60` and
+grades active time against the 5-min threshold. Wall-clock without
+subtracting approval wait under-reports agent speed when tool
+approvals are frequent (Gemini WebFetch / GoogleSearch especially).
+
 ## Canonical publish variable
 
 Before P1-P3, decide the public repo that v1 ships from.

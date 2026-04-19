@@ -24,7 +24,7 @@
     },
     {
       "id": "latency",
-      "spec": "wall-clock <= 5 minutes at verification_depth=detailed",
+      "spec": "active agent time <= 5 minutes at verification_depth=detailed, where active = wall-clock minus time spent waiting on user approval prompts (tool-permission dialogs, sandbox prompts, etc.)",
       "threshold_minutes": 5
     },
     {

@@ -10,11 +10,24 @@
 // envelope_conforms, latency. Latency is only graded when the operator
 // passes --elapsed-minutes=<N>, since wall-clock isn't in the envelope.
 //
+// Latency measures ACTIVE AGENT TIME, not raw wall-clock. Interactive
+// agents (Claude Code, Gemini, Codex) pause for per-tool approval
+// prompts that the operator must manually accept. That wait is human
+// latency, not agent latency, and scaling the number of tool calls (or
+// the operator's reaction time) shouldn't push a well-behaved agent
+// over the gate. The operator records two numbers:
+//   --elapsed-minutes=N       wall-clock from prompt to final envelope
+//   --approval-seconds=N      total seconds spent waiting on approvals
+//                             (optional; default 0 — old behavior)
+// Active agent time = elapsed_minutes - approval_seconds/60, and the
+// gate threshold is applied to active time. Both numbers are reported.
+//
 // Parity mode (--parity) takes 3+ envelopes plus a ground-truth file
 // and scores cross_agent_parity (exact + coarse-class match).
 //
 // Usage:
-//   node scripts/grade-acceptance.mjs <envelope.json> <ground-truth.json> [--elapsed-minutes=N]
+//   node scripts/grade-acceptance.mjs <envelope.json> <ground-truth.json> \
+//       [--elapsed-minutes=N] [--approval-seconds=N]
 //   node scripts/grade-acceptance.mjs --parity <env1.json> <env2.json> <env3.json> <ground-truth.json>
 //
 // Exit codes: 0 all conditions pass, 1 any fail, 2 usage error.
@@ -61,14 +74,15 @@ export function grade(envelope, groundTruth, opts = {}) {
   conditions.push(checkEnvelopeConforms(envelope, groundTruth));
 
   if (typeof opts.elapsed_minutes === 'number') {
-    conditions.push(checkLatency(opts.elapsed_minutes, groundTruth));
+    const approvalSeconds = typeof opts.approval_seconds === 'number' ? opts.approval_seconds : 0;
+    conditions.push(checkLatency(opts.elapsed_minutes, approvalSeconds, groundTruth));
   } else {
     const threshold = findThreshold(groundTruth, 'latency', 'threshold_minutes');
     conditions.push({
       name: 'latency',
       pass: null,
-      actual: 'not measured (pass --elapsed-minutes=N)',
-      expected: threshold != null ? `<= ${threshold} min` : 'unspecified',
+      actual: 'not measured (pass --elapsed-minutes=N; add --approval-seconds=N to exclude human approval wait)',
+      expected: threshold != null ? `<= ${threshold} min active agent time` : 'unspecified',
     });
   }
 
@@ -281,13 +295,17 @@ function checkEnvelopeConforms(envelope, groundTruth) {
   };
 }
 
-function checkLatency(elapsedMinutes, groundTruth) {
+function checkLatency(elapsedMinutes, approvalSeconds, groundTruth) {
   const threshold = findThreshold(groundTruth, 'latency', 'threshold_minutes') ?? 5;
+  const activeMinutes = Math.max(0, elapsedMinutes - approvalSeconds / 60);
+  const actual = approvalSeconds > 0
+    ? `${activeMinutes.toFixed(1)} min active (${elapsedMinutes} min wall-clock minus ${approvalSeconds}s human approval wait)`
+    : `${elapsedMinutes} min elapsed (no approval wait reported — treated as 100% active time; pass --approval-seconds=N if applicable)`;
   return {
     name: 'latency',
-    pass: elapsedMinutes <= threshold,
-    actual: `${elapsedMinutes} min elapsed`,
-    expected: `<= ${threshold} min`,
+    pass: activeMinutes <= threshold,
+    actual,
+    expected: `<= ${threshold} min active agent time`,
   };
 }
 
@@ -316,6 +334,7 @@ async function runCli() {
 async function runSingle(argv) {
   const positional = [];
   let elapsedMinutes;
+  let approvalSeconds;
   for (const a of argv) {
     if (a.startsWith('--elapsed-minutes=')) {
       const n = Number(a.slice('--elapsed-minutes='.length));
@@ -324,6 +343,13 @@ async function runSingle(argv) {
         process.exit(2);
       }
       elapsedMinutes = n;
+    } else if (a.startsWith('--approval-seconds=')) {
+      const n = Number(a.slice('--approval-seconds='.length));
+      if (!Number.isFinite(n) || n < 0) {
+        console.error(`--approval-seconds needs a non-negative number, got: ${a}`);
+        process.exit(2);
+      }
+      approvalSeconds = n;
     } else if (a.startsWith('--')) {
       console.error(`unknown flag: ${a}`);
       process.exit(2);
@@ -337,10 +363,17 @@ async function runSingle(argv) {
     process.exit(2);
   }
 
+  if (typeof approvalSeconds === 'number' && typeof elapsedMinutes !== 'number') {
+    console.error('--approval-seconds requires --elapsed-minutes to be set as well');
+    process.exit(2);
+  }
+
   const [envPath, gtPath] = positional;
   const envelope = await readJson(envPath);
   const groundTruth = await readJson(gtPath);
-  const opts = typeof elapsedMinutes === 'number' ? { elapsed_minutes: elapsedMinutes } : {};
+  const opts = {};
+  if (typeof elapsedMinutes === 'number') opts.elapsed_minutes = elapsedMinutes;
+  if (typeof approvalSeconds === 'number') opts.approval_seconds = approvalSeconds;
   const { conditions, passed_all } = grade(envelope, groundTruth, opts);
   reportConditions(conditions);
   process.exit(passed_all ? 0 : 1);
@@ -390,8 +423,13 @@ function reportConditions(conditions) {
 function printUsage() {
   console.error(
     'usage:\n' +
-      '  grade-acceptance.mjs <envelope.json> <ground-truth.json> [--elapsed-minutes=N]\n' +
-      '  grade-acceptance.mjs --parity <env1.json> <env2.json> <env3.json> [...] <ground-truth.json>',
+      '  grade-acceptance.mjs <envelope.json> <ground-truth.json> \\\n' +
+      '      [--elapsed-minutes=N] [--approval-seconds=N]\n' +
+      '  grade-acceptance.mjs --parity <env1.json> <env2.json> <env3.json> [...] <ground-truth.json>\n' +
+      '\n' +
+      '  --elapsed-minutes=N    total wall-clock minutes from trigger to final envelope\n' +
+      '  --approval-seconds=N   total seconds spent waiting on user approval prompts\n' +
+      '                         (subtracted from wall-clock to get active agent time)',
   );
 }
 
