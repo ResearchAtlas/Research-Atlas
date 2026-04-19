@@ -27,10 +27,10 @@
 //     contain `parsed` (required, object). Skills in SKILL_RULES additionally
 //     require every listed evidence key to be structurally present with a
 //     matching shape (nullable object, array, or nullable string).
-//   - verdict_summary: when present, must be a flat object of
-//     { string -> non-negative integer }. When meta.skill is in the
-//     SKILL_RULES table, keys must be from that skill's closed set AND
-//     counts must match a rollup of data.verdicts under the skill's
+//   - verdict_summary: required whenever data.verdicts is present. Must be
+//     a flat object of { string -> non-negative integer }. When meta.skill
+//     is in the SKILL_RULES table, keys must be from that skill's closed
+//     set AND counts must match a rollup of data.verdicts under the skill's
 //     verdict_rollup map (catches drift between summary totals and the
 //     actual verdict list; also flags unknown verdict classes).
 //
@@ -199,9 +199,10 @@ function validateData(obj, push) {
     }
   }
 
-  validateVerdictSummary(meta, data.verdict_summary, push);
+  const hasVerdicts = data.verdicts !== undefined;
+  validateVerdictSummary(meta, data.verdict_summary, hasVerdicts, push);
 
-  if (data.verdicts === undefined) return;
+  if (!hasVerdicts) return;
 
   if (!Array.isArray(data.verdicts)) {
     push('data.verdicts', 'must be an array when present');
@@ -276,8 +277,13 @@ function validateVerdictSummaryCounts(meta, data, push) {
   }
 }
 
-function validateVerdictSummary(meta, summary, push) {
-  if (summary === undefined) return;
+function validateVerdictSummary(meta, summary, hasVerdicts, push) {
+  if (summary === undefined) {
+    if (hasVerdicts) {
+      push('data.verdict_summary', 'required when data.verdicts is present');
+    }
+    return;
+  }
   if (!summary || typeof summary !== 'object' || Array.isArray(summary)) {
     push('data.verdict_summary', 'must be an object when present');
     return;

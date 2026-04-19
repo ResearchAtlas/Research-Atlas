@@ -12,6 +12,10 @@
     "task": "citation_audit",
     "content": "## Citation audit\n\n- cite-001: supports claim\n- cite-002: cited for an unsupported claim\n",
     "citations_checked": 2,
+    "verdict_summary": {
+      "supports_claim": 1,
+      "off_topic": 1
+    },
     "verdicts": [
       {
         "reference_id": "cite-001",
