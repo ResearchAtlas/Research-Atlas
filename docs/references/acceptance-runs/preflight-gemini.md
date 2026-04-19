@@ -217,12 +217,17 @@ validator caught every gap.
 
 ## Attempt 4 — PARTIAL PASS (4/5 conditions after run_id repair)
 
-Saved raw envelope (as-pasted, placeholder run_id preserved, first
-verdict only for size):
+Saved raw envelope (as-pasted, full 30 verdicts, placeholder run_id
+preserved; byte-identical to canonical except for one line):
 [`preflight-gemini.attempt-4.envelope.raw.json`](preflight-gemini.attempt-4.envelope.raw.json)
 
-Canonical envelope (run_id repaired to valid UUID v4, full 30 verdicts):
+Canonical envelope (run_id repaired to valid UUID v4, otherwise
+bit-identical to raw):
 [`preflight-gemini.envelope.json`](preflight-gemini.envelope.json)
+
+See §"Mechanical run_id repair (auditable chain of custody)" below
+for the diff + validator-single-breach + SHA-256 proof that these
+two files differ on exactly one field.
 
 Run profile:
 
@@ -319,7 +324,7 @@ concurrent fetch with no consent gating. Gate interpretation: L3
 closes **PARTIAL PASS (4/5)** on the same terms as L2 (Option A),
 with the latency miss declared here and in the announce draft.
 
-### Mechanical run_id repair (documented and auditable)
+### Mechanical run_id repair (auditable chain of custody)
 
 **Single issue caught by the hardened validator.** Gemini's
 attempt-4 envelope carried a placeholder-shaped `meta.run_id`:
@@ -340,13 +345,60 @@ blocks, self_check — passed the hardened contract as-written.
 the canonical envelope. The repaired run_id is
 `e4b99088-c45f-4359-a9d2-5ed33f01aab5`. No other field was altered.
 
+**Chain of custody — reviewer-verifiable.** Both files are
+committed in full (23,016 bytes each). A reviewer can verify the
+repair scope independently, without trusting this transcript:
+
+1. **Byte-level diff shows exactly one line differs.** Run
+   ```bash
+   diff docs/references/acceptance-runs/preflight-gemini.attempt-4.envelope.raw.json \
+        docs/references/acceptance-runs/preflight-gemini.envelope.json
+   ```
+   Output:
+   ```
+   6c6
+   <     "run_id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
+   ---
+   >     "run_id": "e4b99088-c45f-4359-a9d2-5ed33f01aab5",
+   ```
+
+2. **Validator against raw emits exactly one error.** Run
+   ```bash
+   node scripts/validators/envelope.mjs --glob \
+     "docs/references/acceptance-runs/preflight-gemini.attempt-4.envelope.raw.json"
+   ```
+   Output:
+   ```
+   FAIL  preflight-gemini.attempt-4.envelope.raw.json
+           meta.run_id: must be a UUID string
+   ```
+   Exactly one validator diagnostic, on the exact field the repair
+   touched. All other hardened rules (evidence keys, verdict_summary
+   rollup, non-empty content, verdicts_complete, errors presence)
+   pass against the raw file as-pasted.
+
+3. **SHA-256 hashes** (captured at commit time, pinned here for
+   drift detection):
+   - raw: `c8e528cb6a0b19d4573dc14b9edc0b4eaa5a1597a1e585e7e2f95a6ce713c639`
+   - canonical: `b1cc01ded6ef434c91e8c663aa4fc84fe5cfc4900250834aca8981c895f6bcc8`
+
+   If either hash changes, the file has drifted and the chain of
+   custody is broken — both must be rewritten together and the
+   repair re-documented.
+
+Together the diff + validator-single-breach + hash pin prove that
+the canonical envelope differs from what Gemini actually emitted
+only by the 36-character UUID substitution on line 6. A reviewer
+does not have to take the transcript's word for it.
+
 **Precedent.** This mirrors the Codex attempt-3 backfill of
 `self_check.verdicts_complete: "pass"`, where the envelope was
 shape-valid except for a single missing key that the hardened
 schema required. In both cases the substantive skill output
 (verdicts, evidence, resolver results) was correct and independent;
 only a single mechanical field needed repair. The raw pre-repair
-envelope is preserved as `.raw.json` for audit.
+envelope is preserved as `.raw.json` in full for audit, not
+truncated.
 
 **Why this is a repair, not a fabrication.** `run_id` is a
 trace-correlation field — it exists for idempotency and log
@@ -354,7 +406,8 @@ correlation, not for correctness. The skill's *substantive* output
 (verdicts, resolver data, cross-check results, self_check) did not
 depend on run_id and was not altered. The repair substitutes one
 opaque identifier for another; it does not change any claim the
-envelope makes about the 30 input references.
+envelope makes about the 30 input references. The chain-of-custody
+evidence above makes this provable rather than asserted.
 
 **Hardening follow-up (post-v1, non-blocking for L3).** The
 canonical SKILL.md already specifies that `run_id` must be UUID v4
