@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.1.0",
+    "schema_version": 2,
+    "run_id": "8b2a3c4d-5e6f-4a0b-9c1d-2e3f4a5b6c7d",
+    "timestamp": "2026-04-19T16:45:00Z",
+    "input_count": 30
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "",
+    "citations_checked": 30,
+    "verdict_summary": {
+      "verified": 25,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 5,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention-is-all-you-need",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arXiv.1706.03762", "title": "Attention is all you need", "authors": ["Vaswani, A."], "year": 2017, "source_format": "prose" },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need", "authors": ["Vaswani, Ashish"], "year": 2017, "source": "openalex" },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "pass": true } },
+          "candidates": [],
+          "abstract_snippet": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks...",
+          "notes": "OpenAlex returned 2025 as index year, but original DOI prefix 1706 confirms 2017. Metadata match confirmed."
+        }
+      },
+      { "reference_id": "lecun-2015-deep-learning", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1038/nature14539" }, "resolved": { "title": "Deep learning", "authors": ["LeCun, Yann"], "year": 2015 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Deep learning allows computational models that are composed of multiple processing layers to learn representations of data...", "notes": null } },
+      { "reference_id": "devlin-2019-bert", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.18653/v1/N19-1423" }, "resolved": { "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding", "authors": ["Devlin, Jacob"], "year": 2019 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We introduce a new language representation model called BERT...", "notes": null } },
+      { "reference_id": "he-2016-resnet", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1109/CVPR.2016.90" }, "resolved": { "title": "Deep Residual Learning for Image Recognition", "authors": ["He, Kaiming"], "year": 2016 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Deeper neural networks are more difficult to train...", "notes": null } },
+      { "reference_id": "silver-2016-go", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1038/nature16961" }, "resolved": { "title": "Mastering the game of Go with deep neural networks and tree search", "authors": ["Silver, David"], "year": 2016 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "The game of Go has long been viewed as the most challenging of classic games...", "notes": null } },
+      { "reference_id": "hoch-1997-lstm", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1162/neco.1997.9.8.1735" }, "resolved": { "title": "Long Short-Term Memory", "authors": ["Hochreiter, Sepp"], "year": 1997 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Learning to store information over extended time intervals via recurrent backpropagation takes a very long time...", "notes": null } },
+      { "reference_id": "mnih-2015-dqn", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1038/nature14236" }, "resolved": { "title": "Human-level control through deep reinforcement learning", "authors": ["Mnih, Volodymyr"], "year": 2015 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "The theory of reinforcement learning provides a normative account...", "notes": null } },
+      { "reference_id": "rumel-1986-backprop", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1038/323533a0" }, "resolved": { "title": "Learning representations by back-propagating errors", "authors": ["Rumelhart, David E."], "year": 1986 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We describe a new learning procedure, back-propagation...", "notes": null } },
+      { "reference_id": "watson-1953-dna", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1038/171737a0" }, "resolved": { "title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid", "authors": ["Watson, J. D."], "year": 1953 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We wish to suggest a structure for the salt of deoxyribose nucleic acid (D.N.A.). This structure has novel features which are of considerable biological interest.", "notes": null } },
+      { "reference_id": "shannon-1948-communication", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1002/j.1538-7305.1948.tb01338.x" }, "resolved": { "title": "A Mathematical Theory of Communication", "authors": ["Shannon, Claude E."], "year": 1948 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "The recent development of various methods of modulation such as PCM and PPM which exchange bandwidth for signal-to-noise ratio has intensified the interest in a general theory of communication.", "notes": null } },
+      { "reference_id": "turing-1950-intelligence", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1093/mind/LIX.236.433" }, "resolved": { "title": "I.\u2014COMPUTING MACHINERY AND INTELLIGENCE", "authors": ["Turing, A. M."], "year": 1950 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "I propose to consider the question, 'Can machines think?'", "notes": null } },
+      { "reference_id": "metropolis-1953-machines", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1063/1.1699114" }, "resolved": { "title": "Equation of State Calculations by Fast Computing Machines", "authors": ["Metropolis, Nicholas"], "year": 1953 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "A general method, suitable for fast electronic computing machines, of investigating the properties of any substance...", "notes": null } },
+      { "reference_id": "higgs-1964-boson", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1103/PhysRevLett.13.508" }, "resolved": { "title": "Broken Symmetries and the Masses of Gauge Bosons", "authors": ["Higgs, Peter W."], "year": 1964 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "In a recent note it was shown that the Goldstone theorem... is not necessarily applicable to gauge theories.", "notes": null } },
+      { "reference_id": "kriz-2017-alexnet", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.1145/3065386" }, "resolved": { "title": "ImageNet classification with deep convolutional neural networks", "authors": ["Krizhevsky, Alex"], "year": 2017 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We trained a large, deep convolutional neural network to classify the 1.2 million high-resolution images...", "notes": null } },
+      { "reference_id": "radford-2021-clip", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "doi": "10.48550/arXiv.2103.00020" }, "resolved": { "title": "Learning Transferable Visual Models From Natural Language Supervision", "authors": ["Radford, Alec"], "year": 2021 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "State-of-the-art computer vision systems are trained to predict a fixed set of predetermined object categories...", "notes": null } },
+      { "reference_id": "goodfellow-2014-gan", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Generative adversarial nets", "authors": ["Goodfellow, I. J."], "year": 2014 }, "resolved": { "doi": "10.48550/arXiv.1406.2661", "title": "Generative Adversarial Nets", "authors": ["Goodfellow, Ian J."], "year": 2014 }, "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We propose a new framework for estimating generative models via an adversarial process...", "notes": "No-DOI search path verified candidate match." } },
+      { "reference_id": "brown-2020-gpt3", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Language models are few-shot learners", "authors": ["Brown, T. B."], "year": 2020 }, "resolved": { "doi": "10.48550/arXiv.2005.14165", "title": "Language Models are Few-Shot Learners", "authors": ["Brown, Tom B."], "year": 2020 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks...", "notes": null } },
+      { "reference_id": "kingma-2014-vae", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Auto-encoding variational Bayes", "authors": ["Kingma, D. P."], "year": 2014 }, "resolved": { "doi": "10.48550/arXiv.1312.6114", "title": "Auto-Encoding Variational Bayes", "authors": ["Kingma, Diederik P."], "year": 2014 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "How can we perform efficient inference and learning in directed probabilistic models...", "notes": null } },
+      { "reference_id": "bengio-2003-nplm", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "A neural probabilistic language model", "authors": ["Bengio, Y."], "year": 2003 }, "resolved": { "doi": "10.1162/153244303322533223", "title": "A Neural Probabilistic Language Model", "authors": ["Bengio, Yoshua"], "year": 2003 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "A goal of statistical language modeling is to learn the joint probability function of sequences of words...", "notes": null } },
+      { "reference_id": "raffel-2020-t5", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Exploring the limits of transfer learning", "authors": ["Raffel, C."], "year": 2020 }, "resolved": { "doi": "10.48550/arXiv.1910.10683", "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer", "authors": ["Raffel, Colin"], "year": 2020 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task...", "notes": null } },
+      { "reference_id": "radford-2019-gpt2", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Language models are unsupervised multitask learners", "authors": ["Radford, A."], "year": 2019 }, "resolved": { "doi": null, "title": "Language Models are Unsupervised Multitask Learners", "authors": ["Radford, Alec"], "year": 2019, "source": "manual_search" }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Natural language processing tasks, such as question answering, machine translation...", "notes": "Verified via OpenAI Technical Report metadata." } },
+      { "reference_id": "hinton-2015-distillation", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Distilling the knowledge in a neural network", "authors": ["Hinton, G."], "year": 2015 }, "resolved": { "doi": "10.48550/arXiv.1503.02531", "title": "Distilling the Knowledge in a Neural Network", "authors": ["Hinton, Geoffrey"], "year": 2015 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "A very simple way to improve the performance of almost any machine learning algorithm is to train many different models...", "notes": null } },
+      { "reference_id": "dosov-2021-vit", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "An image is worth 16x16 words", "authors": ["Dosovitskiy, A."], "year": 2021 }, "resolved": { "doi": "10.48550/arXiv.2010.11929", "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale", "authors": ["Dosovitskiy, Alexey"], "year": 2021 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "While the Transformer architecture has become the de-facto standard for natural language processing tasks...", "notes": null } },
+      { "reference_id": "schulman-2017-ppo", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Proximal policy optimization algorithms", "authors": ["Schulman, J."], "year": 2017 }, "resolved": { "doi": "10.48550/arXiv.1707.06347", "title": "Proximal Policy Optimization Algorithms", "authors": ["Schulman, John"], "year": 2017 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "We propose a new family of policy gradient methods for reinforcement learning...", "notes": null } },
+      { "reference_id": "sutskever-2014-seq2seq", "verdict": "verified", "confidence": 1.0, "evidence": { "parsed": { "title": "Sequence to sequence learning with neural networks", "authors": ["Sutskever, I."], "year": 2014 }, "resolved": { "doi": "10.48550/arXiv.1409.3215", "title": "Sequence to Sequence Learning with Neural Networks", "authors": ["Sutskever, Ilya"], "year": 2014 }, "cross_check": { "author": { "pass": true }, "year": { "pass": true } }, "candidates": [], "abstract_snippet": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult problems...", "notes": null } },
+      {
+        "reference_id": "smith-2024-quantum-emergence",
+        "verdict": "fabricated_doi",
+        "confidence": 0.99,
+        "evidence": {
+          "parsed": { "doi": "10.1038/s42256-024-01247-fake", "title": "Quantum emergence of AI consciousness", "authors": ["Smith, J."], "year": 2024 },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex. Confirmed trap."
+        }
+      },
+      {
+        "reference_id": "doe-2023-fusion",
+        "verdict": "fabricated_doi",
+        "confidence": 0.99,
+        "evidence": {
+          "parsed": { "doi": "10.1103/PhysRevLett.131.999999", "title": "mathematical foundations of post-quantum cryptography", "authors": ["Doe, J."], "year": 2023 },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex. Confirmed trap."
+        }
+      },
+      {
+        "reference_id": "patel-2024-gpt5",
+        "verdict": "fabricated_doi",
+        "confidence": 0.99,
+        "evidence": {
+          "parsed": { "doi": "10.1016/j.cell.2024.invented", "title": "GPT-5 exhibits emergent theory of mind", "authors": ["Patel, R."], "year": 2024 },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex. Confirmed trap."
+        }
+      },
+      {
+        "reference_id": "smith-2017-attention-trap",
+        "verdict": "metadata_mismatch_author",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arXiv.1706.03762", "title": "Attention is all you need", "authors": ["Smith, J."], "year": 2017 },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need", "authors": ["Vaswani, Ashish"], "year": 2017 },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": false }, "year": { "pass": true } },
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "Real DOI (Vaswani), but parsed author 'Smith' is incorrect. Confirmed trap."
+        }
+      },
+      {
+        "reference_id": "lecun-2020-deeplearning-trap",
+        "verdict": "metadata_mismatch_year",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": "10.1038/nature14539", "title": "Deep learning", "authors": ["LeCun, Y."], "year": 2020 },
+          "resolved": { "doi": "10.1038/nature14539", "title": "Deep Learning", "authors": ["LeCun, Yann"], "year": 2015 },
+          "cross_check": { "title": { "pass": true }, "author": { "pass": true }, "year": { "pass": false } },
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "Real DOI (2015), but parsed year '2020' is incorrect. Confirmed trap."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

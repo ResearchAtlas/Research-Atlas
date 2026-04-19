@@ -15,7 +15,9 @@
 //     timestamp, SemVer version, status enum)
 //   - errors: always required at the envelope root (use [] when none)
 //   - data.content: required when status is success|partial AND
-//     data.verdicts is present (prevents "I emitted JSON but no report")
+//     data.verdicts is present (prevents "I emitted JSON but no report").
+//     Must be a non-empty string unless data.output_format === "json",
+//     in which case an empty string is allowed (machine-only payload).
 //   - the `verdicts_complete` invariant whenever `data.verdicts` is present:
 //       data.verdicts.length === meta.input_count      (preferred signal)
 //       data.verdicts.length === data.citations_checked (fallback)
@@ -212,12 +214,21 @@ function validateData(obj, push) {
   // When we're producing verdicts and the run is not an outright error,
   // consumers rely on `content` as the human-readable twin of the
   // machine output. Missing content means the agent synthesized JSON
-  // without the prose report the task advertised.
+  // without the prose report the task advertised. Empty string is only
+  // acceptable when the caller explicitly asked for machine-only output
+  // via data.output_format === "json"; for any other output_format
+  // (markdown, text, or unspecified) content must be a non-empty string.
   if (status === 'success' || status === 'partial') {
     if (typeof data.content !== 'string') {
       push(
         'data.content',
         `required when status is "${status}" and data.verdicts is present (may be empty string only for output_format=json)`,
+      );
+    } else if (data.content.length === 0 && data.output_format !== 'json') {
+      const fmt = data.output_format === undefined ? 'unspecified' : JSON.stringify(data.output_format);
+      push(
+        'data.content',
+        `must be a non-empty string when output_format is ${fmt} (empty content allowed only when output_format === "json")`,
       );
     }
   }
