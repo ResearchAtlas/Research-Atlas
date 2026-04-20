@@ -67,10 +67,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   are locked, the run itself is the release gate.
 - Track C6 cross-agent acceptance runs on Codex and Gemini CLI are pending in the
   local release-workflow materials.
-- Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills` under a
-  future GitHub org) has not been created yet; until then, the plugin installs
-  from the monorepo at `HaroldZhong/Research-Atlas`, which is registered as a
-  single-plugin marketplace identified as `research-atlas`.
+- Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills`) has not
+  been created yet; until then, the plugin installs from the monorepo at
+  `ResearchAtlas/Research-Atlas`, which is registered as a single-plugin
+  marketplace identified as `research-atlas`.
 
 ---
 

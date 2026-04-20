@@ -607,7 +607,7 @@ export function HomePage() {
                                     </CardHeader>
                                     <CardContent>
                                         <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
-{`/plugin marketplace add HaroldZhong/Research-Atlas
+{`/plugin marketplace add ResearchAtlas/Research-Atlas
 /plugin install research-verification@research-atlas`}
                                         </pre>
                                         <p className="mt-3 text-sm text-muted-foreground">
@@ -626,7 +626,7 @@ export function HomePage() {
                                     </CardHeader>
                                     <CardContent>
                                         <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
-{`git clone https://github.com/HaroldZhong/Research-Atlas
+{`git clone https://github.com/ResearchAtlas/Research-Atlas
 cd Research-Atlas
 codex   # ask: "verify these references" or run $research-verification`}
                                         </pre>
@@ -646,7 +646,7 @@ codex   # ask: "verify these references" or run $research-verification`}
                                     </CardHeader>
                                     <CardContent>
                                         <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
-{`gemini skills install https://github.com/HaroldZhong/Research-Atlas \\
+{`gemini skills install https://github.com/ResearchAtlas/Research-Atlas \\
   --path .agents/skills/research-verification
 gemini skills list   # confirm research-verification is listed`}
                                         </pre>
