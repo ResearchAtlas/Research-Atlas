@@ -26,7 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - **Claude Code plugin manifest** — `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json` at the repo root make this repo installable as
   its own single-plugin marketplace (named `research-atlas`) via
-  `/plugin marketplace add HaroldZhong/Research-Atlas` →
+  `/plugin marketplace add ResearchAtlas/Research-Atlas` →
   `/plugin install research-verification@research-atlas`. The marketplace
   identifier is `research-atlas` regardless of the hosting repo name.
 - **Repo-root `AGENTS.md`** — onboarding guide for Codex / Cursor / Aider / Copilot /
