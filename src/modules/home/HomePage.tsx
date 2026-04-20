@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { ArrowRight, Copy, Layers, Sparkles, Zap, Shield, Users, Lightbulb, BarChart } from 'lucide-react'
-import { useRef, useEffect } from 'react'
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react'
+import { ArrowRight, Copy, Layers, Sparkles, Zap, Shield, Users, Lightbulb, BarChart, Terminal } from 'lucide-react'
+import { useEffect } from 'react'
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
 import { Helmet } from 'react-helmet-async'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import BlurText from '@/components/react-bits/BlurText'
 import { GUIDES } from '@/data/guides'
 import { PROMPTS } from '@/data/prompts'
@@ -14,19 +15,15 @@ import { WORKFLOWS } from '@/data/workflows'
 import { guidePathFromId } from '@/lib/seoRoutes'
 
 const Counter = ({ value }: { value: number }) => {
-    const ref = useRef<HTMLSpanElement>(null)
-    const isInView = useInView(ref, { once: true, margin: "-100px" })
     const motionValue = useMotionValue(0)
     const springValue = useSpring(motionValue, { duration: 3000, bounce: 0 })
     const rounded = useTransform(springValue, (latest) => Math.round(latest))
 
     useEffect(() => {
-        if (isInView) {
-            motionValue.set(value)
-        }
-    }, [isInView, value, motionValue])
+        motionValue.set(value)
+    }, [value, motionValue])
 
-    return <motion.span ref={ref}>{rounded}</motion.span>
+    return <motion.span>{rounded}</motion.span>
 }
 
 const fadeInUp = {
@@ -136,7 +133,7 @@ export function HomePage() {
                                 className="mt-3 text-2xl font-semibold text-primary sm:text-3xl lg:text-4xl justify-center lg:justify-start"
                             />
                             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                                Empower your qualitative, quantitative, and mixed methods research with rigorously tested AI workflows and prompts.
+                                Ship evidence-grade literature reviews, verified citations, and reproducible analyses with AI workflows built for academic rigor.
                             </p>
                             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                                 <Button asChild size="lg" className="gap-2 h-12 px-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow">
@@ -170,7 +167,7 @@ export function HomePage() {
                                             <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
                                             <div className="h-3 w-3 rounded-full bg-green-500/80" />
                                         </div>
-                                        <span className="ml-2 text-xs font-mono text-muted-foreground/80">preview.tsx</span>
+                                        <span className="ml-2 text-xs font-mono text-muted-foreground/80">research-prompt.yaml</span>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4 p-6">
@@ -572,6 +569,98 @@ export function HomePage() {
                 </div>
             </section>
 
+            {/* Install on your agent */}
+            <section id="install" className="py-20 lg:py-24">
+                <div className="container mx-auto">
+                    <div className="mx-auto max-w-3xl text-center mb-10">
+                        <Badge variant="secondary" className="mb-4">
+                            <Terminal className="mr-1 h-3 w-3" aria-hidden="true" />
+                            New: flagship skill
+                        </Badge>
+                        <h2 className="text-3xl font-bold tracking-tight text-balance">
+                            Install <span className="text-primary">Research Verification</span> on your agent
+                        </h2>
+                        <p className="mt-4 text-lg text-muted-foreground">
+                            One canonical skill. Three agents. Verifies reference lists end-to-end against CrossRef and OpenAlex, catches fabricated DOIs, and returns a structured per-reference verdict.
+                        </p>
+                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4 }}
+                        className="mx-auto max-w-3xl"
+                    >
+                        <Tabs defaultValue="claude" className="w-full">
+                            <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="claude">Claude Code</TabsTrigger>
+                                <TabsTrigger value="codex">Codex CLI</TabsTrigger>
+                                <TabsTrigger value="gemini">Gemini CLI</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="claude" className="mt-4">
+                                <Card>
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-base">Via the plugin marketplace</CardTitle>
+                                        <CardDescription>
+                                            Two commands in a Claude Code session. Skill is auto-discovered and prompt-triggered.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
+{`/plugin marketplace add ResearchAtlas/Research-Atlas
+/plugin install research-verification@research-atlas`}
+                                        </pre>
+                                        <p className="mt-3 text-sm text-muted-foreground">
+                                            Then ask: <span className="font-mono">&ldquo;verify these references&rdquo;</span> and paste your list.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="codex" className="mt-4">
+                                <Card>
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-base">Native <span className="font-mono">.agents/skills</span> discovery</CardTitle>
+                                        <CardDescription>
+                                            Clone the repo and launch Codex from inside it — the skill is picked up natively from <span className="font-mono">.agents/skills/research-verification/</span>. No config.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
+{`git clone https://github.com/ResearchAtlas/Research-Atlas
+cd Research-Atlas
+codex   # ask: "verify these references" or run $research-verification`}
+                                        </pre>
+                                        <p className="mt-3 text-sm text-muted-foreground">
+                                            Or symlink <span className="font-mono">.agents/skills/research-verification</span> into your own project&apos;s <span className="font-mono">.agents/skills/</span> to use it everywhere.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="gemini" className="mt-4">
+                                <Card>
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-base">Via <span className="font-mono">gemini skills install</span></CardTitle>
+                                        <CardDescription>
+                                            Gemini reads the same <span className="font-mono">.agents/skills/</span> tree. Install once, then activation is prompt-driven — Gemini asks for consent when your prompt matches.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
+{`gemini skills install https://github.com/ResearchAtlas/Research-Atlas \\
+  --path .agents/skills/research-verification
+gemini skills list   # confirm research-verification is listed`}
+                                        </pre>
+                                        <p className="mt-3 text-sm text-muted-foreground">
+                                            Then ask Gemini: <span className="font-mono">&ldquo;verify these references&rdquo;</span>. Approve the consent prompt and paste your list.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
+                    </motion.div>
+                </div>
+            </section>
+
             {/* CTA Section */}
             <section className="py-20 lg:py-24">
                 <div className="container mx-auto">
@@ -588,7 +677,7 @@ export function HomePage() {
 
                         <div className="relative z-10 p-8 sm:p-16 text-center">
                             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-balance text-white">
-                                Ready to streamline your prompt workflow?
+                                Ready to ship evidence-grade research with AI?
                             </h2>
                             <p className="mt-6 text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
                                 Start with a workflow pack or browse the full library to accelerate your research today.

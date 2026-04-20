@@ -8,11 +8,20 @@ image/
 *.py
 
 .local/
-docs/plans/
 
+# Docs and planning notes stay local/private
+docs/
+
+# Per-agent configs: private by default; publish only the flagship skill
 .agent/
-.agents/
-.claude/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/research-verification/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/research-verification/
 .codex/
 .cursor/
 .gemini/
@@ -23,6 +32,10 @@ docs/plans/
 public/og/preview*.html
 public/og/preview*.png
 public/og/temp-*.html
+
+# Tool debug output
+.playwright-mcp/
+%SystemDrive%/
 
 *.log
 .DS_Store

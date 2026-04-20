@@ -39,7 +39,7 @@ export default [
     },
   },
   {
-    files: ["scripts/**/*.{js,mjs,cjs}", "*.mjs"],
+    files: ["scripts/**/*.{js,mjs,cjs}", "plugin/hooks/**/*.{js,mjs,cjs}", "*.mjs"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

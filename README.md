@@ -1,26 +1,70 @@
-# Research Atlas 🔬
+# Research Atlas
 
-Research Atlas is a static hub of prompts, workflows, and guides for rigorous AI-assisted research.
+Research Atlas is an inspectable research plugin suite for rigorous
+AI-assisted research. The companion site is
+[researchatlas.info](https://researchatlas.info).
 
-Use the live site: [researchatlas.info](https://researchatlas.info)
+Version 1 ships one flagship skill:
 
-The repository powers the website, but the website is the primary product surface for readers and researchers.
+- `research-verification` — end-to-end reference verification across
+  Claude Code, Codex CLI, and Gemini CLI
 
-## What You’ll Find
+## Install
 
-- **Library**: Copy-ready prompts organized by research stage and method.
-- **Workflows**: Step-by-step research pipelines for discovery, verification, writing, and reproducibility.
-- **Guides**: Editorial explanations of the frameworks and principles behind the workflows.
+### Claude Code
 
-## Website First
+```text
+/plugin marketplace add ResearchAtlas/Research-Atlas
+/plugin install research-verification@research-atlas
+```
 
-If you want to use Research Atlas, start on the website:
+Then ask: `verify these references`
 
-- Browse prompts in the Library
-- Follow complete procedures in Workflows
-- Read the supporting methodology in Guides
+### Codex CLI
 
-The repo is mainly for maintaining the site and its content source.
+```bash
+git clone https://github.com/ResearchAtlas/Research-Atlas
+cd Research-Atlas
+codex
+```
+
+Then ask: `verify these references`
+
+Codex discovers the skill natively from
+`.agents/skills/research-verification/`. You can also invoke it with
+`$research-verification`.
+
+### Gemini CLI
+
+```bash
+gemini skills install https://github.com/ResearchAtlas/Research-Atlas \
+  --path .agents/skills/research-verification
+gemini skills list
+```
+
+Then ask: `verify these references`
+
+Gemini activates the skill by prompt match and asks for consent before
+loading the skill body.
+
+## What The Skill Does
+
+- Resolves DOI-backed references against CrossRef first and OpenAlex as
+  fallback.
+- Cross-checks title, first-author surname, and publication year to
+  catch fabricated DOIs and metadata mismatches.
+- Emits a structured per-reference verdict envelope alongside a
+  human-readable report.
+
+## Website
+
+The website is the public library and guide surface for Research Atlas:
+
+- Library: copy-ready prompts
+- Workflows: step-by-step research procedures
+- Guides: framework and method explanations
+
+Start here: [researchatlas.info](https://researchatlas.info)
 
 ## For Maintainers
 
@@ -30,17 +74,25 @@ npm run dev
 npm run build
 ```
 
+Useful verification commands:
+
+```bash
+npm run mirror:skills:check
+npm run validate:envelopes
+npm run grade:acceptance:fixtures
+npm run test:hook:smoke
+```
+
 ## Contributing
 
-Research Atlas remains website-first. If you want to suggest a prompt or workflow, use the contribution path linked on the live site.
+This repo contains both the website and the shipped flagship skill.
+Changes usually fall into one of two lanes:
 
-## Tech Stack
+- website changes under `src/`
+- canonical skill changes under `.claude/skills/research-verification/`
 
-- **Framework:** React + Vite
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS + shadcn/ui
-- **State Management:** TanStack Query
-- **Icons:** Lucide React
+Do not hand-edit `.agents/skills/` or `plugin/skills/`; those are
+mechanical mirrors.
 
 ## License
 

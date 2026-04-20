@@ -1,0 +1,22 @@
+{
+  "name": "research-verification",
+  "version": "1.0.0",
+  "description": "Verify research claims, fact-check citations, audit evidence integrity, and catch fabricated references. Implements the VERIFY framework with live DOI resolution (CrossRef primary, OpenAlex fallback), metadata cross-check (title >=0.85 fuzzy, first-author surname, year +/-1), a no-DOI candidate-scoring path, and a structured per-reference verdict envelope. Ships with a worked example and a 30-reference acceptance corpus.",
+  "author": {
+    "name": "Research Atlas",
+    "url": "https://researchatlas.info"
+  },
+  "homepage": "https://researchatlas.info",
+  "repository": "https://github.com/ResearchAtlas/Research-Atlas",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "verification",
+    "citations",
+    "fact-checking",
+    "VERIFY",
+    "CrossRef",
+    "OpenAlex",
+    "academic"
+  ]
+}

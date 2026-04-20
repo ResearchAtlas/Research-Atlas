@@ -1,0 +1,17 @@
+{
+  "name": "research-atlas",
+  "owner": {
+    "name": "Research Atlas",
+    "url": "https://researchatlas.info"
+  },
+  "description": "Research Atlas's flagship plugins for AI-assisted academic research. Currently ships the research-verification skill; more skills land post-acceptance-test.",
+  "plugins": [
+    {
+      "name": "research-verification",
+      "source": "./plugin",
+      "version": "1.0.0",
+      "description": "End-to-end reference verification: CrossRef + OpenAlex DOI resolution, metadata cross-check, no-DOI search fallback, and a structured per-reference verdict envelope. 30-reference acceptance corpus bundled.",
+      "keywords": ["research", "verification", "citations", "VERIFY"]
+    }
+  ]
+}

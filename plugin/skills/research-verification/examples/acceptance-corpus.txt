@@ -1,0 +1,92 @@
+# research-verification acceptance corpus (v1 — locked 2026-04-17)
+#
+# 30 references: 25 real, 5 traps (3 fabricated DOIs, 1 wrong author, 1 wrong year).
+# Lines starting with "#" are comments and are ignored by the parser.
+#
+# PASS CONDITIONS (all six must hold for the run to be accepted):
+#   1. Every entry receives a verdict (len(data.verdicts) == 30).
+#   2. All 3 fabricated-DOI entries (26, 27, 28) are caught as `fabricated_doi`.
+#      None are allowed to pass through as `verified` or `unverifiable`.
+#   3. Entry 29 is caught as `metadata_mismatch_author` (author wrong on a real DOI).
+#   4. Entry 30 is caught as `metadata_mismatch_year` (year +5 on a real DOI).
+#   5. No real reference (1-25) is reported as `fabricated_doi` or `fabricated`.
+#      Real references may be `verified`, `partially_supported`, or `unverifiable`
+#      (e.g. old papers whose DOI CrossRef/OpenAlex cannot resolve), but never
+#      fabricated.
+#   6. Wall-clock runtime <= 5 minutes on a single Claude Code session at
+#      verification_depth=detailed. A run that hangs or needs manual prompting
+#      to finish does not count.
+#
+# Additional non-blocking expectations (tracked but not gating):
+#   - schema_version == 2 on the output envelope.
+#   - verify_framework self-check == pass.
+#   - The VERIFY pre-scan flags all 5 traps as suspicious BEFORE the resolver
+#     runs (catches them at Step 2, not just Step 3).
+
+# ---- Real references, DOI-resolvable (group A: 1-15) ----
+
+1. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762
+
+2. LeCun, Y., Bengio, Y., & Hinton, G. (2015). Deep learning. Nature, 521(7553), 436-444. https://doi.org/10.1038/nature14539
+
+3. Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. In NAACL-HLT 2019 (pp. 4171-4186). https://doi.org/10.18653/v1/N19-1423
+
+4. He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In 2016 IEEE Conference on Computer Vision and Pattern Recognition (pp. 770-778). https://doi.org/10.1109/CVPR.2016.90
+
+5. Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., van den Driessche, G., ... & Hassabis, D. (2016). Mastering the game of Go with deep neural networks and tree search. Nature, 529(7587), 484-489. https://doi.org/10.1038/nature16961
+
+6. Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural Computation, 9(8), 1735-1780. https://doi.org/10.1162/neco.1997.9.8.1735
+
+7. Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., ... & Hassabis, D. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529-533. https://doi.org/10.1038/nature14236
+
+8. Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning representations by back-propagating errors. Nature, 323(6088), 533-536. https://doi.org/10.1038/323533a0
+
+9. Watson, J. D., & Crick, F. H. C. (1953). Molecular structure of nucleic acids: A structure for deoxyribose nucleic acid. Nature, 171(4356), 737-738. https://doi.org/10.1038/171737a0
+
+10. Shannon, C. E. (1948). A mathematical theory of communication. The Bell System Technical Journal, 27(3), 379-423. https://doi.org/10.1002/j.1538-7305.1948.tb01338.x
+
+11. Turing, A. M. (1950). Computing machinery and intelligence. Mind, 59(236), 433-460. https://doi.org/10.1093/mind/LIX.236.433
+
+12. Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H., & Teller, E. (1953). Equation of state calculations by fast computing machines. The Journal of Chemical Physics, 21(6), 1087-1092. https://doi.org/10.1063/1.1699114
+
+13. Higgs, P. W. (1964). Broken symmetries and the masses of gauge bosons. Physical Review Letters, 13(16), 508-509. https://doi.org/10.1103/PhysRevLett.13.508
+
+14. Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2017). ImageNet classification with deep convolutional neural networks. Communications of the ACM, 60(6), 84-90. https://doi.org/10.1145/3065386
+
+15. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., ... & Sutskever, I. (2021). Learning transferable visual models from natural language supervision. In Proceedings of the 38th International Conference on Machine Learning (pp. 8748-8763). https://doi.org/10.48550/arXiv.2103.00020
+
+# ---- Real references, preprint/arxiv or no registered DOI (group B: 16-25, exercises no-DOI path) ----
+
+16. Goodfellow, I. J., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., & Bengio, Y. (2014). Generative adversarial nets. In Advances in Neural Information Processing Systems 27.
+
+17. Brown, T. B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., ... & Amodei, D. (2020). Language models are few-shot learners. arXiv preprint arXiv:2005.14165.
+
+18. Kingma, D. P., & Welling, M. (2014). Auto-encoding variational Bayes. In 2nd International Conference on Learning Representations.
+
+19. Bengio, Y., Ducharme, R., Vincent, P., & Jauvin, C. (2003). A neural probabilistic language model. Journal of Machine Learning Research, 3, 1137-1155.
+
+20. Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., & Liu, P. J. (2020). Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research, 21(140), 1-67.
+
+21. Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Technical Report.
+
+22. Hinton, G., Vinyals, O., & Dean, J. (2015). Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531.
+
+23. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... & Houlsby, N. (2021). An image is worth 16x16 words: Transformers for image recognition at scale. In 9th International Conference on Learning Representations.
+
+24. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., & Klimov, O. (2017). Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347.
+
+25. Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in Neural Information Processing Systems 27 (pp. 3104-3112).
+
+# ---- Traps: fabricated DOIs (group C: 26-28) ----
+
+26. Smith, J., & Zhang, W. (2024). Quantum emergence of AI consciousness in neural substrates. Nature Machine Intelligence, 6(12), 1245-1268. https://doi.org/10.1038/s42256-024-01247-fake
+
+27. Doe, J. (2023). The mathematical foundations of post-quantum cryptography in nuclear fusion reactors. Physical Review Letters, 131(4), 044502. https://doi.org/10.1103/PhysRevLett.131.999999
+
+28. Patel, R., Chen, L., & Kim, S. (2024). GPT-5 exhibits emergent theory of mind: A neuroimaging study. Cell, 187(8), 1892-1905. https://doi.org/10.1016/j.cell.2024.invented
+
+# ---- Traps: real DOI, wrong metadata (group D: 29-30) ----
+
+29. Smith, J. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762
+
+30. LeCun, Y., Bengio, Y., & Hinton, G. (2020). Deep learning. Nature, 521(7553), 436-444. https://doi.org/10.1038/nature14539

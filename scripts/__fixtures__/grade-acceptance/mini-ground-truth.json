@@ -1,0 +1,49 @@
+{
+  "corpus": "grade-acceptance mini fixture",
+  "corpus_version": "mini-1",
+  "locked": "2026-04-18",
+  "total_items": 2,
+  "pass_conditions": [
+    {
+      "id": "recall",
+      "spec": "correctly classify the 1 trap item (expected_verdict match required when set)",
+      "threshold": 1
+    },
+    {
+      "id": "precision",
+      "spec": "flag no real items as fabricated",
+      "threshold": 0
+    },
+    {
+      "id": "evidence_present",
+      "spec": "every flagged item has a resolver or cross_check entry"
+    },
+    {
+      "id": "envelope_conforms",
+      "spec": "schema_version == 2, verdicts_complete (len == 2)"
+    },
+    {
+      "id": "latency",
+      "spec": "wall-clock <= 5 minutes",
+      "threshold_minutes": 5
+    }
+  ],
+  "items": [
+    {
+      "id": "vaswani-2017-attention",
+      "ground_truth": {
+        "class": "real",
+        "acceptable_verdicts": ["verified", "partially_supported"],
+        "must_not_be": ["fabricated", "fabricated_doi"]
+      }
+    },
+    {
+      "id": "smith-2024-fabricated",
+      "ground_truth": {
+        "class": "fabricated_doi",
+        "expected_verdict": "fabricated_doi",
+        "must_include_evidence": ["resolved == null"]
+      }
+    }
+  ]
+}
