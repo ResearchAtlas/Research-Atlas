@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000102",
+    "timestamp": "2026-07-01T10:10:00Z",
+    "input_count": 1
+  },
+  "status": "partial",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "quick",
+    "output_format": "markdown",
+    "content": "## Verification report\n\n- ref-1: **unverifiable** — DOI failed the `^10\\.\\d{4,9}/\\S+$` shape check and was rejected before resolution.\n",
+    "citations_checked": 1,
+    "verdict_summary": {
+      "verified": 0,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 1
+    },
+    "verdicts": [
+      {
+        "reference_id": "ref-1",
+        "verdict": "unverifiable",
+        "confidence": 0.0,
+        "evidence": {
+          "parsed": { "doi": null, "title": "A study of nothing", "authors": ["Doe, J."], "year": 2023, "venue": null, "source_format": "prose", "raw": "1. Doe, J. (2023). A study of nothing. doi:99.not-a-doi/xyz" },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "Supplied DOI '99.not-a-doi/xyz' does not match ^10\\.\\d{4,9}/\\S+$; rejected at parse, not sent to a resolver."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": [
+    { "reference_id": "ref-1", "stage": "parse", "reason": "invalid_doi_format:99.not-a-doi/xyz", "raw": "1. Doe, J. (2023). A study of nothing. doi:99.not-a-doi/xyz" }
+  ]
+}
