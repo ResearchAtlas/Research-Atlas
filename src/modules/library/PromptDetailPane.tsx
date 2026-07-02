@@ -7,9 +7,25 @@ import { X, Check, Clipboard, FileDown, Info, Star, ArrowRight, ArrowLeft } from
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useFavorites } from '@/lib/favorites'
+import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import type { ContentStatus } from '@/data/provenance'
 import { prettifyVariableName, usePersistedVariables, useResolvedVariables } from '@/lib/promptVariables'
 import { buildCopyText, buildPromptMarkdown } from '@/lib/promptMarkdown'
+
+const STATUS_LABELS: Record<ContentStatus, string> = {
+    verified: 'Verified',
+    reviewed: 'Reviewed',
+    unverified: 'Unverified',
+    needs_refresh: 'Needs refresh',
+}
+
+const STATUS_STYLES: Record<ContentStatus, string> = {
+    verified: 'border-green-500/40 text-green-600 dark:text-green-400',
+    reviewed: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
+    unverified: 'border-border text-muted-foreground',
+    needs_refresh: 'border-amber-500/40 text-amber-600 dark:text-amber-400',
+}
 
 interface PromptDetailPaneProps {
     prompt: StaticPrompt | null
@@ -87,9 +103,21 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
                 </div>
 
                 {/* Header */}
-                <h2 className="text-2xl font-bold text-foreground mb-6 leading-tight">
+                <h2 className="text-2xl font-bold text-foreground mb-3 leading-tight">
                     {prompt.title}
                 </h2>
+
+                {/* Provenance / quality status */}
+                <div className="flex flex-wrap items-center gap-2 mb-6 text-xs text-muted-foreground">
+                    <Badge variant="outline" className={cn("font-medium", STATUS_STYLES[prompt.provenance.status])}>
+                        {STATUS_LABELS[prompt.provenance.status]}
+                    </Badge>
+                    {prompt.provenance.reviewedAt && (
+                        <span>Reviewed {prompt.provenance.reviewedAt}</span>
+                    )}
+                    <span aria-hidden="true">·</span>
+                    <span>Source: {prompt.provenance.source}</span>
+                </div>
 
                 {/* Main Description */}
                 <p className="text-muted-foreground text-sm leading-relaxed mb-8">
