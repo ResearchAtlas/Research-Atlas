@@ -232,6 +232,7 @@ function validateData(obj, push) {
   const hasVerdicts = data.verdicts !== undefined;
   validateVerdictSummary(meta, data.verdict_summary, hasVerdicts, push);
   validateClaims(meta, data, push);
+  validateTaskSections(meta, data, push);
 
   if (!hasVerdicts) return;
 
@@ -321,6 +322,29 @@ function validateClaims(meta, data, push) {
       'data.claims_evaluated',
       `must equal data.claims length; got ${data.claims_evaluated} vs ${data.claims.length}`,
     );
+  }
+}
+
+// Task-scoped section mutual-exclusivity (research-verification v2.2.0+).
+// SKILL.md declares the two output shapes are mutually exclusive: reference-level
+// tasks emit citations_checked/verdict_summary/verdicts and OMIT claims/
+// claims_evaluated; claim-level tasks emit claims/claims_evaluated and OMIT
+// citations_checked/verdict_summary/verdicts. Enforced only for the
+// research-verification skill, which owns this contract. ai_detection emits
+// neither structured section (prose + per-paragraph ratings) and is unconstrained.
+const REFERENCE_LEVEL_TASKS = new Set(['verify_citations', 'bibliography_audit']);
+const CLAIM_LEVEL_TASKS = new Set(['verify_claims', 'alignment_audit', 'evidence_check']);
+
+function validateTaskSections(meta, data, push) {
+  if (meta?.skill !== 'research-verification') return;
+  const task = data.task;
+  if (REFERENCE_LEVEL_TASKS.has(task)) {
+    if ('claims' in data) push('data.claims', `must be omitted for reference-level task "${task}" (claim-level section)`);
+    if ('claims_evaluated' in data) push('data.claims_evaluated', `must be omitted for reference-level task "${task}" (claim-level section)`);
+  } else if (CLAIM_LEVEL_TASKS.has(task)) {
+    if ('verdicts' in data) push('data.verdicts', `must be omitted for claim-level task "${task}" (reference-level section)`);
+    if ('verdict_summary' in data) push('data.verdict_summary', `must be omitted for claim-level task "${task}" (reference-level section)`);
+    if ('citations_checked' in data) push('data.citations_checked', `must be omitted for claim-level task "${task}" (reference-level section)`);
   }
 }
 

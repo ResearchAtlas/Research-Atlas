@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Runnable smoke harness for scripts/grade-acceptance.mjs.
 //
-// Runs the grader across the three mini fixtures and asserts exit codes:
+// Runs the grader across mini fixtures and asserts exit codes:
 //   - passing envelope           -> exit 0 (all conditions green)
 //   - wrong-trap-class envelope  -> exit 1 (recall fails: P1-A regression guard)
 //   - precision-fail envelope    -> exit 1 (precision fails: real item flagged)

@@ -37,7 +37,7 @@
     },
     {
       "id": "cross_agent_parity",
-      "spec": "verdict class (coarse) matches across Claude / Codex / Gemini on >= 28/30 items"
+      "spec": "verdict class (coarse) matches across Claude Code / Codex CLI on >= 31/32 items"
     }
   ],
   "items": [

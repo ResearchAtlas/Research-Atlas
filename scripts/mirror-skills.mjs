@@ -2,7 +2,7 @@
 // Mirror the canonical Anthropic-format skill tree into every distribution path.
 // Canonical source:  .claude/skills/                (Claude Code reads this in-dev)
 // Mirror targets:
-//   .agents/skills/                                  (shared open-agent-skills tree; Codex + Gemini read natively)
+//   .agents/skills/                                  (shared open-agent-skills tree; Codex reads natively)
 //   plugin/skills/                                   (Claude Code plugin packaging; shipped via marketplace)
 //
 // Usage:

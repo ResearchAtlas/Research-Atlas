@@ -12,7 +12,7 @@
 // passes --elapsed-minutes=<N>, since wall-clock isn't in the envelope.
 //
 // Latency measures ACTIVE AGENT TIME, not raw wall-clock. Interactive
-// agents (Claude Code, Gemini, Codex) pause for per-tool approval
+// agents (Claude Code, Codex) pause for per-tool approval
 // prompts that the operator must manually accept. That wait is human
 // latency, not agent latency, and scaling the number of tool calls (or
 // the operator's reaction time) shouldn't push a well-behaved agent
@@ -23,13 +23,13 @@
 // Active agent time = elapsed_minutes - approval_seconds/60, and the
 // gate threshold is applied to active time. Both numbers are reported.
 //
-// Parity mode (--parity) takes 3+ envelopes plus a ground-truth file
+// Parity mode (--parity) takes 2+ envelopes plus a ground-truth file
 // and scores cross_agent_parity (exact + coarse-class match).
 //
 // Usage:
 //   node scripts/grade-acceptance.mjs <envelope.json> <ground-truth.json> \
 //       [--elapsed-minutes=N] [--approval-seconds=N]
-//   node scripts/grade-acceptance.mjs --parity <env1.json> <env2.json> <env3.json> <ground-truth.json>
+//   node scripts/grade-acceptance.mjs --parity <env1.json> <env2.json> <ground-truth.json>
 //
 // Exit codes: 0 all conditions pass, 1 any fail, 2 usage error.
 //
@@ -101,8 +101,8 @@ export function grade(envelope, groundTruth, opts = {}) {
 }
 
 export function gradeParity(envelopes, groundTruth) {
-  if (!Array.isArray(envelopes) || envelopes.length < 3) {
-    throw new Error('gradeParity requires at least 3 envelopes');
+  if (!Array.isArray(envelopes) || envelopes.length < 2) {
+    throw new Error('gradeParity requires at least 2 envelopes');
   }
 
   const ids = groundTruth.items.map((i) => String(i.id));
@@ -447,8 +447,8 @@ async function runSingle(argv) {
 }
 
 async function runParity(argv) {
-  if (argv.length < 4) {
-    console.error('--parity needs at least 3 envelope files + 1 ground-truth file');
+  if (argv.length < 3) {
+    console.error('--parity needs at least 2 envelope files + 1 ground-truth file');
     process.exit(2);
   }
   const envelopePaths = argv.slice(0, -1);
@@ -492,7 +492,7 @@ function printUsage() {
     'usage:\n' +
       '  grade-acceptance.mjs <envelope.json> <ground-truth.json> \\\n' +
       '      [--elapsed-minutes=N] [--approval-seconds=N]\n' +
-      '  grade-acceptance.mjs --parity <env1.json> <env2.json> <env3.json> [...] <ground-truth.json>\n' +
+      '  grade-acceptance.mjs --parity <env1.json> <env2.json> [...] <ground-truth.json>\n' +
       '\n' +
       '  --elapsed-minutes=N    total wall-clock minutes from trigger to final envelope\n' +
       '  --approval-seconds=N   total seconds spent waiting on user approval prompts\n' +

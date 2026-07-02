@@ -42,7 +42,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   metadata (multiline, required, descriptions, defaults), localStorage
   persistence for sandbox values and workflow progress (with reset),
   Copy-as-Markdown export, and a real `/skills` page with true install flows
-  (Claude Code / Codex CLI / Gemini CLI) replacing the orphaned placeholder.
+  (Claude Code / Codex CLI) replacing the orphaned placeholder.
 - **GitHub Actions CI** — lint, full build gate, grader fixtures, and hook smoke
   on every PR and push to main.
 
@@ -56,8 +56,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ### Known gaps — 2026-07-02 wave
 
-- Corpus v2 acceptance runs are pending on all three agents (Claude Code,
-  Codex CLI, Gemini CLI). The saved envelopes under
+- Corpus v2 acceptance runs are pending on Claude Code and Codex CLI. The saved envelopes under
   `scripts/acceptance/envelopes/` are v1 (30-item) artifacts and grade only
   against the v1 ground truth in git history.
 - `verified` prompt status remains reserved: no prompt has been exercised
@@ -78,8 +77,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   human-readable report. Ships with a worked-example transcript and a locked 30-reference
   acceptance corpus (25 real + 5 traps) covering all six milestone pass conditions.
 - **Mechanical skill mirror** — `scripts/mirror-skills.mjs` rewrites the canonical
-  `.claude/skills/` tree into `.agents/skills/` (shared open-agent path for Codex +
-  Gemini) and `plugin/skills/` (Claude Code plugin packaging). `npm run mirror:skills`
+  `.claude/skills/` tree into `.agents/skills/` (shared open-agent path for Codex)
+  and `plugin/skills/` (Claude Code plugin packaging). `npm run mirror:skills`
   to sync; `npm run mirror:skills:check` as a CI-friendly drift check; wired into
   `prebuild` so stale mirrors fail the build.
 - **Claude Code plugin manifest** — `plugin/.claude-plugin/plugin.json` and
@@ -90,14 +89,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   identifier is `research-atlas` regardless of the hosting repo name.
 - **Repo-root `AGENTS.md`** — onboarding guide for Codex / Cursor / Aider / Copilot /
   Zed. Documents the canonical-skill contract, per-agent invocation mechanics (Claude
-  auto-select, Codex native discovery + `$research-verification`, Gemini
-  prompt-driven `activate_skill`), and the `codex_hooks = true` opt-in for users who
-  want lifecycle hooks.
-- **"Install on your agent" landing section** on the home page — three-tab Claude /
-  Codex / Gemini install block with the canonical install command for each agent.
+  auto-select, Codex native discovery + `$research-verification`), and the
+  `codex_hooks = true` opt-in for users who want lifecycle hooks.
+- **"Install on your agent" landing section** on the home page — Claude / Codex
+  install block with the canonical install command for each agent.
 - **Selective `.gitignore` tunnel** — `.claude/skills/research-verification/`,
   `.agents/skills/research-verification/`, and the current milestone plan are
-  published; the rest of `.claude/`, `.agents/`, `.codex/`, `.gemini/`, and
+  published; the rest of `.claude/`, `.agents/`, `.codex/`, and
   `docs/plans/` stays private.
 - **Acceptance-run protocol** — the six pass conditions, per-agent invocation
   steps, and transcript conventions that govern the release gate.
@@ -124,8 +122,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 - Track B7 live acceptance run on Claude Code is pending — the corpus and harness
   are locked, the run itself is the release gate.
-- Track C6 cross-agent acceptance runs on Codex and Gemini CLI are pending in the
-  local release-workflow materials.
+- Track C6 cross-agent acceptance runs on Codex CLI are pending in the local
+  release-workflow materials.
 - Public dedicated marketplace/plugin repo (e.g. `researchatlas/skills`) has not
   been created yet; until then, the plugin installs from the monorepo at
   `ResearchAtlas/Research-Atlas`, which is registered as a single-plugin

@@ -7,7 +7,7 @@ AI-assisted research. The companion site is
 Version 1 ships one flagship skill:
 
 - `research-verification` — end-to-end reference verification across
-  Claude Code, Codex CLI, and Gemini CLI
+  Claude Code and Codex CLI
 
 ## Install
 
@@ -33,19 +33,6 @@ Then ask: `verify these references`
 Codex discovers the skill natively from
 `.agents/skills/research-verification/`. You can also invoke it with
 `$research-verification`.
-
-### Gemini CLI
-
-```bash
-gemini skills install https://github.com/ResearchAtlas/Research-Atlas \
-  --path .agents/skills/research-verification
-gemini skills list
-```
-
-Then ask: `verify these references`
-
-Gemini activates the skill by prompt match and asks for consent before
-loading the skill body.
 
 ## What The Skill Does
 

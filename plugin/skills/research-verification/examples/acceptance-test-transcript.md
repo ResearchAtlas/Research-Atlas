@@ -190,4 +190,4 @@ If any of the following changes, the acceptance-test harness should fail loudly:
 4. The no-DOI path accepts a candidate with score ≤ 0.7 as `verified`.
 5. `data.verdicts` length ≠ number of parsed references.
 
-These are the invariants the 30-reference acceptance corpus (see `acceptance-corpus.txt`) will stress.
+These are the invariants the acceptance corpus (see `acceptance-corpus.txt`) will stress.

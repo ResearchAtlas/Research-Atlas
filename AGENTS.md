@@ -116,8 +116,8 @@ For a local dev checkout (not installed as a plugin), swap
 Not mirrored to Codex: Codex hooks (`[features] codex_hooks`) are
 experimental and disabled on Windows as of 2026-04. The canonical
 Node script is hostable by any harness that can pipe a PostToolUse
-payload to stdin — Gemini CLI included — so porting is an opt-in
-exercise per-harness, not a mirror step.
+payload to stdin, so porting is an opt-in exercise per harness, not
+a mirror step.
 
 Use a one-item envelope write as the local smoke test for this hook.
 
@@ -154,27 +154,6 @@ Use a one-item envelope write as the local smoke test for this hook.
   ```
   This repo does not ship a hook. The flag is documented here so power users can
   wire their own. Default is `false`.
-
-### Gemini CLI
-
-- Skill discovery path: `.agents/skills/research-verification/` — native via the
-  shared open-agent-skills alias. Takes precedence over `.gemini/skills/`.
-- Verification command: `gemini skills list` should show `research-verification`
-  after Gemini is launched inside this repo.
-- **Invocation is prompt-driven, not selector-driven.** Issue a user-facing prompt
-  that matches the skill's description (e.g. "verify these references"); Gemini
-  calls `activate_skill` and presents a consent prompt. On approval, the SKILL.md
-  body enters the conversation.
-- `/skills` in Gemini is a MANAGEMENT surface — `list`, `link`, `enable`, `disable`,
-  `reload`. It is not an activation selector.
-- For a remote install pointing at this monorepo:
-  ```sh
-  gemini skills install https://github.com/ResearchAtlas/Research-Atlas \
-    --path .agents/skills/research-verification
-  ```
-  The `--path` flag is required — without it, Gemini tries to install the whole
-  repo as a skill and fails. For a local install against a working copy:
-  `gemini skills link .agents/skills/research-verification --scope workspace`.
 
 ### Cursor / Aider / Copilot / Zed
 

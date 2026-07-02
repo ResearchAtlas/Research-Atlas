@@ -14,7 +14,6 @@ export default [
       ".claude/**",
       ".codex/**",
       ".cursor/**",
-      ".gemini/**",
       ".shared/**",
       ".local/**",
       "docs/plans/**",
