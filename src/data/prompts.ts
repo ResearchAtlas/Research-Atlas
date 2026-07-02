@@ -44,20 +44,23 @@ const nlmAuthor = { name: "NotebookLM Research Workflow Guide" }
 const toolkitProvenance: Provenance = {
   source: "Academic Use Toolkit",
   owner: "research-atlas",
-  status: "unverified",
+  status: "reviewed",
   addedAt: "2026-02-04",
+  reviewedAt: "2026-07-02",
 }
 const reportProvenance: Provenance = {
   source: "AI in Research Report",
   owner: "research-atlas",
-  status: "unverified",
+  status: "reviewed",
   addedAt: "2026-02-04",
+  reviewedAt: "2026-07-02",
 }
 const nlmProvenance: Provenance = {
   source: "NotebookLM Research Workflow Guide",
   owner: "research-atlas",
-  status: "unverified",
+  status: "reviewed",
   addedAt: "2026-02-08",
+  reviewedAt: "2026-07-02",
 }
 
 export const PROMPTS: StaticPrompt[] = [
