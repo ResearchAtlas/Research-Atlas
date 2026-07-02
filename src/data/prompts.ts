@@ -4159,7 +4159,7 @@ End with a short first-impression summary: what would make an editor keep readin
   {
     id: "check_epistemic_upgrades",
     title: "Claim-Strength Audit",
-    description: "Compare each draft claim against what its cited or source material actually supports, catching silent upgrades in claim strength.",
+    description: "Compare each draft claim against what its cited or source material actually supports, catching places where claim strength quietly escalates beyond the evidence.",
     stages: ["writing", "review"],
     researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
     tags: ["Claims", "Evidence", "Review"],
@@ -4168,7 +4168,7 @@ End with a short first-impression summary: what would make an editor keep readin
       goal: "Detect places where a draft's phrasing claims more than its own source material supports.",
       context: "You are comparing draft phrasing against the source notes given, not researching new sources.",
       constraints: "Base every comparison only on the source notes provided; if no source notes are given for a claim, say the support cannot be checked rather than guessing.",
-      instructions: `Compare the draft below against its source notes (if provided) and find places where the phrasing claims more than the source actually supports — a "silent upgrade" in claim strength.
+      instructions: `Compare the draft below against its source notes (if provided) and find places where the phrasing claims more than the source actually supports — places where claim strength has quietly escalated between source and draft.
 
 Draft:
 """
@@ -4180,18 +4180,18 @@ Source notes (methods, results, or cited findings the draft is based on, if avai
 {{source_notes}}
 """
 
-Look specifically for these upgrade types:
+Look specifically for these kinds of escalation:
 - Association presented as causation (e.g. "X causes Y" when the source only shows correlation)
 - Observational findings presented as a recommendation or prescription
 - Dropped hedges (source said "may," "suggests," "in this sample"; draft drops the qualifier)
 - Population or scope widening (source covers a specific group/condition; draft implies it generalizes further)
 
 Output a table:
-| Draft phrasing | What the source supports | Upgrade type | Safer rewrite |
+| Claim as written | Strongest statement the source supports | Kind of escalation | Suggested revision |
 |---|---|---|---|
 
-If source notes are not provided or don't cover a given claim, write "cannot check against source" in the "What the source supports" column instead of guessing.`,
-      outputRequirements: "A single table (Draft phrasing | What the source supports | Upgrade type | Safer rewrite) covering every detected upgrade, with unchecked claims explicitly marked as such.",
+If source notes are not provided or don't cover a given claim, write "cannot check against source" in the second column instead of guessing.`,
+      outputRequirements: "A single table (Claim as written | Strongest statement the source supports | Kind of escalation | Suggested revision) covering every detected escalation, with unchecked claims explicitly marked as such.",
     },
     variables: [
       { name: "draft_text", type: "multiline", required: true, description: "Draft text to audit for claim-strength upgrades" },
@@ -4218,8 +4218,8 @@ If source notes are not provided or don't cover a given claim, write "cannot che
     content: {
       goal: "Check an AI-assisted research artifact (code, analysis, draft, or figure) for common ways AI assistance goes wrong before trusting the output.",
       context: "Lu et al. (2026, Nature, doi:10.1038/s41586-026-10265-5) documented recurring failure patterns in AI-assisted research work, including issues that passed the author's own review. This check applies that general lesson to the artifact described below.",
-      constraints: "For each check, only mark 'clear' if you have a specific reason from the artifact description; otherwise use 'suspected' or 'insufficient evidence.' Do not fabricate evidence of a failure or of its absence.",
-      instructions: `Walk the AI-assisted artifact described below through each failure check. For each check, give a verdict of clear / suspected / insufficient evidence, plus what to inspect next to resolve it.
+      constraints: "For each check, only mark 'no issue found' if you have a specific reason from the artifact description; otherwise use 'needs investigation' or 'cannot assess from what was provided.' Do not fabricate evidence of a failure or of its absence.",
+      instructions: `Walk the AI-assisted artifact described below through each failure check. For each check, give a verdict of no issue found / needs investigation / cannot assess from what was provided, plus what to inspect next to resolve it.
 
 Artifact description (what was produced, how AI was involved, and any relevant code/output/draft excerpts):
 """
@@ -4235,7 +4235,7 @@ Checks:
 6. Method descriptions that don't match what was done — does the written methodology match the actual code/steps, or has it drifted?
 
 For each of the six checks, output:
-- Verdict: clear / suspected / insufficient evidence
+- Verdict: no issue found / needs investigation / cannot assess from what was provided
 - What to inspect next: the concrete next step to resolve uncertainty
 
 End with an overall risk summary (not a pass/fail grade — a plain-language list of what still needs human verification).`,
