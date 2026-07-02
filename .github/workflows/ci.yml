@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      # build runs the prebuild gate first (mirror:skills:check, envelope
+      # validation, and content validation on branches that have it), then
+      # client build + SSR prerender + SEO smoke.
+      - run: npm run build
+      - run: npm run grade:acceptance:fixtures
+      - run: npm run test:hook:smoke
