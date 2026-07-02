@@ -133,7 +133,7 @@ export function HomePage() {
                                 className="mt-3 text-2xl font-semibold text-primary sm:text-3xl lg:text-4xl justify-center lg:justify-start"
                             />
                             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                                Ship evidence-grade literature reviews, verified citations, and reproducible analyses with AI workflows built for academic rigor.
+                                Ship evidence-grade literature reviews, citation-disciplined drafts, and reproducible analyses with AI workflows built for academic rigor.
                             </p>
                             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                                 <Button asChild size="lg" className="gap-2 h-12 px-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow">
@@ -420,7 +420,7 @@ export function HomePage() {
                                 label: "Prompt Library",
                                 value: promptCount,
                                 suffix: "+",
-                                description: "Field-tested prompts with variables",
+                                description: "Curated prompts with variables",
                                 icon: Sparkles,
                                 color: "text-blue-500",
                                 gradient: "from-blue-500/20 to-transparent"
