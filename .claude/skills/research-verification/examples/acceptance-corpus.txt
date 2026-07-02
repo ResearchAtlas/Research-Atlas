@@ -4,10 +4,10 @@
 # 5 traps (3 fabricated DOIs, 1 wrong author, 1 wrong year).
 # Lines starting with "#" are comments and are ignored by the parser.
 #
-# NOTE ON VERSIONS: envelopes produced against corpus v1 (30 items) grade only
-# against the v1 ground truth (see git history). The saved artifacts under
-# scripts/acceptance/envelopes/ are v1 runs; fresh v2 acceptance runs on
-# Claude Code and Codex CLI gate the next skill release.
+# NOTE ON VERSIONS: the saved artifacts under scripts/acceptance/envelopes/ are
+# the v2 acceptance runs (32 items, skill v2.2.0) on Claude Code and Codex CLI;
+# they grade against this corpus and the v2 ground truth. Earlier v1 envelopes
+# (30 items) live in git history and grade only against the v1 ground truth.
 #
 # PASS CONDITIONS (all eight must hold for the run to be accepted):
 #   1. The envelope validates against schema_version 2 and every entry receives
