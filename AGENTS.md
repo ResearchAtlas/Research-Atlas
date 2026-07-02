@@ -123,9 +123,9 @@ Use a one-item envelope write as the local smoke test for this hook.
 ## Testing
 
 - Website: verify visually (`npm run dev`) — no automated UI tests yet.
-- Skill: run the 30-reference acceptance corpus at
+- Skill: run the 32-reference acceptance corpus at
   `.claude/skills/research-verification/examples/acceptance-corpus.txt` in a fresh
-  agent session. All six pass conditions in the corpus header must hold.
+  agent session. All eight pass conditions in the corpus header must hold.
 
 ## Agent-specific notes
 

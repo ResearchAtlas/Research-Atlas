@@ -1,0 +1,54 @@
+{
+  "corpus": "grade-acceptance mini fixture (retraction surfacing)",
+  "corpus_version": "mini-retraction-1",
+  "locked": "2026-07-02",
+  "total_items": 2,
+  "pass_conditions": [
+    {
+      "id": "recall",
+      "spec": "no trap items in this fixture",
+      "threshold": 0
+    },
+    {
+      "id": "precision",
+      "spec": "flag no real items as fabricated",
+      "threshold": 0
+    },
+    {
+      "id": "evidence_present",
+      "spec": "every flagged item has a resolver or cross_check entry"
+    },
+    {
+      "id": "envelope_conforms",
+      "spec": "schema_version == 2, verdicts_complete (len == 2)"
+    },
+    {
+      "id": "retraction_flagged",
+      "spec": "every real_retracted item surfaces the retraction: evidence.retraction.retracted == true or evidence.notes contains 'RETRACTED'"
+    },
+    {
+      "id": "latency",
+      "spec": "wall-clock <= 5 minutes",
+      "threshold_minutes": 5
+    }
+  ],
+  "items": [
+    {
+      "id": "vaswani-2017-attention",
+      "ground_truth": {
+        "class": "real",
+        "acceptable_verdicts": ["verified", "partially_supported"],
+        "must_not_be": ["fabricated", "fabricated_doi"]
+      }
+    },
+    {
+      "id": "wakefield-1998-ileal",
+      "ground_truth": {
+        "class": "real_retracted",
+        "acceptable_verdicts": ["verified", "partially_supported"],
+        "must_not_be": ["fabricated", "fabricated_doi"],
+        "notes": "Wakefield 1998 — RETRACTED Feb 2010; run must surface the retraction"
+      }
+    }
+  ]
+}

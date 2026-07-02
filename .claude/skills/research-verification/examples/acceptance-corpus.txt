@@ -1,10 +1,16 @@
-# research-verification acceptance corpus (v1 — locked 2026-04-17)
+# research-verification acceptance corpus (v2 — updated 2026-07-02; v1 locked 2026-04-17)
 #
-# 30 references: 25 real, 5 traps (3 fabricated DOIs, 1 wrong author, 1 wrong year).
+# 32 references: 27 real (incl. 1 exact duplicate + 1 retracted paper),
+# 5 traps (3 fabricated DOIs, 1 wrong author, 1 wrong year).
 # Lines starting with "#" are comments and are ignored by the parser.
 #
-# PASS CONDITIONS (all six must hold for the run to be accepted):
-#   1. Every entry receives a verdict (len(data.verdicts) == 30).
+# NOTE ON VERSIONS: envelopes produced against corpus v1 (30 items) grade only
+# against the v1 ground truth (see git history). The saved artifacts under
+# scripts/acceptance/envelopes/ are v1 runs; a fresh v2 acceptance run per
+# agent is pending and gates the next skill release.
+#
+# PASS CONDITIONS (all eight must hold for the run to be accepted):
+#   1. Every entry receives a verdict (len(data.verdicts) == 32).
 #   2. All 3 fabricated-DOI entries (26, 27, 28) are caught as `fabricated_doi`.
 #      None are allowed to pass through as `verified` or `unverifiable`.
 #   3. Entry 29 is caught as `metadata_mismatch_author` (author wrong on a real DOI).
@@ -16,6 +22,14 @@
 #   6. Wall-clock runtime <= 5 minutes on a single Claude Code session at
 #      verification_depth=detailed. A run that hangs or needs manual prompting
 #      to finish does not count.
+#   7. Entry 31 is an exact duplicate of entry 1. It must still receive its own
+#      verdict entry (mirroring entry 1's verdict) with a "-dup2" reference_id
+#      suffix and a duplicate_of parse error — never silently dropped
+#      (SKILL.md Step 0.5.5).
+#   8. Entry 32 resolves via a real DOI but the publication is RETRACTED
+#      (Wakefield 1998, retracted 2010). The run must surface the retraction:
+#      evidence.retraction.retracted == true or a "RETRACTED:" note, plus a
+#      dedicated retracted-references section in the report.
 #
 # Additional non-blocking expectations (tracked but not gating):
 #   - schema_version == 2 on the output envelope.
@@ -90,3 +104,9 @@
 29. Smith, J. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762
 
 30. LeCun, Y., Bengio, Y., & Hinton, G. (2020). Deep learning. Nature, 521(7553), 436-444. https://doi.org/10.1038/nature14539
+
+# ---- Integrity items, added in v2 (group E: 31-32) ----
+
+31. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762
+
+32. Wakefield, A. J., Murch, S. H., Anthony, A., Linnell, J., Casson, D. M., Malik, M., Berelowitz, M., Dhillon, A. P., Thomson, M. A., Harvey, P., Valentine, A., Davies, S. E., & Walker-Smith, J. A. (1998). Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children. The Lancet, 351(9103), 637-641. https://doi.org/10.1016/S0140-6736(97)11096-0

@@ -19,6 +19,7 @@ const grader = join(repoRoot, 'scripts', 'grade-acceptance.mjs');
 const fixtures = join(repoRoot, 'scripts', '__fixtures__', 'grade-acceptance');
 const groundTruth = join(fixtures, 'mini-ground-truth.json');
 const groundTruthDup = join(fixtures, 'mini-ground-truth-dup.json');
+const groundTruthRetraction = join(fixtures, 'mini-ground-truth-retraction.json');
 
 function runGrader(envelope, gt = groundTruth) {
   return new Promise((res, rej) => {
@@ -60,7 +61,21 @@ const cases = [
     fixture: 'mini-envelope-duplicate-handling.json',
     groundTruth: groundTruthDup,
     expectCode: 0,
-    expectStdoutMatch: /PASS\s+envelope_conforms/,
+    expectStdoutMatch: /PASS\s+duplicate_handling/,
+  },
+  {
+    name: 'retraction surfaced (retraction evidence present, grading passes)',
+    fixture: 'mini-envelope-retraction.json',
+    groundTruth: groundTruthRetraction,
+    expectCode: 0,
+    expectStdoutMatch: /PASS\s+retraction_flagged/,
+  },
+  {
+    name: 'retraction missed (no retraction evidence, retraction_flagged must fail)',
+    fixture: 'mini-envelope-retraction-missed.json',
+    groundTruth: groundTruthRetraction,
+    expectCode: 1,
+    expectStdoutMatch: /FAIL\s+retraction_flagged/,
   },
 ];
 

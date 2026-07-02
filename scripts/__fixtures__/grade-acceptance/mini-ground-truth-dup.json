@@ -23,6 +23,10 @@
       "spec": "schema_version == 2, verdicts_complete (len == 3, duplicate mirrored)"
     },
     {
+      "id": "duplicate_handling",
+      "spec": "every real_duplicate item has its own mirrored verdict entry with a -dupN reference_id or a duplicate_of error entry"
+    },
+    {
       "id": "latency",
       "spec": "wall-clock <= 5 minutes",
       "threshold_minutes": 5
@@ -48,7 +52,7 @@
     {
       "id": "vaswani-2017-attention-dup2",
       "ground_truth": {
-        "class": "real",
+        "class": "real_duplicate",
         "note": "second occurrence of item 1; verdict mirrored per Step 0.5.5",
         "acceptable_verdicts": ["verified", "partially_supported"],
         "must_not_be": ["fabricated", "fabricated_doi"]
