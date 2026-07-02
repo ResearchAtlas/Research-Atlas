@@ -162,12 +162,13 @@ function indexVerdicts(envelope) {
   //     (mirrors the corpus's numeric enumeration, which is the
   //     contract the ground-truth file uses)
   // Ordinal fallback is safe because the skill processes references
-  // in input order and emits one verdict per input chunk (Step 0.5
-  // de-dup keeps first occurrence, so ordinality matches corpus
-  // position as long as no dedup fires; when dedup fires the
-  // duplicate is recorded in errors, not verdicts). When both a slug
-  // and an ordinal resolve to the same verdict, the slug wins because
-  // it was set first.
+  // in input order and emits exactly one verdict per parsed input
+  // reference — INCLUDING duplicates, which get their own mirrored
+  // verdict entry under the v2.2.0 contract (Step 0.5.5). So the
+  // 1-indexed position in data.verdicts always matches corpus
+  // position; duplicates no longer drop out of verdicts (they are
+  // additionally recorded in errors). When both a slug and an ordinal
+  // resolve to the same verdict, the slug wins because it was set first.
   const out = new Map();
   const verdicts = envelope?.data?.verdicts ?? [];
   verdicts.forEach((v, i) => {

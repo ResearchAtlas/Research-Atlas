@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { BookOpen, Ellipsis, FileText, GitBranch, Home, Library, Moon, Sun } from 'lucide-react'
+import { BookOpen, Ellipsis, FileText, GitBranch, Home, Library, Moon, Sparkles, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -17,6 +17,7 @@ const navItems = [
     { to: '/library', label: 'Library', icon: Library },
     { to: '/workflows', label: 'Workflows', icon: GitBranch },
     { to: '/guides', label: 'Guides', icon: BookOpen },
+    { to: '/skills', label: 'Skills', icon: Sparkles },
 ]
 
 type Theme = 'dark' | 'light'
@@ -156,7 +157,7 @@ export function AppLayout() {
                 className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden"
                 aria-label="Primary mobile navigation"
             >
-                <div className="grid grid-cols-4 gap-1 px-2 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
+                <div className="grid grid-cols-5 gap-1 px-2 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
                     {navItems.map((item) => (
                         <NavLink
                             key={`mobile-${item.to}`}

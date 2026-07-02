@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000103",
+    "timestamp": "2026-07-01T10:15:00Z",
+    "input_count": 1
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Verification report\n\n- ref-1: **unverifiable** — no confident title-search match; best candidate scored below the 0.7 threshold.\n",
+    "citations_checked": 1,
+    "verdict_summary": {
+      "verified": 0,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 1
+    },
+    "verdicts": [
+      {
+        "reference_id": "ref-1",
+        "verdict": "unverifiable",
+        "confidence": 0.0,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Emergent metacognition in large language models via recursive introspection", "authors": ["Rivera, K."], "year": 2025, "venue": "Journal of Synthetic Cognition", "source_format": "prose", "raw": "7. Rivera, K. (2025). Emergent metacognition in large language models via recursive introspection..." },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [
+            { "source": "openalex", "score": 0.41, "title": "Metacognition and confidence in language model reasoning", "authors": ["Nguyen"], "year": 2024, "doi": "10.1000/omitted", "url": "https://openalex.org/W0000000001" },
+            { "source": "semantic_scholar", "score": 0.33, "title": "Introspective prompting for chain-of-thought", "authors": ["Lopez"], "year": 2023, "doi": null, "url": "https://www.semanticscholar.org/paper/0000" }
+          ],
+          "abstract_snippet": null,
+          "notes": "All title-search candidates scored below 0.7; no confident match. Likely fabricated or paraphrased title. Do NOT guess a DOI."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

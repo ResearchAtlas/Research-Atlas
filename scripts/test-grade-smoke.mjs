@@ -18,12 +18,13 @@ const repoRoot = resolve(__dirname, '..');
 const grader = join(repoRoot, 'scripts', 'grade-acceptance.mjs');
 const fixtures = join(repoRoot, 'scripts', '__fixtures__', 'grade-acceptance');
 const groundTruth = join(fixtures, 'mini-ground-truth.json');
+const groundTruthDup = join(fixtures, 'mini-ground-truth-dup.json');
 
-function runGrader(envelope) {
+function runGrader(envelope, gt = groundTruth) {
   return new Promise((res, rej) => {
     const child = spawn(
       process.execPath,
-      [grader, envelope, groundTruth, '--elapsed-minutes=1'],
+      [grader, envelope, gt, '--elapsed-minutes=1'],
       { stdio: ['ignore', 'pipe', 'pipe'] },
     );
     let stdout = '';
@@ -54,12 +55,19 @@ const cases = [
     expectCode: 1,
     expectStdoutMatch: /FAIL\s+precision/,
   },
+  {
+    name: 'duplicate-handling envelope (mirrored dup entry, grading still passes)',
+    fixture: 'mini-envelope-duplicate-handling.json',
+    groundTruth: groundTruthDup,
+    expectCode: 0,
+    expectStdoutMatch: /PASS\s+envelope_conforms/,
+  },
 ];
 
 async function main() {
   const failures = [];
   for (const c of cases) {
-    const { code, stdout, stderr } = await runGrader(join(fixtures, c.fixture));
+    const { code, stdout, stderr } = await runGrader(join(fixtures, c.fixture), c.groundTruth ?? groundTruth);
     const problems = [];
     if (code !== c.expectCode) problems.push(`exit ${code}, expected ${c.expectCode}`);
     if (c.expectStdoutMatch && !c.expectStdoutMatch.test(stdout)) {
