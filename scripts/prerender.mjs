@@ -7,7 +7,7 @@ const templatePath = path.join(distDir, 'index.html')
 const serverDir = path.join(distDir, 'server')
 const manifestPath = path.join(distDir, 'prerender-manifest.json')
 const sitemapPath = path.join(distDir, 'sitemap.xml')
-const FALLBACK_ROUTES = ['/', '/library', '/workflows', '/guides']
+const FALLBACK_ROUTES = ['/', '/library', '/workflows', '/guides', '/skills']
 
 const readServerEntryPath = async () => {
     const files = await readdir(serverDir)
