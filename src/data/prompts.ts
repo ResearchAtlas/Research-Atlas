@@ -1222,7 +1222,7 @@ Please rewrite the English LaTeX snippet I provide to remove obvious machine-lik
       constraints: "Flat vector style. Soft palette. White background.",
       instructions: `
 # Role
-I want you to act as an expert scientific illustrator who creates clear, publication-ready method figures for top-tier research venues (e.g., Nature Methods, Science Advances, PNAS). You produce diagrams that are rigorous, minimalist, and easy to parse.
+I want you to act as an expert scientific illustrator who creates clear, publication-ready method figures for top-tier research venues. You produce diagrams that are rigorous, minimalist, and easy to parse.
 
 # Task
 I will provide a paper abstract and a description of the methodology. First, deeply understand the mechanism, modules, and data flow. Then design a professional architecture figure.
@@ -1263,11 +1263,11 @@ E) Legend: color meanings (soft pastel categories), if applicable.
 F) One optional alternative layout if the first is crowded.
 
 # Input
-{{latex_snippet}}`,
+{{method_description}}`,
       outputRequirements: "Return a figure design blueprint.",
     },
     variables: [
-      { name: "latex_snippet", type: "multiline", required: true, description: "Method description/abstract" }
+      { name: "method_description", type: "multiline", required: true, description: "Method description/abstract" }
     ],
     outputFormat: "markdown",
     author: toolkitAuthor,
@@ -1468,10 +1468,10 @@ Read and analyze the PDF of my paper. Based on my specified target venue, write 
 # Self-check before output
 1. Tone check: if the review reads too gentle, re-check ambiguous results and raise sharper questions.
 2. Specificity check: replace vague criticism with concrete items (e.g., "missing robustness analysis on X dataset", "no sensitivity analysis for Y").
+3. Grounding check: base every criticism strictly on content present in the uploaded PDF; if a section is unclear, illegible, or missing, say so explicitly rather than inferring or inventing details.
 
 # Input
-I have uploaded a PDF. My target venue is: [enter target venue, for example: PNAS, Nature Human Behaviour, or the 2026 Joint Statistical Meetings].
-Venue: {{venue}}`,
+I have uploaded a PDF. My target venue is: {{venue}}`,
       outputRequirements: "Return strict review report + strategic advice.",
     },
     variables: [
@@ -1496,7 +1496,7 @@ Venue: {{venue}}`,
       constraints: "Minimalist, no filler, precise formatting.",
       instructions: `Context: You are an experienced academic editor who writes precise, publication-ready figure captions.
 
-Objective: Convert the Chinese/English description {{description}} into an English figure caption.
+Objective: Convert the description {{description}} into an English figure caption.
 - Noun phrase -> Title Case, no period.
 - Full sentence -> Sentence case, end with period.
 
@@ -1605,6 +1605,7 @@ Part 2 [Plain-language check]: Short restatement.`,
 
 Objective: Analyze the paper (PDF content {{pdf_content}} or text) for target venue {{venue}}.
 - Originality, Rigor, Internal consistency.
+- Base all critique strictly on the supplied paper content ({{pdf_content}}); do not infer or invent claims, baselines, or results not present in the text.
 
 Style: Realistic top-venue review.
 
@@ -1646,7 +1647,8 @@ Response: 1. Trend brief
 2. Top threads/posts
 3. Capabilities/Use cases
 4. Open questions
-5. Follow-up terms`,
+5. Follow-up terms
+Only report posts/sources you actually located; do not invent handles, post text, or engagement numbers. If coverage is sparse, say so explicitly.`,
       outputRequirements: "Trend brief and threads.",
     },
     variables: [
@@ -1679,8 +1681,9 @@ Audience: Researcher.
 Response: 1. Search strategy
 2. Annotated bibliography (8-20 sources)
 3. Concept map
-4. Next steps`,
-      outputRequirements: "Annotated bibliography.",
+4. Next steps
+Only include sources you actually located via search; do not invent titles, authors, or DOIs. If fewer than 8 verifiable sources exist, say so rather than padding the list.`,
+      outputRequirements: "Annotated bibliography of only verifiably retrieved sources.",
     },
     variables: [
       { name: "topic", type: "text", required: true },
@@ -1743,7 +1746,8 @@ Audience: Researcher.
 Response: 1. Thread briefs
 2. Evidence excerpts (quotes)
 3. Theme synthesis
-4. Research implications`,
+4. Research implications
+Quote only text found verbatim in real threads; include a link or identifier for each thread. If you cannot locate genuine discussion threads on this topic, say so rather than fabricating them.`,
       outputRequirements: "Discussion synthesis.",
     },
     variables: [
@@ -1775,7 +1779,8 @@ Response: For each section:
 - Key claims (bullets)
 - Evidence (short quotes)
 - Reproducibility checklist
-- Limitations`,
+- Limitations
+Quote only text verified as present in the actual paper; if full text is unavailable, state that explicitly rather than fabricating quotes or claims.`,
       outputRequirements: "Detailed paper summary.",
     },
     variables: [
@@ -1806,7 +1811,8 @@ Audience: Researcher.
 Response: Numbered list:
 - Bold concept label
 - Direct quote
-- Location pointer`,
+- Location pointer
+Only extract quotes and location pointers you can verify are accurate to the source text; if the text is not accessible, state that rather than inventing quotes or page numbers.`,
       outputRequirements: "Structured quote list.",
     },
     variables: [
@@ -1869,7 +1875,8 @@ Audience: Researcher.
 Response: - Verdict
 - Reasoning
 - Evidence quotes
-- Correction if needed`,
+- Correction if needed
+If the attached documents do not contain enough information to verify the statement, say so explicitly rather than guessing.`,
       outputRequirements: "Fact check verdict.",
     },
     variables: [
@@ -1901,7 +1908,8 @@ Response: 1. Prior work shortlist
 2. Novelty matrix
 3. Overlap assessment
 4. Positioning recs
-5. Risk flags`,
+5. Risk flags
+List only prior work you can verify exists (via search or provided context); do not invent paper titles or authors. Mark any item you are uncertain about.`,
       outputRequirements: "Novelty assessment report.",
     },
     variables: [
@@ -1933,8 +1941,9 @@ Audience: Researcher.
 Response: - Claim extraction
 - For each: supporting/contradicting sources
 - Strength rating
-- Verification steps`,
-      outputRequirements: "Verification report.",
+- Verification steps
+Only cite sources you actually located and can verify; never invent citations. If no verifiable source supports or contradicts a claim, state that explicitly and rate confidence accordingly.`,
+      outputRequirements: "Verification report with only verifiable sources.",
     },
     variables: [
       { name: "paste_text", type: "text", required: true },
@@ -2089,7 +2098,7 @@ Response: 1) Markdown table: Construct | Option | Source fields | Coding rules |
     id: "w1_s4_sanity",
     title: "Analysis-Ready Variable Dictionary",
     description: "Produce final variable spec with names, types, reference categories, transforms.",
-    stages: ["design"],
+    stages: ["measures"],
     researchTypes: ["quantitative", "mixed_methods"],
     tags: ["Operationalization", "Variables", "Workflow"],
     framework: "COSTAR",
@@ -2132,7 +2141,7 @@ Name | Label | Role | Type | Values/labels | Reference | Transform | Derived rul
     id: "w1_s5_ethics",
     title: "Inclusion/Exclusion and Missingness Plan",
     description: "Decide analytic sample rules and defensible missing data handling.",
-    stages: ["design"],
+    stages: ["design", "data_qc"],
     researchTypes: ["quantitative", "mixed_methods"],
     tags: ["Operationalization", "Missingness", "Workflow"],
     framework: "COSTAR",
@@ -2379,7 +2388,7 @@ Response: - SOP steps
     id: "w2_s5_statement",
     title: "Storage and Access Control",
     description: "Set up secure storage and controlled access for research data.",
-    stages: ["writing"],
+    stages: ["design"],
     researchTypes: ["quantitative", "mixed_methods", "qualitative"],
     tags: ["Compliance", "Storage", "Workflow"],
     framework: "COSTAR",
@@ -2419,7 +2428,7 @@ Response: 1) Access roles table: Role | Access | Rationale
     id: "w2_s6_sop",
     title: "Final Data Handling SOP",
     description: "Package all compliance guidance into one SOP.",
-    stages: ["writing"],
+    stages: ["design"],
     researchTypes: ["quantitative", "mixed_methods", "qualitative"],
     tags: ["Compliance", "Sop", "Workflow"],
     framework: "COSTAR",
