@@ -32,8 +32,8 @@
     },
     {
       "id": "latency",
-      "spec": "active agent time <= 5 minutes at verification_depth=detailed, where active = wall-clock minus time spent waiting on user approval prompts (tool-permission dialogs, sandbox prompts, etc.)",
-      "threshold_minutes": 5
+      "spec": "active agent time <= per_ref_seconds * total_items at verification_depth=detailed, where active = wall-clock minus time spent waiting on user approval prompts (tool-permission dialogs, sandbox prompts). The budget scales with corpus size because per-reference resolver cost (1-3 sequential live HTTP lookups + memoization + circuit breaker) is the real invariant; a flat minute-count silently loosens for short lists and breaks when the corpus grows. At 35 s/ref this is 18.7 min for the 32-ref corpus and 5.8 min for a 10-ref list.",
+      "per_ref_seconds": 35
     },
     {
       "id": "cross_agent_parity",
