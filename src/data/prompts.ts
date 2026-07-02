@@ -2862,7 +2862,7 @@ Objective: Given {{raw_references}} and style {{citation_style}}:
 - Format each reference correctly
 - Check for missing fields
 - Standardize author names
-- Verify DOIs/URLs
+- Check DOI/URL format and flag any missing or malformed entries
 
 Style: Reference list format.
 Tone: Precise.
@@ -2967,7 +2967,9 @@ Response: Annotated directory tree + file manifest table.`,
       goal: "Specify environment requirements.",
       context: "Documenting computational environment.",
       constraints: "Reproducible on clean machine.",
-      instructions: `Context: You are documenting computational environment.
+      instructions: `Context: You are documenting the computational environment for the following codebase/analysis:
+
+{{code_summary}}
 
 Objective: Create environment specification:
 - OS and version
@@ -2984,7 +2986,9 @@ Audience: Someone setting up from scratch.
 Response: Requirements.txt/environment.yml + setup instructions.`,
       outputRequirements: "Environment specification.",
     },
-    variables: [],
+    variables: [
+      { name: "code_summary", type: "multiline", required: true },
+    ],
     outputFormat: "markdown",
     author: toolkitAuthor,
     provenance: toolkitProvenance,
