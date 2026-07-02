@@ -8,7 +8,8 @@ in its absence the repo's skill tree at `.claude/skills/` is sufficient.
 ## What this repo is
 
 - **The website** — a Vite + React 19 + TypeScript + Tailwind + shadcn/ui static site,
-  prerendered via `scripts/prerender.mjs`. Deploys to Vercel.
+  prerendered via `scripts/prerender.mjs`. Deploys to Cloudflare Pages
+  (`public/_headers` and `public/_redirects` are Pages conventions).
 - **A flagship Anthropic Agent Skill** — `research-verification`, the end-to-end
   reference-verification workflow built around the VERIFY framework, CrossRef +
   OpenAlex DOI resolution, and a structured per-reference verdict envelope.
@@ -193,6 +194,10 @@ If you were dropped into this repo to work on a task, the task is likely one of:
    ready to either (a) be registered as a single-plugin marketplace from this repo
    via `.claude-plugin/marketplace.json`, or (b) be copied into a dedicated
    `researchatlas/plugins` marketplace repo when that exists.
+   Version semantics: the plugin *package* version (`plugin.json` /
+   `marketplace.json`, currently 1.0.0) tracks the packaging, while the skill
+   itself is versioned independently in SKILL.md frontmatter (currently 2.2.0).
+   User-facing surfaces should quote the skill version.
 
 When in doubt about scope, inspect the tracked skill tree, website
 source, and recent git history. Local planning docs may exist, but they
