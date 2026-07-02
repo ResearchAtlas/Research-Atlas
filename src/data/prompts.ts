@@ -74,12 +74,12 @@ export const PROMPTS: StaticPrompt[] = [
       goal: "Produce three versions of an opening paragraph for a research introduction.",
       context: "You are a top-tier science writer crafting a doctoral introduction.",
       constraints: "Each version must use a distinct narrative strategy and remain academically rigorous.",
-      instructions: `As a top-tier science writer, please develop three distinct versions of the “opening paragraph” for my doctoral research {{research_topic}} using the following narrative strategies:
-●	Strategy A: Historical Evolution Approach - Begin with the historical origins of the research question or field, outline a clear evolutionary trajectory, and identify the current critical juncture.
+      instructions: `Act as a science writer drafting a doctoral introduction. Develop three distinct versions of the opening paragraph for my doctoral research {{research_topic}} using the following narrative strategies:
+- Strategy A: Historical Evolution Approach - Begin with the historical origins of the research question or field, outline a clear evolutionary trajectory, and identify the current critical juncture.
 
-●	Strategy B: Paradox-Conflict Approach - Present an apparent contradiction or paradox between a widely accepted view in the field and a puzzling, recent empirical fact to create research tension.
+- Strategy B: Paradox-Conflict Approach - Present an apparent contradiction or paradox between a widely accepted view in the field and a puzzling, recent empirical fact to create research tension.
 
-●	Strategy C: Case-Story Approach - Open with a typical, vivid, and representative specific case or story, using a microcosmic perspective to introduce broader, worthy-of-study universal issues.
+- Strategy C: Case-Story Approach - Open with a typical, vivid, and representative specific case or story, using a microcosmic perspective to introduce broader, worthy-of-study universal issues.
 
 Ensure each version has a distinct style and achieves the goal of engaging readers and establishing research importance.`,
       outputRequirements: "Return three labeled paragraphs, each distinct in style and hook.",
@@ -104,14 +104,15 @@ Ensure each version has a distinct style and achieves the goal of engaging reade
       goal: "Elevate the significance and urgency of a research question.",
       context: "You are a professional grant proposal writer.",
       constraints: "Avoid empty slogans; maintain academic rigor.",
-      instructions: `As a professional grant proposal writer, please conduct a comprehensive “rhetorical enhancement” of my plain statement regarding the significance of my research question {{statement}}.
-First, expand the argumentative perspective from an “academic internal” focus to a “social external” one. Clearly demonstrate the potential, non-negligible negative impacts that would result for [a specific social dimension, industry development, or human welfare] if this issue remains unsolved.
-Second, infuse a sense of “timeliness” or “urgency” into addressing this issue. Argue why “now” is the optimal—or even the final—time window to research this question (e.g., due to the emergence of new data, the implementation of a policy, or the prominence of a social trend).
+      instructions: `Act as a grant proposal writer. Rhetorically strengthen my plain statement regarding the significance of my research question {{statement}}.
+First, expand the argumentative perspective from an academic internal focus to a social external one. Clearly demonstrate the potential, non-negligible negative impacts that would result for {{social_dimension}} if this issue remains unsolved.
+Second, infuse a sense of timeliness or urgency into addressing this issue. Argue why now is the optimal—or even the final—time window to research this question (e.g., due to the emergence of new data, the implementation of a policy, or the prominence of a social trend).
 Finally, package the above arguments in more impactful and persuasive language, while avoiding empty slogans and maintaining academic rigor.`,
       outputRequirements: "Return a refined, persuasive paragraph.",
     },
     variables: [
       { name: "statement", type: "multiline", required: true, description: "Significance statement" },
+      { name: "social_dimension", type: "text", required: false, description: "Specific social dimension, industry, or welfare area affected (optional)" },
     ],
     outputFormat: "markdown",
     author: toolkitAuthor,
@@ -130,10 +131,12 @@ Finally, package the above arguments in more impactful and persuasive language, 
       goal: "Reframe a literature review as a debate between academic camps.",
       context: "You are an academic debate organizer.",
       constraints: "Avoid chronological order or simple listing.",
-      instructions: `As an academic debate organizer, help me restructure the “literature review” section in my introduction. I will provide my draft literature review.
-Avoid chronological order or simple listing of viewpoints. First, identify {{n_camps}} major, opposing “academic camps” or “theoretical schools” around the core issue in my research field.
-Second, restructure my literature review as an “academic debate” about the core divergences between these “camps.” Clearly articulate each side’s core arguments, key evidence, and respective theoretical “weaknesses.”
-Finally, precisely “position” my own research as an “intervener” in this debate. Clearly indicate how my research will “support” one side, “reconcile” contradictions between sides, or “transcend” the debate itself by providing new evidence or perspectives.
+      instructions: `As an academic debate organizer, help me restructure the literature review section in my introduction. I will provide my draft literature review.
+Avoid chronological order or simple listing of viewpoints. First, identify {{n_camps}} major, opposing academic camps or theoretical schools around the core issue in my research field.
+Second, restructure my literature review as an academic debate about the core divergences between these camps. Clearly articulate each side's core arguments, key evidence, and respective theoretical weaknesses.
+Finally, precisely position my own research as an intervener in this debate. Clearly indicate how my research will support one side, reconcile contradictions between sides, or transcend the debate itself by providing new evidence or perspectives.
+
+Base the camps and arguments strictly on the literature review draft provided; do not invent studies, authors, or findings not present in the draft, and flag any camp where the evidence is thin.
 
 Draft Literature Review:
 {{literature_review_draft}}`,
@@ -160,9 +163,9 @@ Draft Literature Review:
       goal: "Craft extremely concise and powerful pivot sentences.",
       context: "You are a rhetorician proficient in academic writing’s cohesion and transition.",
       constraints: "Ensure the transition is inevitable and persuasive.",
-      instructions: `As a rhetorician proficient in academic writing’s “cohesion and transition,” please refine the most critical “transition” section in my introduction. I will provide the concluding paragraph of my literature review and my preliminary statement of research gap.
-Your task is to write [for example: 1-3] extremely concise, logically rigorous, and powerful “pivot sentences” between these two elements. These sentences need to perfectly transition from “summarizing others’ work” (what they have done) to “introducing my research” (what I will do).
-Attempt to use classic sentence structures such as “Despite extensive research…, they have generally overlooked…” or “These contradictions in the existing literature precisely point to a deeper, unresolved question:…” and ensure the transition is inevitable and persuasive.
+      instructions: `As a rhetorician proficient in academic writing's cohesion and transition, please refine the most critical transition section in my introduction. I will provide the concluding paragraph of my literature review and my preliminary statement of research gap.
+Your task is to write 1 to 3 extremely concise, logically rigorous, and powerful pivot sentences between these two elements. These sentences need to perfectly transition from summarizing others' work (what they have done) to introducing my research (what I will do).
+Attempt to use classic sentence structures such as "Despite extensive research…, they have generally overlooked…" or "These contradictions in the existing literature precisely point to a deeper, unresolved question:…" and ensure the transition is inevitable and persuasive.
 
 Research Topic: {{research_topic}}
 Known Limits / Literature Conclusion: {{known_limits}}
@@ -191,11 +194,11 @@ Your Contribution / Gap Statement: {{your_contribution}}`,
       goal: "Demonstrate the theoretical dialogue landscape and your role in it.",
       context: "You are an academic cartographer.",
       constraints: "Clearly identify your role: follower, reconciler, critic, or pioneer.",
-      instructions: `As an academic cartographer, help me clearly demonstrate to readers in my introduction the “theoretical dialogue” club that my research aims to join.
-My research is about {{research_topic}}, mainly drawing on [Theory A] and [Theory B].
-First, write a paragraph briefly introducing the broader academic dialogue field represented by [Theory A] and [Theory B] and their core issues.
-Second, clearly identify what role my research wants to play in this dialogue: a “follower” (adding to existing frameworks), a “reconciler” (attempting to integrate two seemingly contradictory theories), a “critic” (aiming to challenge core assumptions of one theory), or a “pioneer” (attempting to initiate a new dialogue topic).
-Finally, clearly identify several core scholars I wish to “dialogue” with to demonstrate my academic positioning.
+      instructions: `As an academic cartographer, help me clearly demonstrate to readers in my introduction the theoretical dialogue club that my research aims to join.
+My research is about {{research_topic}}, mainly drawing on {{theory_a}} and {{theory_b}}.
+First, write a paragraph briefly introducing the broader academic dialogue field represented by {{theory_a}} and {{theory_b}} and their core issues.
+Second, clearly identify what role my research wants to play in this dialogue: a follower (adding to existing frameworks), a reconciler (attempting to integrate two seemingly contradictory theories), a critic (aiming to challenge core assumptions of one theory), or a pioneer (attempting to initiate a new dialogue topic).
+Finally, clearly identify several core scholars I wish to dialogue with to demonstrate my academic positioning.
 
 Research Topic: {{research_topic}}
 Research Question: {{research_question}}
@@ -204,6 +207,8 @@ Hypotheses: {{hypotheses}}`,
     },
     variables: [
       { name: "research_topic", type: "text", required: true },
+      { name: "theory_a", type: "text", required: true, description: "Name of first theory" },
+      { name: "theory_b", type: "text", required: true, description: "Name of second theory" },
       { name: "research_question", type: "text", required: true },
       { name: "hypotheses", type: "text", required: true },
     ],
@@ -224,13 +229,13 @@ Hypotheses: {{hypotheses}}`,
       goal: "Argue why the chosen theoretical perspective is most suitable.",
       context: "You are a methodology professor.",
       constraints: "Argue why alternatives have limitations or blind spots.",
-      instructions: `As a methodology professor, write a defensive argument for my introduction section regarding “why choose {{chosen_method}} over others.”
+      instructions: `As a methodology professor, write a defensive argument for my introduction section regarding why choose {{chosen_method}} over others.
 My research question is: {{research_topic}}.
 My chosen core theoretical perspective is: {{chosen_method}}.
 Alternative theoretical perspectives that I did not choose are: {{why_not_others}}.
 First, briefly explain the core analytical capabilities and advantages of my chosen theoretical perspective.
-Second, clearly argue why other alternative theoretical perspectives have certain “fundamental” limitations or “analytical blind spots” when explaining my unique research question.
-Finally, conclude that my chosen theoretical perspective is the “most suitable” and “most powerful” theoretical lens for addressing the current specific research question.`,
+Second, clearly argue why other alternative theoretical perspectives have certain fundamental limitations or analytical blind spots when explaining my unique research question.
+Finally, conclude that my chosen theoretical perspective is the most suitable and most powerful theoretical lens for addressing the current specific research question.`,
       outputRequirements: "Return a structured argumentative paragraph.",
     },
     variables: [
@@ -286,22 +291,17 @@ Sample Scope: {{sample_scope}}`,
     difficulty: "advanced",
     content: {
       goal: "Stress-test the introduction for weak claims and logic gaps.",
-      context: "You are an extremely critical “devil’s advocate” skilled at finding problems.",
-      constraints: "Stand in the position of a “most unfriendly” reviewer.",
-      instructions: `As an extremely critical “devil’s advocate” skilled at finding problems, conduct a comprehensive “stress test” on my provided introduction draft.
-Stand in the position of a “most unfriendly” reviewer, identify and sharply point out all “taken-for-granted” assertions, “insufficiently supported” claims, “vaguely defined” concepts, and “logically flawed” reasoning in the introduction.
-Provide a list of [for example: 5-7] most likely to be attacked, fatal logical flaws. For example: “The author claims this issue is ‘crucial,’ but provides no independent, strong arguments beyond citing two literatures.” “The ‘research gap’ identified by the author has actually been preliminarily explored in the literature of XXX (2023), and the author seems to deliberately avoid this key literature.”
+      context: "You are an extremely critical devil's advocate skilled at finding problems.",
+      constraints: "Stand in the position of a most unfriendly reviewer.",
+      instructions: `As an extremely critical devil's advocate skilled at finding problems, conduct a comprehensive stress test on my provided introduction draft.
+Stand in the position of a most unfriendly reviewer, identify and sharply point out all taken-for-granted assertions, insufficiently supported claims, vaguely defined concepts, and logically flawed reasoning in the introduction.
+Provide a list of 5 to 7 most likely to be attacked, fatal logical flaws. For example: "The author claims this issue is 'crucial,' but provides no independent, strong arguments beyond citing two literatures." "The 'research gap' identified by the author has actually been preliminarily explored in the literature of XXX (2023), and the author seems to deliberately avoid this key literature."
 
-Draft:
-{{research_topic}} (Topic)
-{{target_audience}} (Audience)
-{{hook_style}} (Hook Style)`,
+Introduction draft: {{introduction_draft}}`,
       outputRequirements: "Return a numbered list of critical flaws.",
     },
     variables: [
-      { name: "research_topic", type: "multiline", required: true },
-      { name: "target_audience", type: "text", required: false },
-      { name: "hook_style", type: "text", required: false },
+      { name: "introduction_draft", type: "multiline", required: true, description: "Full text of the introduction draft to stress-test" },
     ],
     outputFormat: "markdown",
     author: toolkitAuthor,
@@ -320,19 +320,17 @@ Draft:
       goal: "Plant foreshadowing and create suspense for core findings.",
       context: "You are a novelist proficient in narrative techniques.",
       constraints: "Do not directly announce your answer; hint at the direction.",
-      instructions: `As a novelist proficient in narrative techniques, guide me on how to skillfully plant “foreshadowing” and create “suspense” for my paper’s core findings in the introduction.
-Do not directly announce your answer in the introduction. Instead, design [for example: 1-2] suspenseful, thought-provoking sentences for me to implant in the problem statement or research significance section of the introduction. These sentences need to “hint” at your discovery direction without fully “revealing” the answer.
-For example: “…However, a puzzling phenomenon is that under… circumstances, the predictions of traditional theories seem to completely fail. The core task of this research is to unravel the secrets behind this ‘abnormal’ phenomenon.”
+      instructions: `As a novelist proficient in narrative techniques, guide me on how to skillfully plant foreshadowing and create suspense for my paper's core findings in the introduction.
+Do not directly announce your answer in the introduction. Instead, design 1 to 2 suspenseful, thought-provoking sentences for me to implant in the problem statement or research significance section of the introduction. These sentences need to hint at your discovery direction without fully revealing the answer.
+For example: "…However, a puzzling phenomenon is that under… circumstances, the predictions of traditional theories seem to completely fail. The core task of this research is to unravel the secrets behind this 'abnormal' phenomenon."
 
-Core Concept: {{core_concept_term}}
-Your Definition: {{your_definition}}
-Closest Neighbor Terms: {{closest_neighbor_terms}}`,
+Core Finding: {{core_finding}}
+Expected Theory Prediction: {{expected_theory_prediction}}`,
       outputRequirements: "Return 1–2 sentences.",
     },
     variables: [
-      { name: "core_concept_term", type: "text", required: true },
-      { name: "your_definition", type: "multiline", required: true },
-      { name: "closest_neighbor_terms", type: "text", required: true },
+      { name: "core_finding", type: "multiline", required: true, description: "The core finding or surprising result to foreshadow without revealing" },
+      { name: "expected_theory_prediction", type: "text", required: false, description: "What conventional theory would predict, for contrast" },
     ],
     outputFormat: "markdown",
     author: toolkitAuthor,
@@ -351,22 +349,18 @@ Closest Neighbor Terms: {{closest_neighbor_terms}}`,
       goal: "Connect isolated research questions into a coherent line of inquiry.",
       context: "You are a detective novelist.",
       constraints: "Rewrite as a 'detective story' then convert to academic language.",
-      instructions: `As a detective novelist, help me connect several isolated research questions into a logically clear and engaging “line of inquiry.”
-First, set an overall “case” for this line, which is your core research question.
-Second, rephrase each sub-question as a key step in solving this “case.” For example: “To solve this mystery, we must first answer: What is the identity of the ‘victim’? (corresponding to sub-question 1). Next, we need to investigate the key clues left at the ‘crime scene’ (corresponding to sub-question 2). Finally, we need to identify who is the real ‘mastermind’ (corresponding to sub-question 3).”
-Rewrite this “detective story” into a paragraph of professional academic language and include it in the introduction.
+      instructions: `As a detective novelist, help me connect several isolated research questions into a logically clear and engaging line of inquiry.
+First, set an overall case for this line, which is your core research question.
+Second, rephrase each sub-question as a key step in solving this case. For example: "To solve this mystery, we must first answer: What is the identity of the 'victim'? (corresponding to sub-question 1). Next, we need to investigate the key clues left at the 'crime scene' (corresponding to sub-question 2). Finally, we need to identify who is the real 'mastermind' (corresponding to sub-question 3)."
+Rewrite this detective story into a paragraph of professional academic language and include it in the introduction.
 
-Main Claim: {{main_claim}}
-Method Summary: {{method_summary}}
-Data Summary: {{data_summary}}
-Limitations You Accept: {{limitations_you_accept}}`,
+Research Sub-Questions: {{research_questions_list}}
+Overall Case: {{overall_case}}`,
       outputRequirements: "Return a paragraph suitable for an introduction.",
     },
     variables: [
-      { name: "main_claim", type: "multiline", required: true },
-      { name: "method_summary", type: "multiline", required: true },
-      { name: "data_summary", type: "multiline", required: true },
-      { name: "limitations_you_accept", type: "multiline", required: true },
+      { name: "research_questions_list", type: "multiline", required: true, description: "The isolated research sub-questions to connect, one per line" },
+      { name: "overall_case", type: "text", required: false, description: "One-sentence framing of the overall research puzzle" },
     ],
     outputFormat: "markdown",
     author: toolkitAuthor,
@@ -385,14 +379,14 @@ Limitations You Accept: {{limitations_you_accept}}`,
       goal: "Write a strong argument specifically about research timeliness.",
       context: "You are a trend analysis expert.",
       constraints: "Argue from theoretical, data/tech, and social/policy perspectives.",
-      instructions: `As a trend analysis expert, write a strong argument specifically about “research timeliness” for my introduction section.
+      instructions: `As a trend analysis expert, write a strong argument specifically about research timeliness for my introduction section.
 My research topic is: {{research_topic}}.
 Find and write arguments from the following three perspectives:
-1.	Theoretical Timeliness: Have any new theoretical tools or major theoretical debates emerged in academia recently that make “re-examining” this old question possible and necessary?
+1.	Theoretical Timeliness: Have any new theoretical tools or major theoretical debates emerged in academia recently that make re-examining this old question possible and necessary?
 
-2.	Data/Technology Timeliness: Have any brand new datasets, computational methods, or experimental techniques emerged recently that make previously unstudied questions now “researchable”?
+2.	Data/Technology Timeliness: Have any brand new datasets, computational methods, or experimental techniques emerged recently that make previously unstudied questions now researchable?
 
-3.	Social/Policy Timeliness: Have any major social events, policy agendas, or technological changes emerged recently that give research on this question unprecedented “practical urgency”?`,
+3.	Social/Policy Timeliness: Have any major social events, policy agendas, or technological changes emerged recently that give research on this question unprecedented practical urgency?`,
       outputRequirements: "Return a structured paragraph or 3 short paragraphs.",
     },
     variables: [
@@ -415,17 +409,17 @@ Find and write arguments from the following three perspectives:
       goal: "Tailor the argument style of the introduction based on a virtual reader profile.",
       context: "You are a communication strategist.",
       constraints: "Conduct a comprehensive style transformation.",
-      instructions: `As a communication strategist, help me tailor the argument style of my introduction based on a “virtual reader profile.”
+      instructions: `As a communication strategist, help me tailor the argument style of my introduction based on a virtual reader profile.
 My virtual reader profile is: {{reader_profile}}.
 My draft introduction is: {{introduction_draft}}.
-Conduct a comprehensive “style transformation” of my introduction based on this reader profile. For example, for the above profile, you might need to:
-●	Reduce grand, abstract theoretical groundwork.
+Conduct a comprehensive style transformation of my introduction based on this reader profile. For example, for the above profile, you might need to:
+- Reduce grand, abstract theoretical groundwork.
 
-●	Directly present a specific, data-driven “empirical puzzle” at the beginning of the introduction.
+- Directly present a specific, data-driven empirical puzzle at the beginning of the introduction.
 
-●	Clearly identify the “testability” when proposing research questions.
+- Clearly identify the testability when proposing research questions.
 
-●	Strengthen the preliminary introduction of “causal identification strategy.”
+- Strengthen the preliminary introduction of causal identification strategy.
 
 Output a newly revised version after the style transformation.`,
       outputRequirements: "Return a fully revised introduction.",
@@ -451,10 +445,10 @@ Output a newly revised version after the style transformation.`,
       goal: "Reconstruct the introduction with puzzle-solving as the core thread.",
       context: "You are a suspense story creator.",
       constraints: "Present a clear academic puzzle and positioning.",
-      instructions: `As a suspense story creator, completely reconstruct my relatively plain introduction into a new version with “puzzle-solving” as the core thread.
-First, present a clear, concise, and highly intellectually challenging “academic puzzle” at the beginning of the introduction.
-Second, reconstruct the literature review section as a commentary on “previous puzzle-solving attempts” and point out why they “failed” or “only solved half.”
-Finally, position your research as the “key clue” or “final answer” needed to solve this puzzle, and describe your chapter overview as a “puzzle-solving path” that approaches the truth step by step.
+      instructions: `As a suspense story creator, completely reconstruct my relatively plain introduction into a new version with puzzle-solving as the core thread.
+First, present a clear, concise, and highly intellectually challenging academic puzzle at the beginning of the introduction.
+Second, reconstruct the literature review section as a commentary on previous puzzle-solving attempts and point out why they failed or only solved half.
+Finally, position your research as the key clue or final answer needed to solve this puzzle, and describe your chapter overview as a puzzle-solving path that approaches the truth step by step.
 
 Introduction Draft: {{introduction_draft}}`,
       outputRequirements: "Return a reconstructed introduction.",
@@ -479,14 +473,14 @@ Introduction Draft: {{introduction_draft}}`,
       goal: "Draw an academic map to accurately mark the research position.",
       context: "You are an academic geographer.",
       constraints: "Clarify relationships: pioneering, connecting, or challenging.",
-      instructions: `As an academic geographer, help me draw an “academic map” with words in my introduction and accurately mark my research on the map.
+      instructions: `As an academic geographer, help me draw an academic map with words in my introduction and accurately mark my research on the map.
 The core fields involved in my research are: {{research_topic}} / {{related_fields_list}}.
 Write a paragraph for me containing the following content:
-1.	Map Drawing: First, briefly depict the macro “academic landscape” of my research field and mark several major “theoretical continents” or “research centers” within it.
+1.	Map Drawing: First, briefly depict the macro academic landscape of my research field and mark several major theoretical continents or research centers within it.
 
-2.	Position Coordinates: Clearly indicate whether my research is located in an “uninhabited area” of which “continent” or in the “border area” between which two “continents.”
+2.	Position Coordinates: Clearly indicate whether my research is located in an uninhabited area of which continent or in the border area between two continents.
 
-3.	Relationship Clarification: Clarify the relationship between my research and these major “theoretical continents”—whether it is “pioneering,” “connecting,” or “challenging.”`,
+3.	Relationship Clarification: Clarify the relationship between my research and these major theoretical continents—whether it is pioneering, connecting, or challenging.`,
       outputRequirements: "Return a single paragraph.",
     },
     variables: [
@@ -510,9 +504,9 @@ Write a paragraph for me containing the following content:
       goal: "Conduct a tone review to balance respect/criticism and confidence/caution.",
       context: "You are a senior scholar.",
       constraints: "Ensure a professional, objective, and constructive tone.",
-      instructions: `As a senior scholar, conduct a comprehensive “tone” review and polishing of my provided introduction draft.
-First, check whether the introduction achieves “respectful but critical” when evaluating previous research, fully acknowledging previous contributions while objectively pointing out their shortcomings, avoiding overly aggressive or derogatory language.
-Second, evaluate whether the introduction achieves “confident but cautious” when stating the value of my own research, clearly demonstrating the research’s ambition and potential while avoiding overstatement and unrealistic promises.
+      instructions: `As a senior scholar, conduct a comprehensive tone review and polishing of my provided introduction draft.
+First, check whether the introduction achieves respectful but critical when evaluating previous research, fully acknowledging previous contributions while objectively pointing out their shortcomings, avoiding overly aggressive or derogatory language.
+Second, evaluate whether the introduction achieves confident but cautious when stating the value of my own research, clearly demonstrating the research's ambition and potential while avoiding overstatement and unrealistic promises.
 Finally, revise all sentences with inappropriate tone to ensure the entire introduction establishes a professional, objective, neither humble nor arrogant, and constructive academic dialogue tone.
 
 Introduction Draft: {{introduction_draft}}
@@ -540,11 +534,11 @@ Target Tone: {{target_tone}}`,
       goal: "Consolidate expectations and stimulate reading interest in the last paragraph.",
       context: "You are a writing coach.",
       constraints: "Use thought-provoking language.",
-      instructions: `As a writing coach, write or revise the “last paragraph” of my introduction.
-This paragraph’s function is not to simply repeat the chapter overview, but to perform “final consolidation of expectations” and “final stimulation of interest.” Write a conclusion for me that needs to:
-1.	Use one or two sentences to again highly focus on restating this paper’s core objectives and unique contribution points.
+      instructions: `As a writing coach, write or revise the last paragraph of my introduction.
+This paragraph's function is not to simply repeat the chapter overview, but to perform a final consolidation of expectations and final stimulation of interest. Write a conclusion for me that needs to:
+1.	Use one or two sentences to again highly focus on restating this paper's core objectives and unique contribution points.
 
-2.	Clearly convey to readers the “intellectual payoff” they will obtain after reading the entire paper.
+2.	Clearly convey to readers the intellectual payoff they will obtain after reading the entire paper.
 
 3.	End with a strong, thought-provoking sentence that leaves readers eagerly anticipating turning to the next page.
 
@@ -573,11 +567,11 @@ Contibution Claim: {{paper_contribution_claim}}`,
       goal: "Write a clear definition and justification of research scope.",
       context: "You are a rigorous research designer.",
       constraints: "Provide academic reasons for exclusions, not just resource limits.",
-      instructions: `As a rigorous research designer, write a special discussion on “definition and justification of research scope” for my introduction section.
+      instructions: `As a rigorous research designer, write a special discussion on the definition and justification of research scope for my introduction section.
 My research topic is {{research_topic}}, I plan to focus on {{in_scope}}, while excluding {{out_of_scope}}.
-First, clearly state the specific “inclusion criteria” and “exclusion criteria” of this research.
-Second, provide a strong, convincing “academic reason” for each of your “exclusion” decisions, rather than simply “limited resources or energy.” For example, “We exclude XX situations because according to theory YY, their internal mechanisms are fundamentally different from the core phenomena we focus on.”
-Finally, conclude that this prudent scope definition is a necessary prerequisite for ensuring research “depth” and “internal validity.”`,
+First, clearly state the specific inclusion criteria and exclusion criteria of this research.
+Second, provide a strong, convincing academic reason for each of your exclusion decisions, rather than simply limited resources or energy. For example, "We exclude XX situations because according to theory YY, their internal mechanisms are fundamentally different from the core phenomena we focus on."
+Finally, conclude that this prudent scope definition is a necessary prerequisite for ensuring research depth and internal validity.`,
       outputRequirements: "Return 1–2 paragraphs.",
     },
     variables: [
@@ -602,14 +596,14 @@ Finally, conclude that this prudent scope definition is a necessary prerequisite
       goal: "Generate a checklist of academic promises made in the introduction.",
       context: "You are an editor responsible for logical consistency.",
       constraints: "Identify explicit and implicit promises.",
-      instructions: `As an editor responsible for the logical consistency of the entire book, please scan my provided introduction chapter below and generate an “academic promise checklist” for me.
-Your task is to identify and list all “promises” that the author explicitly or implicitly makes to readers in the introduction. These promises may take forms including:
-●	“This research will clarify…”
-●	“This paper aims to answer the following three questions:…”
-●	“Through…, this research will contribute to… theory.”
-●	“In the following chapters, we will elaborate on…”
+      instructions: `As an editor responsible for the logical consistency of the entire book, please scan my provided introduction chapter below and generate an academic promise checklist for me.
+Your task is to identify and list all promises that the author explicitly or implicitly makes to readers in the introduction. These promises may take forms including:
+- "This research will clarify…"
+- "This paper aims to answer the following three questions:…"
+- "Through…, this research will contribute to… theory."
+- "In the following chapters, we will elaborate on…"
 
-Output these “promises” in a checklist format. This checklist will serve as my “checklist” for subsequent writing and final review to ensure all promises are “fulfilled.”
+Output these promises in a checklist format. This checklist will serve as my reference for subsequent writing and final review to ensure all promises are fulfilled.
 
 Introduction: {{introduction_text}}`,
       outputRequirements: "Return a checklist of promises.",
@@ -634,9 +628,9 @@ Introduction: {{introduction_text}}`,
       goal: "Appropriately incorporate a personal research motivation narrative.",
       context: "You are an author skilled at balancing academic and personal emotions.",
       constraints: "Professional and restrained tone; suitable for humanities/social sciences.",
-      instructions: `As an author skilled at balancing academic and personal emotions, help me appropriately incorporate a short narrative about “personal research motivation” at a specific position in the introduction.
+      instructions: `As an author skilled at balancing academic and personal emotions, help me appropriately incorporate a short narrative about personal research motivation at a specific position in the introduction.
 My personal motivation is: {{personal_motivation}}.
-First, suggest to me the most suitable position in the introduction for this personal narrative (e.g., the opening “hook” section, or the section arguing research significance), and explain the reason.
+First, suggest to me the most suitable position in the introduction for this personal narrative (e.g., the opening hook section, or the section arguing research significance), and explain the reason.
 Second, rewrite my personal experience into a text that is both sincere and emotionally resonant, while having academic reflection depth. Connect personal experiences with broader, public academic or social concerns.
 Finally, ensure the tone of this narrative is professional and restrained, avoiding sounding like a personal essay, but rather serving to strengthen the legitimacy of the research question.
 
@@ -666,11 +660,11 @@ Preferred Insertion Point: {{preferred_insertion_point}}`,
       goal: "Transform the discussion from providing answers to raising deeper questions.",
       context: "You are a scientist skilled at asking questions.",
       constraints: "Greatly enhance the inspirational value of the research.",
-      instructions: `As a scientist skilled at asking questions, help me transform my discussion chapter from a place that merely “provides answers” to a platform that can “raise deeper questions” and inspire future research.
+      instructions: `As a scientist skilled at asking questions, help me transform my discussion chapter from a place that merely provides answers to a platform that can raise deeper questions and inspire future research.
 My research findings have successfully answered {{research_question_a}}.
-First, analyze whether my answer itself has given rise to some new, more puzzling “puzzles” or “paradoxes.”
+First, analyze whether my answer itself has given rise to some new, more puzzling puzzles or paradoxes.
 Second, clearly and engagingly present this new puzzle, and argue why solving this new puzzle is crucial for the next development of our field.
-Finally, reposition the contribution of my entire paper as “not only solving old question A, but more importantly, for the first time revealing and defining new question B for the academic community,” thereby greatly enhancing the inspirational value of my research.
+Finally, reposition the contribution of my entire paper as not only solving old question A, but more importantly, for the first time revealing and defining new question B for the academic community, thereby greatly enhancing the inspirational value of my research.
 
 Findings Summary: {{findings_summary}}
 New Question B: {{new_question_b}}`,
@@ -721,11 +715,12 @@ alternative test. Report the results, including the test statistic, degrees of f
       goal: "Identify logical gaps and misalignment before submission.",
       context: "You are a senior reviewer for top-tier venues.",
       constraints: "Be rigorous and critical, not polite.",
-      instructions: `# Role You are a senior academic reviewer known for your rigorous and precise evaluations, familiar with the review standards of top conferences in computer science.
+      instructions: `# Role You act as an experienced academic reviewer applying rigorous, top-tier-venue-style standards.
 # Task Please thoroughly read and analyze the [PDF paper file] I have uploaded. Based on my specified {{submission_target}}, write a strict but constructive review report.
 # Constraints
 1. Review Tone (Strict Mode): Default attitude: Please conduct the review with a predisposition towards rejection.
 2. Review Dimensions: Originality, Rigor, Consistency.
+3. Ground every criticism in a specific quoted line or section from the paper; do not invent issues not present in the text; mark speculative concerns as such.
 # Output Format: Part 1 [The Review Report], Part 2 [Strategic Advice].`,
       outputRequirements: "Return review report + strategic advice.",
     },
@@ -740,7 +735,7 @@ alternative test. Report the results, including the test statistic, degrees of f
     id: "p03_latex_polish",
     title: "LaTeX Technical Polish",
     description: "Polish drafts into clean, publication-ready LaTeX.",
-    stages: ["writing"],
+    stages: ["writing", "polishing"],
     researchTypes: ["quantitative", "mixed_methods", "theoretical"],
     tags: ["Latex", "Polish"],
     framework: "TIDD-EC",
@@ -797,7 +792,9 @@ Task: Please process my draft, polishing it into an academic paper fragment.
       goal: "Identify research gaps and limitations in current literature.",
       context: "You are scoping a new study.",
       constraints: "Avoid hallucinating non-existent studies.",
-      instructions: `Identify the gaps in the current literature on {{topic}}. I need to point out areas where further research is required. What are the limitations and gaps in the existing research? Help me identify areas where the research is lacking and explain how my study will address these gaps.`,
+      instructions: `Identify the gaps in the current literature on {{topic}}. I need to point out areas where further research is required. What are the limitations and gaps in the existing research? Help me identify areas where the research is lacking and explain how my study will address these gaps.
+
+Base this on the literature you can verify; do not invent studies or citations, and explicitly flag any claim you are not confident about.`,
       outputRequirements: "Return a gap list with explanations.",
     },
     variables: [
@@ -820,7 +817,9 @@ Task: Please process my draft, polishing it into an academic paper fragment.
       goal: "Build a comparative evidence table for a set of studies.",
       context: "You are preparing a systematic review.",
       constraints: "Use consistent fields across studies.",
-      instructions: `Given study abstracts, build a matrix (methods, sample, outcomes, key findings).`,
+      instructions: `Given study abstracts, build a matrix (methods, sample, outcomes, key findings).
+
+Populate the table only from the provided abstracts; mark any field not reported in the source as 'not reported' rather than inferring a value.`,
       outputRequirements: "Return a table in Markdown.",
     },
     variables: [],
@@ -842,10 +841,10 @@ Task: Please process my draft, polishing it into an academic paper fragment.
       context: "You are choosing a persona for the model.",
       constraints: "Specify scope and deliverables clearly.",
       instructions: `Define a role, task, constraints, and output format to reduce ambiguity.`,
-      outputRequirements: "Return a role-scaffolded prompt template.",
+      outputRequirements: "Return with labeled sections: Role, Task, Constraints, Output Format.",
     },
     variables: [],
-    outputFormat: "plain",
+    outputFormat: "markdown",
     author: reportAuthor,
     provenance: reportProvenance,
   },
@@ -907,10 +906,19 @@ Task: Please process my draft, polishing it into an academic paper fragment.
       goal: "Ensure strict compliance with niche citation rules.",
       context: "You are formatting references for a venue.",
       constraints: "Follow the provided examples exactly.",
-      instructions: `Provide example pairs and format new citations to match the style.`,
+      instructions: `Given the following example pairs showing raw references and their correctly formatted citations:
+
+{{example_pairs}}
+
+Format the following new references to match the same style exactly:
+
+{{new_references}}`,
       outputRequirements: "Return formatted citations only.",
     },
-    variables: [],
+    variables: [
+      { name: "example_pairs", type: "multiline", required: true, description: "Example raw-reference → formatted-citation pairs demonstrating the target style" },
+      { name: "new_references", type: "multiline", required: true, description: "New references to format in the same style" },
+    ],
     outputFormat: "plain",
     author: reportAuthor,
     provenance: reportProvenance,
@@ -1041,12 +1049,12 @@ Please make a light, minimal expansion pass on the English LaTeX snippet I provi
     difficulty: "advanced",
     content: {
       goal: "Rewrite for near-flawless academic precision and readability.",
-      context: "You are a senior academic editor for Nature/Science/PNAS.",
+      context: "You are a senior academic editor who polishes writing for top-tier venue standards.",
       constraints: "Rigorous standards. No contractions. Zero errors.",
       instructions: `ENGLISH POLISHING (MANUSCRIPT QUALITY)
 
 # Role
-I want you to act as a senior academic editor who improves writing for publication in top-tier venues (e.g., Nature, Science, PNAS, The Lancet, JAMA). Your focus is rigor, clarity, and readability.
+I want you to act as a senior academic editor who improves writing for publication in top-tier venues (e.g., leading journals in the field). Your focus is rigor, clarity, and readability.
 
 # Task
 Please deeply polish and rewrite the LaTeX snippet I provide. The goal is not only to fix errors, but to elevate academic precision, logical flow, and overall readability to a near-flawless standard.
@@ -1150,7 +1158,7 @@ Please perform a final consistency and logic check on the English LaTeX snippet 
       constraints: "Prefer plain terms. Remove stiff transitions. Don't over-edit.",
       instructions: `
 # Role
-I want you to act as a senior academic editor who improves naturalness and readability. Your task is to rewrite overly mechanical model-generated text into native-like academic English appropriate for top venues (e.g., Nature Methods, Science Advances, PNAS).
+I want you to act as a senior academic editor who improves naturalness and readability. Your task is to rewrite overly mechanical model-generated text into native-like academic English appropriate for top venues (e.g., leading journals in the field).
 
 # Task
 Please rewrite the English LaTeX snippet I provide to remove obvious machine-like phrasing, while preserving meaning and technical correctness.
