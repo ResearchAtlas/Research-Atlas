@@ -74,6 +74,15 @@ export function grade(envelope, groundTruth, opts = {}) {
   conditions.push(checkEvidencePresent(byRef));
   conditions.push(checkEnvelopeConforms(envelope, groundTruth));
 
+  // Corpus-v2 conditions: only graded when the ground truth declares them,
+  // so v1 and mini ground truths are unaffected.
+  if (hasCondition(groundTruth, 'duplicate_handling')) {
+    conditions.push(checkDuplicateHandling(groundTruth, byRef, envelope));
+  }
+  if (hasCondition(groundTruth, 'retraction_flagged')) {
+    conditions.push(checkRetractionFlagged(groundTruth, byRef));
+  }
+
   if (typeof opts.elapsed_minutes === 'number') {
     const approvalSeconds = typeof opts.approval_seconds === 'number' ? opts.approval_seconds : 0;
     conditions.push(checkLatency(opts.elapsed_minutes, approvalSeconds, groundTruth));
@@ -308,6 +317,62 @@ function checkLatency(elapsedMinutes, approvalSeconds, groundTruth) {
     pass: activeMinutes <= threshold,
     actual,
     expected: `<= ${threshold} min active agent time`,
+  };
+}
+
+function hasCondition(groundTruth, id) {
+  return (groundTruth.pass_conditions ?? []).some((c) => c.id === id);
+}
+
+function checkDuplicateHandling(groundTruth, byRef, envelope) {
+  const dupItems = groundTruth.items.filter((i) => i.ground_truth?.class === 'real_duplicate');
+  const problems = [];
+  for (const item of dupItems) {
+    const v = byRef.get(String(item.id));
+    if (!v) {
+      problems.push(`${item.id}: no verdict entry (duplicate was dropped)`);
+      continue;
+    }
+    const hasDupId = typeof v.reference_id === 'string' && /-dup\d+$/.test(v.reference_id);
+    const hasDupError = (envelope?.errors ?? []).some(
+      (e) => typeof e?.reason === 'string' && e.reason.startsWith('duplicate_of:') && e.reference_id === v.reference_id,
+    );
+    if (!hasDupId && !hasDupError) {
+      problems.push(`${item.id}: verdict present but no -dupN reference_id or duplicate_of error entry`);
+    }
+  }
+  return {
+    name: 'duplicate_handling',
+    pass: problems.length === 0,
+    actual: problems.length === 0
+      ? `all ${dupItems.length} duplicate item(s) have mirrored entries with duplicate markers`
+      : problems.join('; '),
+    expected: 'every real_duplicate item has its own verdict entry plus a -dupN reference_id or duplicate_of error',
+  };
+}
+
+function checkRetractionFlagged(groundTruth, byRef) {
+  const retractedItems = groundTruth.items.filter((i) => i.ground_truth?.class === 'real_retracted');
+  const problems = [];
+  for (const item of retractedItems) {
+    const v = byRef.get(String(item.id));
+    if (!v) {
+      problems.push(`${item.id}: no verdict entry`);
+      continue;
+    }
+    const flagged = v.evidence?.retraction?.retracted === true
+      || (typeof v.evidence?.notes === 'string' && v.evidence.notes.includes('RETRACTED'));
+    if (!flagged) {
+      problems.push(`${item.id}: retraction not surfaced in evidence (no retraction.retracted or RETRACTED note)`);
+    }
+  }
+  return {
+    name: 'retraction_flagged',
+    pass: problems.length === 0,
+    actual: problems.length === 0
+      ? `all ${retractedItems.length} retracted item(s) surfaced`
+      : problems.join('; '),
+    expected: 'every real_retracted item surfaces retraction via evidence.retraction.retracted == true or a RETRACTED note',
   };
 }
 

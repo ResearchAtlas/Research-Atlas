@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000030",
+    "timestamp": "2026-07-02T12:00:00Z",
+    "input_count": 2
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "content": "## Mini verification report\n\n- vaswani-2017-attention: verified\n- wakefield-1998-ileal: verified (RETRACTED)\n\n### Retracted references\n\n- wakefield-1998-ileal — retracted 2010; do not cite as valid evidence.\n",
+    "citations_checked": 2,
+    "verdict_summary": {
+      "verified": 2,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 0.98,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
+        }
+      },
+      {
+        "reference_id": "wakefield-1998-ileal",
+        "verdict": "verified",
+        "confidence": 0.95,
+        "evidence": {
+          "parsed": { "doi": "10.1016/s0140-6736(97)11096-0", "title": "Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children", "year": 1998 },
+          "resolved": { "doi": "10.1016/s0140-6736(97)11096-0", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": { "checked": true, "retracted": true },
+          "notes": "RETRACTED: publication retracted by The Lancet in 2010; metadata matches but the work must not be cited as valid evidence."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

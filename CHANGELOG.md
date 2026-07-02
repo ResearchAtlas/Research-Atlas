@@ -6,6 +6,65 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+### Added — 2026-07-02 wave (PRs #5–#11)
+
+- **Provenance & freshness system** — every prompt, guide, and workflow carries
+  `{source, sourceUrl?, owner, status, addedAt, reviewedAt?}` metadata replacing
+  the misleading batch timestamps. `npm run validate:content` (zero new
+  dependencies) enforces unique ids, provenance shape, no future/stale dates,
+  resolvable workflow `promptIds`, taxonomy integrity, and
+  `{{placeholder}}` ↔ `variables[]` parity; wired into `prebuild`.
+- **Prompt quality audit** — `PROMPT_RUBRIC.md` (8 criteria) published; all 106
+  prompts audited and statused (`reviewed`, 2026-07-02), 43 fixed in place:
+  anti-fabrication guardrails on source-facing prompts, honest personas,
+  variable-drift repairs, translation artifacts removed. Status badge + source
+  shown on prompt details.
+- **`research-verification` v2.2.0** — duplicate references now produce
+  mirrored verdict entries (`-dupN` ids, `duplicate_of` errors) instead of
+  being dropped, resolving the `input_count`/`verdicts_complete` contradiction;
+  retraction surfacing from resolver responses; structured `data.claims`
+  contract for claim-level tasks; validator gains reference-id uniqueness,
+  retraction shape, and claims checks; 9 new fixtures plus
+  `npm run test:validator:fixtures` (first harness asserting invalid fixtures
+  fail).
+- **Acceptance corpus v2** — 32 references (was 30): entry 31 duplicates entry 1
+  (duplicate-contract trap), entry 32 is a real retracted paper (Wakefield 1998,
+  doi:10.1016/S0140-6736(97)11096-0). Ground truth v2 adds `duplicate_handling`
+  and `retraction_flagged` pass conditions; the grader enforces both when a
+  ground truth declares them (mini fixtures + smoke cases included).
+- **10 externally adapted prompts** (pre-submission audit ladder, claim–evidence
+  map, revision altitude ladder, citation hygiene/support, editor first-pass,
+  claim-strength audit, AI failure-mode self-check, terminology ledger, AI-use
+  disclosure) with per-prompt upstream attribution; `INTEGRATIONS.md` documents
+  the full integration matrix and license rules (Apache-2.0/MIT adapted with
+  attribution; CC BY-NC repos used as design references only).
+- **Library & workflow UX** — variable inputs driven by `PromptVariable`
+  metadata (multiline, required, descriptions, defaults), localStorage
+  persistence for sandbox values and workflow progress (with reset),
+  Copy-as-Markdown export, and a real `/skills` page with true install flows
+  (Claude Code / Codex CLI / Gemini CLI) replacing the orphaned placeholder.
+- **GitHub Actions CI** — lint, full build gate, grader fixtures, and hook smoke
+  on every PR and push to main.
+
+### Changed — 2026-07-02 wave
+
+- Plain "Copy to Clipboard" now appends the prompt's `Constraints:` /
+  `Output requirements:` lines so guardrails reach the model (previously they
+  lived only in page metadata).
+- Hero subhead and library copy toned down to what the product actually does
+  ("citation-disciplined drafts", "curated prompts").
+
+### Known gaps — 2026-07-02 wave
+
+- Corpus v2 acceptance runs are pending on all three agents (Claude Code,
+  Codex CLI, Gemini CLI). The saved envelopes under
+  `scripts/acceptance/envelopes/` are v1 (30-item) artifacts and grade only
+  against the v1 ground truth in git history.
+- `verified` prompt status remains reserved: no prompt has been exercised
+  against a live model yet.
+
+---
+
 ### Added
 
 - **Flagship `research-verification` skill, v2.1.0** — end-to-end reference verification

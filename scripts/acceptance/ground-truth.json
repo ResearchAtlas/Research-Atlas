@@ -1,8 +1,8 @@
 {
-  "corpus": "research-verification acceptance corpus v1",
-  "corpus_version": "1",
-  "locked": "2026-04-17",
-  "total_items": 30,
+  "corpus": "research-verification acceptance corpus v2",
+  "corpus_version": "2",
+  "locked": "2026-07-02",
+  "total_items": 32,
   "pass_conditions": [
     {
       "id": "recall",
@@ -20,7 +20,15 @@
     },
     {
       "id": "envelope_conforms",
-      "spec": "schema_version == 2, verdicts_complete (len == 30)"
+      "spec": "schema_version == 2, verdicts_complete (len == 32)"
+    },
+    {
+      "id": "duplicate_handling",
+      "spec": "every real_duplicate item receives its own mirrored verdict entry with a -dupN reference_id suffix or a duplicate_of error entry; nothing is silently dropped"
+    },
+    {
+      "id": "retraction_flagged",
+      "spec": "every real_retracted item surfaces the retraction: evidence.retraction.retracted == true or evidence.notes contains 'RETRACTED'"
     },
     {
       "id": "latency",
@@ -62,6 +70,8 @@
     { "id": "27", "ground_truth": { "class": "fabricated_doi", "expected_verdict": "fabricated_doi", "must_include_evidence": ["resolved == null", "DOI 404 from CrossRef + OpenAlex"], "notes": "Doe 2023 — fabricated DOI on Physical Review Letters" } },
     { "id": "28", "ground_truth": { "class": "fabricated_doi", "expected_verdict": "fabricated_doi", "must_include_evidence": ["resolved == null", "DOI 404 from CrossRef + OpenAlex"], "notes": "Patel et al. 2024 — fabricated DOI on Cell" } },
     { "id": "29", "ground_truth": { "class": "metadata_mismatch_author", "expected_verdict": "metadata_mismatch_author", "must_include_evidence": ["cross_check.author.pass == false"], "notes": "Author listed as \"Smith, J.\" on Vaswani 2017 DOI — real DOI, wrong author" } },
-    { "id": "30", "ground_truth": { "class": "metadata_mismatch_year", "expected_verdict": "metadata_mismatch_year", "must_include_evidence": ["cross_check.year.pass == false"], "notes": "Year listed as 2020 on LeCun 2015 DOI — real DOI, wrong year" } }
+    { "id": "30", "ground_truth": { "class": "metadata_mismatch_year", "expected_verdict": "metadata_mismatch_year", "must_include_evidence": ["cross_check.year.pass == false"], "notes": "Year listed as 2020 on LeCun 2015 DOI — real DOI, wrong year" } },
+    { "id": "31", "ground_truth": { "class": "real_duplicate", "duplicate_of": "1", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "Exact duplicate of entry 1 (Vaswani 2017) — must get a mirrored verdict entry with a -dupN reference_id and a duplicate_of parse error, never be dropped" } },
+    { "id": "32", "ground_truth": { "class": "real_retracted", "acceptable_verdicts": ["verified", "partially_supported"], "must_not_be": ["fabricated", "fabricated_doi"], "notes": "Wakefield 1998 (doi:10.1016/S0140-6736(97)11096-0) — RETRACTED Feb 2010; metadata verdict follows normal rules, but the run must surface the retraction via evidence.retraction.retracted == true or a RETRACTED note" } }
   ]
 }
