@@ -51,7 +51,8 @@ export function SkillsPage() {
                         <div className="flex items-center gap-2">
                             <ShieldCheck className="h-5 w-5 text-primary" aria-hidden="true" />
                             <CardTitle className="text-xl">research-verification</CardTitle>
-                            <Badge variant="secondary">v1</Badge>
+                            {/* Skill version — keep in sync with .claude/skills/research-verification/SKILL.md frontmatter */}
+                            <Badge variant="secondary">Skill v2.2.0</Badge>
                         </div>
                         <CardDescription>
                             End-to-end reference verification across Claude Code, Codex CLI, and Gemini CLI.
