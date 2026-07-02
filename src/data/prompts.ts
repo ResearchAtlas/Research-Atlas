@@ -3867,4 +3867,482 @@ Constraints:
     author: nlmAuthor,
     provenance: nlmProvenance,
   },
+
+  // External adaptations (2026-07-02) — see /INTEGRATIONS.md for the full matrix.
+  {
+    id: "audit_presubmission_ladder",
+    title: "Pre-Submission Audit",
+    description: "Run an ordered pre-submission audit of a manuscript, from claim alignment through a reviewer-side rejection pass.",
+    stages: ["review", "polishing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Audit", "Submission", "Review"],
+    difficulty: "advanced",
+    content: {
+      goal: "Audit a manuscript in a fixed order before submission and surface every issue that would slow down review.",
+      context: "You are acting as a careful pre-submission reviewer, not the author. Target venue type: {{target_venue_type}}.",
+      constraints: "Work through the stages strictly in order. Do not skip a stage even if it looks clean. Every finding must point to an exact location in the manuscript text; do not raise a finding you cannot locate.",
+      instructions: `Act as a careful pre-submission reviewer auditing this manuscript for a {{target_venue_type}}. Do not rewrite the manuscript; only audit it.
+
+Manuscript:
+"""
+{{manuscript_text}}
+"""
+
+Work through these stages in order, and do not skip ahead:
+1. Claim / front-matter alignment — do the title, abstract, and stated contributions match what the body actually shows?
+2. Figure and legend coverage — does every figure/table referenced in the text exist with a legend, and does every figure in the manuscript get discussed in the text?
+3. Methods/supplement anchoring — does every method, dataset, or statistic named in the results trace back to a methods or supplement section?
+4. Terminology consistency — are key terms used consistently, or do near-synonyms risk reading as different concepts?
+5. Risk pass — flag anything that looks fabricated, overstated, or unsupported by the text as written.
+6. Reviewer-side rejection pass — read once more as a skeptical reviewer looking for a reason to reject; list the top reasons a reviewer could use.
+
+For every finding, use this exact format:
+- Severity: High / Medium / Low
+- Location: exact section, paragraph, or figure/table number
+- What's wrong: one or two sentences
+- Why it matters: the consequence if left unfixed
+- Minimum safe fix: the smallest edit that resolves it
+
+Only report findings you can point to in the text provided; if a stage has no issues, say so explicitly instead of inventing one.`,
+      outputRequirements: "Six labeled stage sections in order, each containing a list of findings in the Severity/Location/What's wrong/Why it matters/Minimum safe fix format. State explicitly when a stage has no findings.",
+    },
+    variables: [
+      { name: "manuscript_text", type: "multiline", required: true, description: "Full manuscript text (or the sections available) to audit" },
+      { name: "target_venue_type", type: "text", required: false, description: "Venue type framing the audit, e.g. \"peer-reviewed journal in my field\"", defaultValue: "peer-reviewed journal in my field" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from Nature-Paper-Skills (MIT) — submission-audit",
+      sourceUrl: "https://github.com/Boom5426/Nature-Paper-Skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "audit_claim_evidence_map",
+    title: "Claim–Evidence Map",
+    description: "Extract every substantive claim from a draft into a table of claim, supporting evidence, status, and safer wording.",
+    stages: ["writing", "review"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Claims", "Evidence", "Review"],
+    difficulty: "intermediate",
+    content: {
+      goal: "Build a claim-by-claim evidence map for a draft so unsupported or overstated claims are visible before submission.",
+      context: "You are checking whether each claim in the draft below is actually backed by evidence in that same draft.",
+      constraints: "Only use evidence present in the draft text; do not search for or assume outside evidence. Every claim needs a row, including ones with no supporting evidence.",
+      instructions: `Read the draft below and extract every substantive claim (a statement asserting a result, effect, comparison, or conclusion — not routine background).
+
+Draft:
+"""
+{{draft_text}}
+"""
+
+Build a table with these columns:
+| Claim | Supporting evidence in the draft | Status | Safer wording if partial/unsupported |
+|---|---|---|---|
+
+Status must be one of: supported, partially supported, unsupported.
+
+For any claim marked "partially supported," suggest safer wording that lowers the strength of the claim to match the evidence (for example, replacing causal phrasing with "consistent with" or "associated with"). For "unsupported" claims, state plainly that no evidence for it appears in the draft — do not invent evidence to fill the gap.
+
+After the table, list any claims you were unsure how to classify and why.`,
+      outputRequirements: "A single markdown table (Claim | Supporting evidence in the draft | Status | Safer wording) covering every substantive claim, followed by a short list of ambiguous cases.",
+    },
+    variables: [
+      { name: "draft_text", type: "multiline", required: true, description: "Full draft text to extract claims from" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from Nature-Paper-Skills (MIT) — claim-evidence map example",
+      sourceUrl: "https://github.com/Boom5426/Nature-Paper-Skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "revise_altitude_ladder",
+    title: "Revision Altitude Ladder",
+    description: "Review a draft strictly from high-altitude framing down to language polish, forbidding prose polish on claims that are still unstable.",
+    stages: ["writing", "polishing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Revision", "Structure", "Editing"],
+    difficulty: "advanced",
+    content: {
+      goal: "Review a draft in strict altitude order so structural problems are fixed before sentence-level polish, never after.",
+      context: "Revision goal: {{revision_goal}}.",
+      constraints: "Review the five altitude levels in order, top to bottom. If a higher level has unresolved problems, do not comment on language/wording for the passages affected — flag them as blocked instead.",
+      instructions: `Review this draft in altitude order. Do not jump ahead to a lower altitude level for any passage until the levels above it are resolved for that passage.
+
+Revision goal (if given): {{revision_goal}}
+
+Draft:
+"""
+{{draft_text}}
+"""
+
+Altitude levels, high to low:
+1. Direction / framing — is the overall argument or contribution framed correctly and pointed at the right audience?
+2. Logic chain — does each step of the argument follow from the one before it, with no missing links?
+3. Evidence and figures — is each claim backed by the evidence or figure it relies on?
+4. Terminology — are key terms used consistently throughout?
+5. Language polish — grammar, word choice, sentence flow. Review this LAST, and only for passages that passed levels 1-4.
+
+Rule: if a passage has an unresolved issue at level 1, 2, or 3, do not suggest language-level edits for that passage. Instead, list it under "Blocked from polish" with the reason. Only passages clear at levels 1-4 get language suggestions at level 5.
+
+Structure your output as one section per altitude level, plus a final "Blocked from polish" section.`,
+      outputRequirements: "Five sections (one per altitude level, in order) plus a closing 'Blocked from polish' section listing passages withheld from language edits and why.",
+    },
+    variables: [
+      { name: "draft_text", type: "multiline", required: true, description: "Full draft text to review" },
+      { name: "revision_goal", type: "text", required: false, description: "What this revision pass is trying to achieve, if known" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from Nature-Paper-Skills (MIT) — manuscript-optimizer",
+      sourceUrl: "https://github.com/Boom5426/Nature-Paper-Skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "cite_hygiene_scan",
+    title: "Citation Hygiene Scan",
+    description: "Scan a bibliography or manuscript for local hygiene defects such as placeholder keys, TODO markers, duplicates, and missing fields.",
+    stages: ["review"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Citations", "Bibliography", "Audit"],
+    difficulty: "intermediate",
+    content: {
+      goal: "Find local hygiene defects in a bibliography or manuscript's citations without attempting to verify that the references actually exist.",
+      context: "Treat any imported or exported bibliography metadata as draft data that may contain errors, not as verified truth.",
+      constraints: "This is a local text scan only. Do not claim to have checked whether any reference actually exists, is correctly attributed, or supports the claim it's attached to — that requires external verification, which this scan does not perform.",
+      instructions: `Scan the bibliography/manuscript text below for citation hygiene defects. This is a local scan of the text as written — you are not verifying that any reference actually exists or is accurate.
+
+Text:
+"""
+{{bibliography_text}}
+"""
+
+Check for:
+- Placeholder or fake citation keys (e.g. "Author2024", "XXX", "REF1" used as if final)
+- "TODO", "citation needed", "[CITATION NEEDED]", or similar unresolved markers
+- Duplicate entries (same work listed more than once, possibly with different keys or formatting)
+- Mixed identifier schemes (some entries with DOIs, others with only URLs or none, inconsistently)
+- Entries missing key fields (author, year, title, venue, or identifier)
+
+Output a defect table:
+| Defect type | Location / entry | What's wrong | Suggested fix |
+|---|---|---|---|
+
+Then a short fix list ordered by how many entries each fix touches.
+
+Important: this scan does NOT verify that any reference actually exists, is correctly cited, or supports the claim it's attached to. For that, use the research-verification skill (see /skills) or another literature-verification process before submission.`,
+      outputRequirements: "A defect table (Defect type | Location/entry | What's wrong | Suggested fix) plus an ordered fix list, plus an explicit closing note that existence/accuracy verification was not performed.",
+    },
+    variables: [
+      { name: "bibliography_text", type: "multiline", required: true, description: "Bibliography and/or in-text citations to scan" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from Nature-Paper-Skills (MIT) — citation-verifier",
+      sourceUrl: "https://github.com/Boom5426/Nature-Paper-Skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "cite_support_scale",
+    title: "Citation Support Labeling",
+    description: "Label how strongly each citation actually supports the claim it's attached to, using a conservative support scale.",
+    stages: ["review", "writing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Citations", "Evidence", "Review"],
+    difficulty: "intermediate",
+    content: {
+      goal: "Rate how well each cited source actually supports the claim it is attached to, using a conservative labeling scale.",
+      context: "You are given claim-citation pairs as text; you are not fetching or verifying the underlying sources, only judging support based on what is provided.",
+      constraints: "Base every label only on the information given for that pair. Never invent bibliographic fields (author, year, venue, DOI) that are missing from the input; if a field is missing, say so instead of filling it in.",
+      instructions: `For each claim-citation pair below, label how strongly the citation supports the claim.
+
+Claim-citation pairs:
+"""
+{{claims_with_citations}}
+"""
+
+Use exactly one of these labels per pair:
+- strong: the source directly demonstrates or states the claim
+- partial: the source is related but doesn't fully cover the claim's scope, population, or strength
+- background: the source supports general context but not the specific claim
+- contradictory: the source appears to contradict the claim
+- metadata-only: only title/abstract-level information is available and the full text was never actually read
+
+Rule: any pair labeled "metadata-only" must be flagged with an explicit note that the source needs to be read in full before the citation is used in a submission — do not upgrade a metadata-only label just because the title looks relevant.
+
+Never invent missing bibliographic fields (author, year, venue, DOI, etc.); if a field is absent from the input, note it as missing rather than filling it in.
+
+Output one table:
+| Claim | Citation | Support label | Notes / missing fields |
+|---|---|---|---|`,
+      outputRequirements: "A single table (Claim | Citation | Support label | Notes/missing fields) covering every pair, with metadata-only rows explicitly flagged for full-text reading before submission.",
+    },
+    variables: [
+      { name: "claims_with_citations", type: "multiline", required: true, description: "List of claim-citation pairs, one per line or block" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from nature-skills (Apache-2.0) — citation support workflow",
+      sourceUrl: "https://github.com/Yuan1z0825/nature-skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "check_editor_first_pass",
+    title: "Editor First-Pass Check",
+    description: "Assess only the title, abstract, and first paragraph the way a desk editor would on a first pass.",
+    stages: ["polishing", "review"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Editing", "Abstract", "Review"],
+    difficulty: "intermediate",
+    content: {
+      goal: "Judge only the title, abstract, and first paragraph the way a time-pressed desk editor reading a submission for the first time would.",
+      context: "Act as a desk editor doing a fast first pass, not a specialist reviewer reading the full manuscript.",
+      constraints: "Only assess the text provided (title, abstract, first paragraph). Do not comment on sections not shown. Do not claim this predicts an editorial decision — this is a first-impression check, not a verdict.",
+      instructions: `Act as a desk editor giving this submission a fast first-pass read. You only see the title, abstract, and first paragraph — that's normal for a first pass, so assess only what's given.
+
+Title, abstract, and first paragraph:
+"""
+{{title_abstract_intro}}
+"""
+
+Answer:
+1. What is the one logic chain a reader can follow from this text alone (in one or two sentences)? If there isn't a single clear chain, say so.
+2. Are these four reader questions answered, and where?
+   - What problem is being addressed?
+   - Why does it matter now?
+   - What is actually new here?
+   - Why should the reader trust the result?
+3. Title discipline issues: is the title accurate to the abstract, free of unsupported strength words ("novel," "first," "breakthrough" used without backing), and clear to a non-specialist in the field?
+
+End with a short first-impression summary: what would make an editor keep reading vs. hesitate. This is a first-impression check only, not a prediction of an editorial outcome.`,
+      outputRequirements: "Three numbered sections (logic chain; four reader questions with answers/gaps; title discipline issues) plus a short first-impression summary. No verdict or acceptance prediction.",
+    },
+    variables: [
+      { name: "title_abstract_intro", type: "multiline", required: true, description: "Title, abstract, and first paragraph of the manuscript" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from Nature-Paper-Skills (MIT) — editor-first-impression",
+      sourceUrl: "https://github.com/Boom5426/Nature-Paper-Skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "check_epistemic_upgrades",
+    title: "Claim-Strength Audit",
+    description: "Compare each draft claim against what its cited or source material actually supports, catching places where claim strength quietly escalates beyond the evidence.",
+    stages: ["writing", "review"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Claims", "Evidence", "Review"],
+    difficulty: "advanced",
+    content: {
+      goal: "Detect places where a draft's phrasing claims more than its own source material supports.",
+      context: "You are comparing draft phrasing against the source notes given, not researching new sources.",
+      constraints: "Base every comparison only on the source notes provided; if no source notes are given for a claim, say the support cannot be checked rather than guessing.",
+      instructions: `Compare the draft below against its source notes (if provided) and find places where the phrasing claims more than the source actually supports — places where claim strength has quietly escalated between source and draft.
+
+Draft:
+"""
+{{draft_text}}
+"""
+
+Source notes (methods, results, or cited findings the draft is based on, if available):
+"""
+{{source_notes}}
+"""
+
+Look specifically for these kinds of escalation:
+- Association presented as causation (e.g. "X causes Y" when the source only shows correlation)
+- Observational findings presented as a recommendation or prescription
+- Dropped hedges (source said "may," "suggests," "in this sample"; draft drops the qualifier)
+- Population or scope widening (source covers a specific group/condition; draft implies it generalizes further)
+
+Output a table:
+| Claim as written | Strongest statement the source supports | Kind of escalation | Suggested revision |
+|---|---|---|---|
+
+If source notes are not provided or don't cover a given claim, write "cannot check against source" in the second column instead of guessing.`,
+      outputRequirements: "A single table (Claim as written | Strongest statement the source supports | Kind of escalation | Suggested revision) covering every detected escalation, with unchecked claims explicitly marked as such.",
+    },
+    variables: [
+      { name: "draft_text", type: "multiline", required: true, description: "Draft text to audit for claim-strength upgrades" },
+      { name: "source_notes", type: "multiline", required: false, description: "Methods, results, or source material the draft is based on" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Research Atlas original, re-derived from the general concept of silent epistemic upgrades (association-to-causation, hedge-dropping, scope-widening) discussed around academic-research-skills (CC BY-NC); written independently, not copied from that repo's text",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "check_ai_failure_modes",
+    title: "AI-Assistance Failure-Mode Self-Check",
+    description: "Walk an AI-assisted research artifact through a set of failure-mode checks before trusting or submitting it.",
+    stages: ["review", "data_qc"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["AI_Use", "Verification", "Data_QC"],
+    difficulty: "advanced",
+    content: {
+      goal: "Check an AI-assisted research artifact (code, analysis, draft, or figure) for common ways AI assistance goes wrong before trusting the output.",
+      context: "Lu et al. (2026, Nature, doi:10.1038/s41586-026-10265-5) documented recurring failure patterns in AI-assisted research work, including issues that passed the author's own review. This check applies that general lesson to the artifact described below.",
+      constraints: "For each check, only mark 'no issue found' if you have a specific reason from the artifact description; otherwise use 'needs investigation' or 'cannot assess from what was provided.' Do not fabricate evidence of a failure or of its absence.",
+      instructions: `Walk the AI-assisted artifact described below through each failure check. For each check, give a verdict of no issue found / needs investigation / cannot assess from what was provided, plus what to inspect next to resolve it.
+
+Artifact description (what was produced, how AI was involved, and any relevant code/output/draft excerpts):
+"""
+{{artifact_description}}
+"""
+
+Checks:
+1. Unverified citations — are any references used that were never actually confirmed to exist and say what they're cited for?
+2. Results that were never actually produced — does any reported number, figure, or output lack a traceable run or computation behind it?
+3. Convenient round numbers — are there suspiciously clean values (exact round percentages, perfectly even sample splits) that deserve a second look?
+4. Shortcuts replacing the intended method — did the actual implementation quietly substitute an easier approach for the one described?
+5. Surprising findings without a checked explanation — is there a result that stands out but has no investigation of why it occurred?
+6. Method descriptions that don't match what was done — does the written methodology match the actual code/steps, or has it drifted?
+
+For each of the six checks, output:
+- Verdict: no issue found / needs investigation / cannot assess from what was provided
+- What to inspect next: the concrete next step to resolve uncertainty
+
+End with an overall risk summary (not a pass/fail grade — a plain-language list of what still needs human verification).`,
+      outputRequirements: "Six numbered check results (Verdict + What to inspect next for each), followed by an overall risk summary listing open items for human verification.",
+    },
+    variables: [
+      { name: "artifact_description", type: "multiline", required: true, description: "Description of the AI-assisted artifact, including how AI was used and relevant excerpts" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Research Atlas original, motivated by Lu et al. 2026, Nature 651:914, doi:10.1038/s41586-026-10265-5; failure checks re-derived independently from the general finding, not copied from any third-party checklist",
+      sourceUrl: "https://doi.org/10.1038/s41586-026-10265-5",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "write_terminology_ledger",
+    title: "Terminology Ledger",
+    description: "Build a one-name-per-concept ledger from a draft, flagging near-synonyms that could read as different concepts.",
+    stages: ["polishing", "writing"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Terminology", "Editing", "Consistency"],
+    difficulty: "beginner",
+    content: {
+      goal: "Build a terminology ledger that pins one chosen term per concept and flags inconsistent variants used in the draft.",
+      context: "You are checking the draft for consistent naming, not correctness of the underlying ideas.",
+      constraints: "Base every ledger row only on terms that actually appear in the draft text; do not introduce concepts that aren't discussed.",
+      instructions: `Read the draft below and build a terminology ledger: one row per concept that is referred to by more than one term, or that risks being misread as a different concept because a near-synonym is used nearby.
+
+Draft:
+"""
+{{draft_text}}
+"""
+
+For each concept, output a table row with:
+| Concept | Chosen term | Variants found | Where they appear | Replacement instruction |
+|---|---|---|---|---|
+
+- "Chosen term" should be the clearest, most consistent option already used in the draft (prefer the term used most often or most precisely).
+- "Variants found" lists every alternate wording used for the same concept.
+- "Where they appear" gives enough of a locator (section, paragraph, or quoted snippet) to find each instance.
+- "Replacement instruction" is a direct instruction, e.g. "replace 'result set' and 'output data' with 'output dataset' throughout."
+
+After the table, separately flag any near-synonyms in the draft that are NOT the same concept but are close enough in wording that a reader could confuse them — list what distinguishes them.`,
+      outputRequirements: "A terminology table (Concept | Chosen term | Variants found | Where they appear | Replacement instruction) plus a separate list of confusable near-synonyms with the distinction between them.",
+    },
+    variables: [
+      { name: "draft_text", type: "multiline", required: true, description: "Draft text to extract terminology from" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted from nature-skills (Apache-2.0) — shared core terminology ledger",
+      sourceUrl: "https://github.com/Yuan1z0825/nature-skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
+  {
+    id: "disclose_ai_use",
+    title: "AI-Use Disclosure Drafter",
+    description: "Classify each described use of AI tools against common journal/publisher disclosure policy categories, then draft an honest disclosure statement.",
+    stages: ["writing", "review"],
+    researchTypes: ["qualitative", "quantitative", "mixed_methods", "computational", "experimental", "systematic_review", "theoretical"],
+    tags: ["Ethics", "AI_Use", "Disclosure"],
+    difficulty: "beginner",
+    content: {
+      goal: "Classify how AI tools were used against typical publisher disclosure categories and draft an honest, accurate disclosure statement.",
+      context: "Policy categories below describe TYPICAL journal/publisher practice, not any specific venue's actual policy — the user must check their venue's real policy before relying on this classification.",
+      constraints: "Do not claim to know any specific venue's actual policy. Label all categorization as typical/common practice only, and instruct the user to verify against their venue's real policy. Do not draft a disclosure statement that describes AI use more narrowly or more broadly than what was actually described.",
+      instructions: `Classify each described use of AI tools below against typical (not venue-specific) publisher disclosure categories, then draft a disclosure statement.
+
+Description of how AI tools were used:
+"""
+{{ai_usage_description}}
+"""
+
+Step 1 — Classify each distinct use against these TYPICAL categories (label them explicitly as typical practice, not any specific venue's rule):
+- Acceptable with light disclosure (e.g. grammar/language polishing)
+- Requires detailed disclosure (e.g. AI-assisted analysis, drafting, code generation, literature summarization)
+- Typically prohibited or restricted (e.g. AI-generated data, AI as a listed author, undisclosed substantive writing)
+
+For each use, state the category and a one-line rationale. Explicitly note: "These categories reflect common practice across journals, not this venue's specific policy — confirm against the venue's actual author guidelines before submission."
+
+Step 2 — Draft a disclosure statement (2-5 sentences) that accurately and honestly describes what AI tools were used for, based only on the description given. Do not broaden or narrow the described use, and do not omit a use that falls in the "requires detailed disclosure" or "typically prohibited" categories.
+
+Output both the classification table and the drafted statement.`,
+      outputRequirements: "A classification table (Use | Typical category | Rationale) with the policy-is-typical-not-venue-specific caveat stated explicitly, followed by a drafted 2-5 sentence disclosure statement.",
+    },
+    variables: [
+      { name: "ai_usage_description", type: "multiline", required: true, description: "Description of how AI tools were used in the research or writing process" },
+    ],
+    outputFormat: "markdown",
+    author: { name: "Research Atlas" },
+    provenance: {
+      source: "Adapted concept from nature-skills (Apache-2.0) — AI-use ethics boundaries, generalized beyond any single venue's policy",
+      sourceUrl: "https://github.com/Yuan1z0825/nature-skills",
+      owner: "research-atlas",
+      status: "reviewed",
+      addedAt: "2026-07-02",
+      reviewedAt: "2026-07-02",
+    },
+  },
 ]
