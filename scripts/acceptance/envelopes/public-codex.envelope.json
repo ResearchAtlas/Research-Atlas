@@ -1,26 +1,26 @@
 {
   "meta": {
     "skill": "research-verification",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "schema_version": 2,
-    "run_id": "6e4b014e-8866-4452-86dd-af836aa9ecd0",
-    "timestamp": "2026-04-20T10:02:03.661Z",
-    "input_count": 30
+    "run_id": "35bc32f3-b919-4643-bc47-f7c5ec2720e1",
+    "timestamp": "2026-07-02T16:10:07Z",
+    "input_count": 32
   },
   "status": "success",
   "data": {
     "task": "verify_citations",
     "verification_depth": "detailed",
     "output_format": "markdown",
-    "content": "Verified 30 references at detailed depth in 7.6s.\nSummary: verified=21, partially_supported=0, unsupported=0, contradicted=0, fabricated=5, unverifiable=4.\nFlagged fabricated_doi: smith-2024-quantum-emergence-of-ai-consciousness-in, doe-2023-the-mathematical-foundations-of-post-quantum, patel-2024-gpt-5-exhibits-emergent-theory-of.\nFlagged metadata mismatches: smith-2017-attention-is-all-you-need:metadata_mismatch_author, lecun-2020-deep-learning:metadata_mismatch_year.",
-    "citations_checked": 30,
+    "content": "# Codex CLI v2d acceptance pass\n\n- task: verify_citations\n- verification_depth: detailed\n- citations_checked: 32\n- elapsed_active_seconds: 13.5\n- summary: verified 19, partially_supported 1, fabricated_rollup 5, unverifiable 7\n- fine_grained: verified 19, partially_supported 1, unverifiable 7, fabricated_doi 3, metadata_mismatch_author 1, metadata_mismatch_year 1\n\n## Retracted references\n\n- wakefield-1998-ileal-lymphoid-nodular-hyperplasia-non-specific: Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children (10.1016/s0140-6736(97)11096-0)\n\n## Resolver notes\n\n- DOI lookups were memoized across repeated DOIs.\n- Title search used the two-error circuit breaker; live OpenAlex search outages recorded: 2, live Semantic Scholar outages recorded: 2.\n- No long backoff was used.\n- Duplicate marker emitted for vaswani-2017-attention-is-all-you-need-dup2.",
+    "citations_checked": 32,
     "verdict_summary": {
-      "verified": 21,
-      "partially_supported": 0,
+      "verified": 19,
+      "partially_supported": 1,
       "unsupported": 0,
       "contradicted": 0,
       "fabricated": 5,
-      "unverifiable": 4
+      "unverifiable": 7
     },
     "verdicts": [
       {
@@ -32,15 +32,7 @@
             "doi": "10.48550/arxiv.1706.03762",
             "title": "Attention is all you need",
             "authors": [
-              "Vaswani, A.",
-              "Shazeer, N.",
-              "Parmar, N.",
-              "Uszkoreit, J.",
-              "Jones, L.",
-              "Gomez",
-              "A. N.",
-              "Kaiser, L.",
-              "Polosukhin, I"
+              "Vaswani, A."
             ],
             "year": 2017,
             "venue": "In Advances in Neural Information Processing Systems 30 (pp. 5998-6008)",
@@ -51,19 +43,19 @@
             "doi": "10.48550/arxiv.1706.03762",
             "title": "Attention Is All You Need",
             "authors": [
-              "Ashish Vaswani",
-              "Noam Shazeer",
-              "Niki Parmar",
-              "Jakob Uszkoreit",
-              "Llion Jones",
-              "Aidan N. Gomez",
-              "Łukasz Kaiser",
-              "Illia Polosukhin"
+              "Vaswani, Ashish",
+              "Shazeer, Noam",
+              "Parmar, Niki",
+              "Uszkoreit, Jakob",
+              "Jones, Llion",
+              "Gomez, Aidan N.",
+              "Kaiser, Lukasz",
+              "Polosukhin, Illia"
             ],
             "year": 2017,
-            "venue": null,
-            "source": "openalex",
-            "raw_response_hash": "ca23b6dbe506d426a572aae95ae2674e2eb08f1bd5a59c19792cb61ba27dbf8c"
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "83aed6e2ab6ef32a0add2d25ca2286e52426699ada02aad334305ef104440675"
           },
           "cross_check": {
             "title": {
@@ -85,6 +77,10 @@
           },
           "candidates": [],
           "abstract_snippet": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more ",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -97,9 +93,7 @@
             "doi": "10.1038/nature14539",
             "title": "Deep learning",
             "authors": [
-              "LeCun, Y.",
-              "Bengio, Y.",
-              "Hinton, G"
+              "LeCun, Y."
             ],
             "year": 2015,
             "venue": "Nature, 521(7553), 436-444",
@@ -117,7 +111,7 @@
             "year": 2015,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "5008c33a5e647d4f53b986b20e8dbfeb825db16c7a916b4f6216649f27f0c50c"
+            "raw_response_hash": "f1bb34efa99a530e1cdc043b7e91b5dcd81bf230d702f621b9c55b4c280c6098"
           },
           "cross_check": {
             "title": {
@@ -139,22 +133,23 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
       {
         "reference_id": "devlin-2019-bert-pre-training-of-deep-bidirectional",
-        "verdict": "verified",
-        "confidence": 1,
+        "verdict": "partially_supported",
+        "confidence": 0.7,
         "evidence": {
           "parsed": {
             "doi": "10.18653/v1/n19-1423",
             "title": "BERT: Pre-training of deep bidirectional transformers for language understanding",
             "authors": [
-              "Devlin, J.",
-              "Chang, M.-W.",
-              "Lee, K.",
-              "Toutanova, K"
+              "Devlin, J."
             ],
             "year": 2019,
             "venue": "In NAACL-HLT 2019 (pp. 4171-4186)",
@@ -173,7 +168,7 @@
             "year": 2019,
             "venue": "Proceedings of the 2019 Conference of the North",
             "source": "crossref",
-            "raw_response_hash": "9cd1691c77a19d1a9b649ceb7cda9cee91ef24571efa89bf48f97203b4f7f3a5"
+            "raw_response_hash": "2e1c2db135a6629155e96ac490abef31ebbbb0fdbab10d083a07bf2eb4fd28f0"
           },
           "cross_check": {
             "title": {
@@ -195,7 +190,11 @@
           },
           "candidates": [],
           "abstract_snippet": null,
-          "notes": null
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": "Resolver metadata had missing fields; all available fields passed."
         }
       },
       {
@@ -207,10 +206,7 @@
             "doi": "10.1109/cvpr.2016.90",
             "title": "Deep residual learning for image recognition",
             "authors": [
-              "He, K.",
-              "Zhang, X.",
-              "Ren, S.",
-              "Sun, J"
+              "He, K."
             ],
             "year": 2016,
             "venue": "In 2016 IEEE Conference on Computer Vision and Pattern Recognition (pp. 770-778)",
@@ -229,7 +225,7 @@
             "year": 2016,
             "venue": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
             "source": "crossref",
-            "raw_response_hash": "7c0a9b5f119a04028f43eb7f6b355f3e2af7cb81ba2ca2fff74c0b454d6e73c1"
+            "raw_response_hash": "7d5ebf767c17640bd1d69fa459f3b8d23eab0feafb3a85603f6b9111fd89faf5"
           },
           "cross_check": {
             "title": {
@@ -251,6 +247,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -263,14 +263,7 @@
             "doi": "10.1038/nature16961",
             "title": "Mastering the game of Go with deep neural networks and tree search",
             "authors": [
-              "Silver, D.",
-              "Huang, A.",
-              "Maddison",
-              "C. J.",
-              "Guez, A.",
-              "Sifre, L.",
-              "van den Driessche, G.",
-              "Hassabis, D"
+              "Silver, D."
             ],
             "year": 2016,
             "venue": "Nature, 529(7587), 484-489",
@@ -305,7 +298,7 @@
             "year": 2016,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "ec0097e01d9dbb0b5ee927a08746f83b5747f8548696cb8bead424c3653b4353"
+            "raw_response_hash": "a0f0fc054b224732757d129059ac650413c8013f6699247a9cc8f1952b30176f"
           },
           "cross_check": {
             "title": {
@@ -327,6 +320,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -339,8 +336,7 @@
             "doi": "10.1162/neco.1997.9.8.1735",
             "title": "Long short-term memory",
             "authors": [
-              "Hochreiter, S.",
-              "Schmidhuber, J"
+              "Hochreiter, S."
             ],
             "year": 1997,
             "venue": "Neural Computation, 9(8), 1735-1780",
@@ -357,7 +353,7 @@
             "year": 1997,
             "venue": "Neural Computation",
             "source": "crossref",
-            "raw_response_hash": "d9937cf0908ed005b47f207b963a1c6f62103fb16bddcffb0e66d8c5b8d26034"
+            "raw_response_hash": "cd5142fe6e6d008b046b24716fa65c858bffeb6d4b3c186c6ffce65d9fdd91c2"
           },
           "cross_check": {
             "title": {
@@ -378,7 +374,11 @@
             }
           },
           "candidates": [],
-          "abstract_snippet": "<jats:p>Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient based method called long short-term memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete-time steps by enforcing c",
+          "abstract_snippet": "Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient based method called long short-term memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete-time steps by enforcing constant ",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -391,15 +391,7 @@
             "doi": "10.1038/nature14236",
             "title": "Human-level control through deep reinforcement learning",
             "authors": [
-              "Mnih, V.",
-              "Kavukcuoglu, K.",
-              "Silver, D.",
-              "Rusu",
-              "A. A.",
-              "Veness, J.",
-              "Bellemare",
-              "M. G.",
-              "Hassabis, D"
+              "Mnih, V."
             ],
             "year": 2015,
             "venue": "Nature, 518(7540), 529-533",
@@ -433,7 +425,7 @@
             "year": 2015,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "13fe2859c6a6f47b1c4a8f605e3582ba59b0e355fc72f398f97207148d88f287"
+            "raw_response_hash": "805414d854e1212f9312e23dbf2a93277d7b18f18c791f615ae53856e6fee84c"
           },
           "cross_check": {
             "title": {
@@ -455,6 +447,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -467,12 +463,7 @@
             "doi": "10.1038/323533a0",
             "title": "Learning representations by back-propagating errors",
             "authors": [
-              "Rumelhart",
-              "D. E.",
-              "Hinton",
-              "G. E.",
-              "Williams",
-              "R. J"
+              "Rumelhart, D. E."
             ],
             "year": 1986,
             "venue": "Nature, 323(6088), 533-536",
@@ -490,7 +481,7 @@
             "year": 1986,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "dcc82483fe66f5b708d2fd5ca262fc51e217c042649b8d2efa7ea2f672a71114"
+            "raw_response_hash": "e24747f58eec2aeb847d3793065477afcd916f2d01386f6c7896f45507a7e990"
           },
           "cross_check": {
             "title": {
@@ -512,6 +503,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -524,10 +519,7 @@
             "doi": "10.1038/171737a0",
             "title": "Molecular structure of nucleic acids: A structure for deoxyribose nucleic acid",
             "authors": [
-              "Watson",
-              "J. D.",
-              "Crick",
-              "F. H. C"
+              "Watson, J. D."
             ],
             "year": 1953,
             "venue": "Nature, 171(4356), 737-738",
@@ -536,20 +528,20 @@
           },
           "resolved": {
             "doi": "10.1038/171737a0",
-            "title": "Molecular structure of nucleic acids: a structure for deoxyribose nucleic acid",
+            "title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
             "authors": [
-              "J. D. Watson",
-              "F. H. C. Crick"
+              "J. D. WATSON",
+              "F. H. C. CRICK"
             ],
             "year": 1953,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "9d9c5f87561d1664344687ca76dd865a33833da993bdf83cba627f43a4c2c4ff"
+            "raw_response_hash": "15724387e6cfd296667f8a08226d9386785d37d103ac39c6707c07f98b8a8ebc"
           },
           "cross_check": {
             "title": {
               "parsed": "Molecular structure of nucleic acids: A structure for deoxyribose nucleic acid",
-              "resolved": "Molecular structure of nucleic acids: a structure for deoxyribose nucleic acid",
+              "resolved": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
               "similarity": 1,
               "pass": true
             },
@@ -566,6 +558,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -578,8 +574,7 @@
             "doi": "10.1002/j.1538-7305.1948.tb01338.x",
             "title": "A mathematical theory of communication",
             "authors": [
-              "Shannon",
-              "C. E"
+              "Shannon, C. E."
             ],
             "year": 1948,
             "venue": "The Bell System Technical Journal, 27(3), 379-423",
@@ -595,7 +590,7 @@
             "year": 1948,
             "venue": "Bell System Technical Journal",
             "source": "crossref",
-            "raw_response_hash": "6a8bab69594775d3860216ef298dd3819e8bb50d52599803d5a9183a4b304f98"
+            "raw_response_hash": "d89e5a44229321f71dacce9750ee6eca2d08352dc453e25d376332c75f0ee149"
           },
           "cross_check": {
             "title": {
@@ -617,6 +612,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -629,8 +628,7 @@
             "doi": "10.1093/mind/lix.236.433",
             "title": "Computing machinery and intelligence",
             "authors": [
-              "Turing",
-              "A. M"
+              "Turing, A. M."
             ],
             "year": 1950,
             "venue": "Mind, 59(236), 433-460",
@@ -639,19 +637,19 @@
           },
           "resolved": {
             "doi": "10.1093/mind/lix.236.433",
-            "title": "I.—Computing Machinery and Intelligence",
+            "title": "I.—COMPUTING MACHINERY AND INTELLIGENCE",
             "authors": [
-              "A. M. Turing"
+              "A. M. TURING"
             ],
             "year": 1950,
             "venue": "Mind",
             "source": "crossref",
-            "raw_response_hash": "b68c59069e2ed4ca106a65f048263c7e93d14f3f69f188b678c95d3d61a831da"
+            "raw_response_hash": "cf65973018c275aedec2c672c9a8065e07e1abff5e1b381880c5271b8ef926a1"
           },
           "cross_check": {
             "title": {
               "parsed": "Computing machinery and intelligence",
-              "resolved": "I.—Computing Machinery and Intelligence",
+              "resolved": "I.—COMPUTING MACHINERY AND INTELLIGENCE",
               "similarity": 1,
               "pass": true
             },
@@ -668,6 +666,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -680,11 +682,7 @@
             "doi": "10.1063/1.1699114",
             "title": "Equation of state calculations by fast computing machines",
             "authors": [
-              "Metropolis, N.",
-              "Rosenbluth, A. W.",
-              "Rosenbluth, M. N.",
-              "Teller, A. H.",
-              "Teller, E"
+              "Metropolis, N."
             ],
             "year": 1953,
             "venue": "The Journal of Chemical Physics, 21(6), 1087-1092",
@@ -695,16 +693,16 @@
             "doi": "10.1063/1.1699114",
             "title": "Equation of State Calculations by Fast Computing Machines",
             "authors": [
-              "N. Metropolis",
-              "A. W. Rosenbluth",
-              "M. N. Rosenbluth",
-              "A. H. Teller",
-              "E. Teller"
+              "Nicholas Metropolis",
+              "Arianna W. Rosenbluth",
+              "Marshall N. Rosenbluth",
+              "Augusta H. Teller",
+              "Edward Teller"
             ],
             "year": 1953,
             "venue": "The Journal of Chemical Physics",
             "source": "crossref",
-            "raw_response_hash": "0cdbcbcc84cfed712d20917f537c3379cb50d3c87b28c265d8335e7cacb199f9"
+            "raw_response_hash": "470ca22961cac86073960c7220eb6b4d0aa281cbab0e931945ccb4191375f016"
           },
           "cross_check": {
             "title": {
@@ -725,7 +723,11 @@
             }
           },
           "candidates": [],
-          "abstract_snippet": "<jats:p>A general method suitable for fast computing machines, for investigating such properties as equations of state for substances consisting of interacting individual molecules, is described. The method consists of a modified Monte Carlo integration over configuration space. Results for the case of two-dimensional rigid spheres are compared with the free volume equation of state and with a four-term virial coefficient expansion. Extensions to more complicated systems are discussed.</jats:p>",
+          "abstract_snippet": "A general method, suitable for fast computing machines, for investigating such properties as equations of state for substances consisting of interacting individual molecules is described. The method consists of a modified Monte Carlo integration over configuration space. Results for the two-dimensional rigid-sphere system have been obtained on the Los Alamos MANIAC and are presented here. These results are compared to the free volume equation of state and to a four-term virial coefficient expans",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -738,8 +740,7 @@
             "doi": "10.1103/physrevlett.13.508",
             "title": "Broken symmetries and the masses of gauge bosons",
             "authors": [
-              "Higgs",
-              "P. W"
+              "Higgs, P. W."
             ],
             "year": 1964,
             "venue": "Physical Review Letters, 13(16), 508-509",
@@ -750,12 +751,12 @@
             "doi": "10.1103/physrevlett.13.508",
             "title": "Broken Symmetries and the Masses of Gauge Bosons",
             "authors": [
-              "P. W. Higgs"
+              "Peter W. Higgs"
             ],
             "year": 1964,
             "venue": "Physical Review Letters",
             "source": "crossref",
-            "raw_response_hash": "79e47c2bf349ff1a6ab8d44765d8c7f847cd39d5262a8ca9a75a4375474c9d6f"
+            "raw_response_hash": "14a2a35b73406880b06124f0af2da8fb557e8bd804710b71f63434c8566f9dc2"
           },
           "cross_check": {
             "title": {
@@ -777,6 +778,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -789,9 +794,7 @@
             "doi": "10.1145/3065386",
             "title": "ImageNet classification with deep convolutional neural networks",
             "authors": [
-              "Krizhevsky, A.",
-              "Sutskever, I.",
-              "Hinton, G. E"
+              "Krizhevsky, A."
             ],
             "year": 2017,
             "venue": "Communications of the ACM, 60(6), 84-90",
@@ -809,7 +812,7 @@
             "year": 2017,
             "venue": "Communications of the ACM",
             "source": "crossref",
-            "raw_response_hash": "e4d473ef55cdff526309ac4ff4f09ef4b7c4dabaa8148098c18ebd0d6995345e"
+            "raw_response_hash": "b3257894b2a6cdbe9cac5857f184132c66bc79685312989545223879138bba57"
           },
           "cross_check": {
             "title": {
@@ -830,7 +833,11 @@
             }
           },
           "candidates": [],
-          "abstract_snippet": null,
+          "abstract_snippet": "We trained a large, deep convolutional neural network to classify the 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes. On the test data, we achieved top-1 and top-5 error rates of 37.5% and 17.0%, respectively, which is considerably better than the previous state-of-the-art. The neural network, which has 60 million parameters and 650,000 neurons, consists of five convolutional layers, some of which are followed by max-pooling layers, and thre",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -843,13 +850,7 @@
             "doi": "10.48550/arxiv.2103.00020",
             "title": "Learning transferable visual models from natural language supervision",
             "authors": [
-              "Radford, A.",
-              "Kim, J. W.",
-              "Hallacy, C.",
-              "Ramesh, A.",
-              "Goh, G.",
-              "Agarwal, S.",
-              "Sutskever, I"
+              "Radford, A."
             ],
             "year": 2021,
             "venue": "In Proceedings of the 38th International Conference on Machine Learning (pp. 8748-8763)",
@@ -874,9 +875,9 @@
               "Ilya Sutskever"
             ],
             "year": 2021,
-            "venue": "Proceedings of Machine Learning Research",
+            "venue": "arXiv (Cornell University)",
             "source": "openalex",
-            "raw_response_hash": "1a4bf0f9273848d54b07f97b935f542ed3d9c6c104fef5ea59d4fd0f8dd3ea9c"
+            "raw_response_hash": "bf28249523ad1716bc1a501d91f0036a8801a83d616838c8b673615625678cd4"
           },
           "cross_check": {
             "title": {
@@ -897,7 +898,11 @@
             }
           },
           "candidates": [],
-          "abstract_snippet": "State-of-the-art computer vision systems are trained to predict a fixed set of predetermined object categories. This restricted form of supervision limits their generality and usability since additional labeled data is needed to specify any other visual concept. Learning directly from raw text about images is a promising alternative which leverages a much broader source of supervision. We demonstrate that the simple pre-training task of predicting which caption goes with which image is an efficient",
+          "abstract_snippet": "State-of-the-art computer vision systems are trained to predict a fixed set of predetermined object categories. This restricted form of supervision limits their generality and usability since additional labeled data is needed to specify any other visual concept. Learning directly from raw text about images is a promising alternative which leverages a much broader source of supervision. We demonstrate that the simple pre-training task of predicting which caption goes with which image is an effici",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": null
         }
       },
@@ -910,15 +915,7 @@
             "doi": null,
             "title": "Generative adversarial nets",
             "authors": [
-              "Goodfellow",
-              "I. J.",
-              "Pouget-Abadie, J.",
-              "Mirza, M.",
-              "Xu, B.",
-              "Warde-Farley, D.",
-              "Ozair, S.",
-              "Courville, A.",
-              "Bengio, Y"
+              "Goodfellow, I. J."
             ],
             "year": 2014,
             "venue": "In Advances in Neural Information Processing Systems 27",
@@ -929,26 +926,20 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided. No confident OpenAlex match."
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
         "reference_id": "brown-2020-language-models-are-few-shot-learners",
         "verdict": "verified",
-        "confidence": 1,
+        "confidence": 0.95,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Language models are few-shot learners",
             "authors": [
-              "Brown",
-              "T. B.",
-              "Mann, B.",
-              "Ryder, N.",
-              "Subbiah, M.",
-              "Kaplan, J.",
-              "Dhariwal, P.",
-              "Amodei, D"
+              "Brown, T. B."
             ],
             "year": 2020,
             "venue": "arXiv preprint arXiv:2005.14165",
@@ -959,42 +950,42 @@
             "doi": "10.48550/arxiv.2005.14165",
             "title": "Language Models are Few-Shot Learners",
             "authors": [
-              "Tom B. Brown",
-              "Benjamin Mann",
-              "Nick Ryder",
-              "Melanie Subbiah",
-              "Jared Kaplan",
-              "Prafulla Dhariwal",
-              "Arvind Neelakantan",
-              "Pranav Shyam",
-              "Girish Sastry",
-              "Amanda Askell",
-              "Sandhini Agarwal",
-              "Ariel Herbert-Voss",
-              "Gretchen Krueger",
-              "Tom Henighan",
-              "Rewon Child",
-              "Aditya Ramesh",
-              "Daniel Ziegler",
-              "Jeff Wu",
-              "Clemens Winter",
-              "Christopher Hesse",
-              "Mark Chen",
-              "Eric Sigler",
-              "Mateusz Litwin",
-              "Scott Gray",
-              "Benjamin Chess",
-              "Jack Clark",
-              "Christopher Berner",
-              "Sam McCandlish",
-              "Alec Radford",
-              "Ilya Sutskever",
-              "Dario Amodei"
+              "Brown, Tom B.",
+              "Mann, Benjamin",
+              "Ryder, Nick",
+              "Subbiah, Melanie",
+              "Kaplan, Jared",
+              "Dhariwal, Prafulla",
+              "Neelakantan, Arvind",
+              "Shyam, Pranav",
+              "Sastry, Girish",
+              "Askell, Amanda",
+              "Agarwal, Sandhini",
+              "Herbert-Voss, Ariel",
+              "Krueger, Gretchen",
+              "Henighan, Tom",
+              "Child, Rewon",
+              "Ramesh, Aditya",
+              "Ziegler, Daniel M.",
+              "Wu, Jeffrey",
+              "Winter, Clemens",
+              "Hesse, Christopher",
+              "Chen, Mark",
+              "Sigler, Eric",
+              "Litwin, Mateusz",
+              "Gray, Scott",
+              "Chess, Benjamin",
+              "Clark, Jack",
+              "Berner, Christopher",
+              "McCandlish, Sam",
+              "Radford, Alec",
+              "Sutskever, Ilya",
+              "Amodei, Dario"
             ],
             "year": 2020,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "1c0560d216b0c856bf7d6384d8db3a99605e7a95ec6b5e56c59466d7a846a8df"
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "44492af89a50104393d845ba28104ac3907521bc2284c8d9cbcf777f59169b46"
           },
           "cross_check": {
             "title": {
@@ -1016,115 +1007,77 @@
           },
           "candidates": [
             {
-              "source": "openalex",
+              "source": "datacite",
               "score": 1,
               "title": "Language Models are Few-Shot Learners",
               "authors": [
-                "Tom B. Brown",
-                "Benjamin Mann",
-                "Nick Ryder",
-                "Melanie Subbiah",
-                "Jared Kaplan",
-                "Prafulla Dhariwal",
-                "Arvind Neelakantan",
-                "Pranav Shyam",
-                "Girish Sastry",
-                "Amanda Askell",
-                "Sandhini Agarwal",
-                "Ariel Herbert-Voss",
-                "Gretchen Krueger",
-                "Tom Henighan",
-                "Rewon Child",
-                "Aditya Ramesh",
-                "Daniel Ziegler",
-                "Jeff Wu",
-                "Clemens Winter",
-                "Christopher Hesse",
-                "Mark Chen",
-                "Eric Sigler",
-                "Mateusz Litwin",
-                "Scott Gray",
-                "Benjamin Chess",
-                "Jack Clark",
-                "Christopher Berner",
-                "Sam McCandlish",
-                "Alec Radford",
-                "Ilya Sutskever",
-                "Dario Amodei"
+                "Brown, Tom B.",
+                "Mann, Benjamin",
+                "Ryder, Nick",
+                "Subbiah, Melanie",
+                "Kaplan, Jared",
+                "Dhariwal, Prafulla",
+                "Neelakantan, Arvind",
+                "Shyam, Pranav",
+                "Sastry, Girish",
+                "Askell, Amanda",
+                "Agarwal, Sandhini",
+                "Herbert-Voss, Ariel",
+                "Krueger, Gretchen",
+                "Henighan, Tom",
+                "Child, Rewon",
+                "Ramesh, Aditya",
+                "Ziegler, Daniel M.",
+                "Wu, Jeffrey",
+                "Winter, Clemens",
+                "Hesse, Christopher",
+                "Chen, Mark",
+                "Sigler, Eric",
+                "Litwin, Mateusz",
+                "Gray, Scott",
+                "Chess, Benjamin",
+                "Clark, Jack",
+                "Berner, Christopher",
+                "McCandlish, Sam",
+                "Radford, Alec",
+                "Sutskever, Ilya",
+                "Amodei, Dario"
               ],
               "year": 2020,
               "doi": "10.48550/arxiv.2005.14165",
-              "url": "https://openalex.org/W2992636018"
+              "url": "https://doi.org/10.48550/arxiv.2005.14165"
             }
           ],
           "abstract_snippet": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": null
         }
       },
       {
         "reference_id": "kingma-2014-auto-encoding-variational-bayes",
-        "verdict": "verified",
-        "confidence": 1,
+        "verdict": "unverifiable",
+        "confidence": 0,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Auto-encoding variational Bayes",
             "authors": [
-              "Kingma",
-              "D. P.",
-              "Welling, M"
+              "Kingma, D. P."
             ],
             "year": 2014,
             "venue": "In 2nd International Conference on Learning Representations",
             "source_format": "prose",
             "raw": "18. Kingma, D. P., & Welling, M. (2014). Auto-encoding variational Bayes. In 2nd International Conference on Learning Representations."
           },
-          "resolved": {
-            "doi": "10.48550/arxiv.1312.6114",
-            "title": "Auto-Encoding Variational Bayes",
-            "authors": [
-              "Diederik P. Kingma",
-              "Max Welling"
-            ],
-            "year": 2013,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "3477be5107748b7bf4a93582c4a8d12df6451a0cb36d0d5e1a8ec955d1256cf0"
-          },
-          "cross_check": {
-            "title": {
-              "parsed": "Auto-encoding variational Bayes",
-              "resolved": "Auto-Encoding Variational Bayes",
-              "similarity": 1,
-              "pass": true
-            },
-            "author": {
-              "parsed": "kingma",
-              "resolved": "kingma",
-              "pass": true
-            },
-            "year": {
-              "parsed": 2014,
-              "resolved": 2013,
-              "pass": true
-            }
-          },
-          "candidates": [
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "Auto-Encoding Variational Bayes",
-              "authors": [
-                "Diederik P. Kingma",
-                "Max Welling"
-              ],
-              "year": 2013,
-              "doi": "10.48550/arxiv.1312.6114",
-              "url": "https://openalex.org/W2120018795"
-            }
-          ],
-          "abstract_snippet": "How can we perform efficient inference and learning in directed probabilistic models, in the presence of continuous latent variables with intractable posterior distributions, and large datasets? We introduce a stochastic variational inference and learning algorithm that scales to large datasets and, under some mild differentiability conditions, even works in the intractable case. Our contributions is two-fold. First, we show that a reparameterization of the variational lower bound yields a lower ",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
@@ -1136,11 +1089,7 @@
             "doi": null,
             "title": "A neural probabilistic language model",
             "authors": [
-              "Bengio",
-              "Y.",
-              "Ducharme, R.",
-              "Vincent, P.",
-              "Jauvin, C"
+              "Bengio, Y."
             ],
             "year": 2003,
             "venue": "Journal of Machine Learning Research, 3, 1137-1155",
@@ -1151,114 +1100,32 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided. No confident OpenAlex match."
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
         "reference_id": "raffel-2020-exploring-the-limits-of-transfer-learning",
-        "verdict": "verified",
-        "confidence": 1,
+        "verdict": "unverifiable",
+        "confidence": 0,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Exploring the limits of transfer learning with a unified text-to-text transformer",
             "authors": [
-              "Raffel",
-              "C.",
-              "Shazeer, N.",
-              "Roberts, A.",
-              "Lee, K.",
-              "Narang, S.",
-              "Matena, M.",
-              "Zhou, Y.",
-              "Li, W.",
-              "Liu",
-              "P. J"
+              "Raffel, C."
             ],
             "year": 2020,
             "venue": "Journal of Machine Learning Research, 21(140), 1-67",
             "source_format": "prose",
             "raw": "20. Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., & Liu, P. J. (2020). Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research, 21(140), 1-67."
           },
-          "resolved": {
-            "doi": "10.48550/arxiv.1910.10683",
-            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
-            "authors": [
-              "Colin Raffel",
-              "Noam Shazeer",
-              "Adam Roberts",
-              "Katherine Lee",
-              "Sharan Narang",
-              "Michael Matena",
-              "Yanqi Zhou",
-              "Wei Li",
-              "Peter J. Liu"
-            ],
-            "year": 2019,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "dc25df3ac6f923e1a12453e5d760ad74e1e5f7bb7d117e1f0731d691b2352218"
-          },
-          "cross_check": {
-            "title": {
-              "parsed": "Exploring the limits of transfer learning with a unified text-to-text transformer",
-              "resolved": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
-              "similarity": 1,
-              "pass": true
-            },
-            "author": {
-              "parsed": "raffel",
-              "resolved": "raffel",
-              "pass": true
-            },
-            "year": {
-              "parsed": 2020,
-              "resolved": 2019,
-              "pass": true
-            }
-          },
-          "candidates": [
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
-              "authors": [
-                "Colin Raffel",
-                "Noam Shazeer",
-                "Adam Roberts",
-                "Katherine Lee",
-                "Sharan Narang",
-                "Michael Matena",
-                "Yanqi Zhou",
-                "Wei Li",
-                "Peter J. Liu"
-              ],
-              "year": 2019,
-              "doi": "10.48550/arxiv.1910.10683",
-              "url": "https://openalex.org/W2998068104"
-            },
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
-              "authors": [
-                "Colin Raffel",
-                "Noam Shazeer",
-                "Adam Roberts",
-                "Katherine Lee",
-                "Sharan Narang",
-                "Michael Matena",
-                "Yanqi Zhou",
-                "Wei Li",
-                "Peter J. Liu"
-              ],
-              "year": 2020,
-              "doi": "10.5555/3454287.3455485",
-              "url": "https://openalex.org/W4228730490"
-            }
-          ],
-          "abstract_snippet": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task, has emerged as a powerful technique in natural language processing (NLP). The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts every language problem into a text-to-text format. Our systematic s",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
@@ -1270,13 +1137,7 @@
             "doi": null,
             "title": "Language models are unsupervised multitask learners",
             "authors": [
-              "Radford",
-              "A.",
-              "Wu, J.",
-              "Child, R.",
-              "Luan, D.",
-              "Amodei, D.",
-              "Sutskever, I"
+              "Radford, A."
             ],
             "year": 2019,
             "venue": "OpenAI Technical Report",
@@ -1287,21 +1148,20 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided. No confident OpenAlex match."
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
         "reference_id": "hinton-2015-distilling-the-knowledge-in-a-neural",
         "verdict": "verified",
-        "confidence": 1,
+        "confidence": 0.95,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Distilling the knowledge in a neural network",
             "authors": [
-              "Hinton, G.",
-              "Vinyals, O.",
-              "Dean, J"
+              "Hinton, G."
             ],
             "year": 2015,
             "venue": "arXiv preprint arXiv:1503.02531",
@@ -1312,14 +1172,14 @@
             "doi": "10.48550/arxiv.1503.02531",
             "title": "Distilling the Knowledge in a Neural Network",
             "authors": [
-              "Geoffrey E. Hinton",
-              "Oriol Vinyals",
-              "Jay B. Dean"
+              "Hinton, Geoffrey",
+              "Vinyals, Oriol",
+              "Dean, Jeff"
             ],
             "year": 2015,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "6901f5c113e1c76554bc249bad648a0a47d81cf77a688b1f855d46e8cb8840e6"
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "161a586751f8a2bde25758bd45e280965849362905fb782acfda8d76638bcc9d"
           },
           "cross_check": {
             "title": {
@@ -1341,242 +1201,147 @@
           },
           "candidates": [
             {
-              "source": "openalex",
+              "source": "datacite",
               "score": 1,
               "title": "Distilling the Knowledge in a Neural Network",
               "authors": [
-                "Geoffrey E. Hinton",
-                "Oriol Vinyals",
-                "Jay B. Dean"
+                "Hinton, Geoffrey",
+                "Vinyals, Oriol",
+                "Dean, Jeff"
               ],
               "year": 2015,
               "doi": "10.48550/arxiv.1503.02531",
-              "url": "https://openalex.org/W1821462560"
+              "url": "https://doi.org/10.48550/arxiv.1503.02531"
             }
           ],
           "abstract_snippet": "A very simple way to improve the performance of almost any machine learning algorithm is to train many different models on the same data and then to average their predictions. Unfortunately, making predictions using a whole ensemble of models is cumbersome and may be too computationally expensive to allow deployment to a large number of users, especially if the individual models are large neural nets. Caruana and his collaborators have shown that it is possible to compress the knowledge in an en",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": null
         }
       },
       {
         "reference_id": "dosovitskiy-2021-an-image-is-worth-16x16-words",
-        "verdict": "verified",
-        "confidence": 1,
+        "verdict": "unverifiable",
+        "confidence": 0,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "An image is worth 16x16 words: Transformers for image recognition at scale",
             "authors": [
-              "Dosovitskiy, A.",
-              "Beyer, L.",
-              "Kolesnikov, A.",
-              "Weissenborn, D.",
-              "Zhai, X.",
-              "Unterthiner, T.",
-              "Houlsby, N"
+              "Dosovitskiy, A."
             ],
             "year": 2021,
             "venue": "In 9th International Conference on Learning Representations",
             "source_format": "prose",
             "raw": "23. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... & Houlsby, N. (2021). An image is worth 16x16 words: Transformers for image recognition at scale. In 9th International Conference on Learning Representations."
           },
-          "resolved": {
-            "doi": "10.48550/arxiv.2010.11929",
-            "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
-            "authors": [
-              "Alexey Dosovitskiy",
-              "Lucas Beyer",
-              "Alexander Kolesnikov",
-              "Dirk Weissenborn",
-              "Xiaohua Zhai",
-              "Thomas Unterthiner",
-              "Mostafa Dehghani",
-              "Matthias Minderer",
-              "Georg Heigold",
-              "Sylvain Gelly",
-              "Jakob Uszkoreit",
-              "Neil Houlsby"
-            ],
-            "year": 2020,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "b0bd3ae9e86eed6b03848175006ae78b188fb9b13e945596b1c8bdccb1a573e3"
-          },
-          "cross_check": {
-            "title": {
-              "parsed": "An image is worth 16x16 words: Transformers for image recognition at scale",
-              "resolved": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
-              "similarity": 1,
-              "pass": true
-            },
-            "author": {
-              "parsed": "dosovitskiy",
-              "resolved": "dosovitskiy",
-              "pass": true
-            },
-            "year": {
-              "parsed": 2021,
-              "resolved": 2020,
-              "pass": true
-            }
-          },
-          "candidates": [
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
-              "authors": [
-                "Alexey Dosovitskiy",
-                "Lucas Beyer",
-                "Alexander Kolesnikov",
-                "Dirk Weissenborn",
-                "Xiaohua Zhai",
-                "Thomas Unterthiner",
-                "Mostafa Dehghani",
-                "Matthias Minderer",
-                "Georg Heigold",
-                "Sylvain Gelly",
-                "Jakob Uszkoreit",
-                "Neil Houlsby"
-              ],
-              "year": 2020,
-              "doi": "10.48550/arxiv.2010.11929",
-              "url": "https://openalex.org/W3094502228"
-            },
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
-              "authors": [
-                "Alexey Dosovitskiy",
-                "Lucas Beyer",
-                "Alexander Kolesnikov",
-                "Dirk Weissenborn",
-                "Xiaohua Zhai",
-                "Thomas Unterthiner",
-                "Mostafa Dehghani",
-                "Matthias Minderer",
-                "Georg Heigold",
-                "Sylvain Gelly",
-                "Jakob Uszkoreit",
-                "Neil Houlsby"
-              ],
-              "year": 2021,
-              "doi": null,
-              "url": "https://openalex.org/W3119786062"
-            }
-          ],
-          "abstract_snippet": "While the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
         "reference_id": "schulman-2017-proximal-policy-optimization-algorithms",
-        "verdict": "unverifiable",
-        "confidence": 0,
+        "verdict": "verified",
+        "confidence": 0.95,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Proximal policy optimization algorithms",
             "authors": [
-              "Schulman, J.",
-              "Wolski, F.",
-              "Dhariwal, P.",
-              "Radford, A.",
-              "Klimov, O"
+              "Schulman, J."
             ],
             "year": 2017,
             "venue": "arXiv preprint arXiv:1707.06347",
             "source_format": "prose",
             "raw": "24. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., & Klimov, O. (2017). Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347."
           },
-          "resolved": null,
-          "cross_check": null,
-          "candidates": [],
-          "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided. No confident OpenAlex match."
+          "resolved": {
+            "doi": "10.48550/arxiv.1707.06347",
+            "title": "Proximal Policy Optimization Algorithms",
+            "authors": [
+              "Schulman, John",
+              "Wolski, Filip",
+              "Dhariwal, Prafulla",
+              "Radford, Alec",
+              "Klimov, Oleg"
+            ],
+            "year": 2017,
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "00fc9e593b484ac68ef4ebec6bb05aeb3a189d9733ec0c7405214dd471c7d6ee"
+          },
+          "cross_check": {
+            "title": {
+              "parsed": "Proximal policy optimization algorithms",
+              "resolved": "Proximal Policy Optimization Algorithms",
+              "similarity": 1,
+              "pass": true
+            },
+            "author": {
+              "parsed": "schulman",
+              "resolved": "schulman",
+              "pass": true
+            },
+            "year": {
+              "parsed": 2017,
+              "resolved": 2017,
+              "pass": true
+            }
+          },
+          "candidates": [
+            {
+              "source": "datacite",
+              "score": 1,
+              "title": "Proximal Policy Optimization Algorithms",
+              "authors": [
+                "Schulman, John",
+                "Wolski, Filip",
+                "Dhariwal, Prafulla",
+                "Radford, Alec",
+                "Klimov, Oleg"
+              ],
+              "year": 2017,
+              "doi": "10.48550/arxiv.1707.06347",
+              "url": "https://doi.org/10.48550/arxiv.1707.06347"
+            }
+          ],
+          "abstract_snippet": "We propose a new family of policy gradient methods for reinforcement learning, which alternate between sampling data through interaction with the environment, and optimizing a \"surrogate\" objective function using stochastic gradient ascent. Whereas standard policy gradient methods perform one gradient update per data sample, we propose a novel objective function that enables multiple epochs of minibatch updates. The new methods, which we call proximal policy optimization (PPO), have some of the ",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": null
         }
       },
       {
         "reference_id": "sutskever-2014-sequence-to-sequence-learning-with-neural",
-        "verdict": "verified",
-        "confidence": 1,
+        "verdict": "unverifiable",
+        "confidence": 0,
         "evidence": {
           "parsed": {
             "doi": null,
             "title": "Sequence to sequence learning with neural networks",
             "authors": [
-              "Sutskever, I.",
-              "Vinyals, O.",
-              "Le",
-              "Q. V"
+              "Sutskever, I."
             ],
             "year": 2014,
             "venue": "In Advances in Neural Information Processing Systems 27 (pp. 3104-3112)",
             "source_format": "prose",
             "raw": "25. Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in Neural Information Processing Systems 27 (pp. 3104-3112)."
           },
-          "resolved": {
-            "doi": "10.48550/arxiv.1409.3215",
-            "title": "Sequence to Sequence Learning with Neural Networks",
-            "authors": [
-              "Ilya Sutskever",
-              "Oriol Vinyals",
-              "Quoc V. Le"
-            ],
-            "year": 2014,
-            "venue": "arXiv (Cornell University)",
-            "source": "openalex",
-            "raw_response_hash": "2b2b80f731986fe2fdbe57a464d78c8ed6cf13d33f5d225233a7649754c97513"
-          },
-          "cross_check": {
-            "title": {
-              "parsed": "Sequence to sequence learning with neural networks",
-              "resolved": "Sequence to Sequence Learning with Neural Networks",
-              "similarity": 1,
-              "pass": true
-            },
-            "author": {
-              "parsed": "sutskever",
-              "resolved": "sutskever",
-              "pass": true
-            },
-            "year": {
-              "parsed": 2014,
-              "resolved": 2014,
-              "pass": true
-            }
-          },
-          "candidates": [
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "Sequence to Sequence Learning with Neural Networks",
-              "authors": [
-                "Ilya Sutskever",
-                "Oriol Vinyals",
-                "Quoc V. Le"
-              ],
-              "year": 2014,
-              "doi": "10.48550/arxiv.1409.3215",
-              "url": "https://openalex.org/W2130942839"
-            },
-            {
-              "source": "openalex",
-              "score": 1,
-              "title": "Sequence to Sequence Learning with Neural Networks",
-              "authors": [
-                "Ilya Sutskever",
-                "Oriol Vinyals",
-                "Quoc V. Le"
-              ],
-              "year": 2014,
-              "doi": null,
-              "url": "https://openalex.org/W2949888546"
-            }
-          ],
-          "abstract_snippet": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks. Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences. In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensiona",
-          "notes": "VERIFY pre-scan flags: no_registered_doi_provided."
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": null,
+          "notes": "no_confident_match"
         }
       },
       {
@@ -1588,8 +1353,7 @@
             "doi": "10.1038/s42256-024-01247-fake",
             "title": "Quantum emergence of AI consciousness in neural substrates",
             "authors": [
-              "Smith, J.",
-              "Zhang, W"
+              "Smith, J."
             ],
             "year": 2024,
             "venue": "Nature Machine Intelligence, 6(12), 1245-1268",
@@ -1600,7 +1364,8 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: invented_doi_pattern. DOI returned 404 from both CrossRef and OpenAlex."
+          "retraction": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex VERIFY pre-scan flags: invented_doi_pattern, too_convenient_or_implausible_topic."
         }
       },
       {
@@ -1612,7 +1377,7 @@
             "doi": "10.1103/physrevlett.131.999999",
             "title": "The mathematical foundations of post-quantum cryptography in nuclear fusion reactors",
             "authors": [
-              "Doe, J"
+              "Doe, J."
             ],
             "year": 2023,
             "venue": "Physical Review Letters, 131(4), 044502",
@@ -1623,7 +1388,8 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: invented_doi_pattern. DOI returned 404 from both CrossRef and OpenAlex."
+          "retraction": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex VERIFY pre-scan flags: invented_doi_pattern, too_convenient_or_implausible_topic."
         }
       },
       {
@@ -1635,9 +1401,7 @@
             "doi": "10.1016/j.cell.2024.invented",
             "title": "GPT-5 exhibits emergent theory of mind: A neuroimaging study",
             "authors": [
-              "Patel, R.",
-              "Chen, L.",
-              "Kim, S"
+              "Patel, R."
             ],
             "year": 2024,
             "venue": "Cell, 187(8), 1892-1905",
@@ -1648,7 +1412,8 @@
           "cross_check": null,
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: invented_doi_pattern. DOI returned 404 from both CrossRef and OpenAlex."
+          "retraction": null,
+          "notes": "DOI returned 404 from both CrossRef and OpenAlex VERIFY pre-scan flags: invented_doi_pattern, too_convenient_or_implausible_topic."
         }
       },
       {
@@ -1660,7 +1425,7 @@
             "doi": "10.48550/arxiv.1706.03762",
             "title": "Attention is all you need",
             "authors": [
-              "Smith, J"
+              "Smith, J."
             ],
             "year": 2017,
             "venue": "In Advances in Neural Information Processing Systems 30 (pp. 5998-6008)",
@@ -1671,19 +1436,19 @@
             "doi": "10.48550/arxiv.1706.03762",
             "title": "Attention Is All You Need",
             "authors": [
-              "Ashish Vaswani",
-              "Noam Shazeer",
-              "Niki Parmar",
-              "Jakob Uszkoreit",
-              "Llion Jones",
-              "Aidan N. Gomez",
-              "Łukasz Kaiser",
-              "Illia Polosukhin"
+              "Vaswani, Ashish",
+              "Shazeer, Noam",
+              "Parmar, Niki",
+              "Uszkoreit, Jakob",
+              "Jones, Llion",
+              "Gomez, Aidan N.",
+              "Kaiser, Lukasz",
+              "Polosukhin, Illia"
             ],
             "year": 2017,
-            "venue": null,
-            "source": "openalex",
-            "raw_response_hash": "ca23b6dbe506d426a572aae95ae2674e2eb08f1bd5a59c19792cb61ba27dbf8c"
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "83aed6e2ab6ef32a0add2d25ca2286e52426699ada02aad334305ef104440675"
           },
           "cross_check": {
             "title": {
@@ -1705,6 +1470,10 @@
           },
           "candidates": [],
           "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
           "notes": "VERIFY pre-scan flags: author_doi_pair_suspicious."
         }
       },
@@ -1717,9 +1486,7 @@
             "doi": "10.1038/nature14539",
             "title": "Deep learning",
             "authors": [
-              "LeCun, Y.",
-              "Bengio, Y.",
-              "Hinton, G"
+              "LeCun, Y."
             ],
             "year": 2020,
             "venue": "Nature, 521(7553), 436-444",
@@ -1737,7 +1504,7 @@
             "year": 2015,
             "venue": "Nature",
             "source": "crossref",
-            "raw_response_hash": "5008c33a5e647d4f53b986b20e8dbfeb825db16c7a916b4f6216649f27f0c50c"
+            "raw_response_hash": "f1bb34efa99a530e1cdc043b7e91b5dcd81bf230d702f621b9c55b4c280c6098"
           },
           "cross_check": {
             "title": {
@@ -1759,7 +1526,138 @@
           },
           "candidates": [],
           "abstract_snippet": null,
-          "notes": "VERIFY pre-scan flags: year_doi_pair_suspicious."
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": "VERIFY pre-scan flags: year_discrepancy_suspicious."
+        }
+      },
+      {
+        "reference_id": "vaswani-2017-attention-is-all-you-need-dup2",
+        "verdict": "verified",
+        "confidence": 1,
+        "evidence": {
+          "parsed": {
+            "doi": "10.48550/arxiv.1706.03762",
+            "title": "Attention is all you need",
+            "authors": [
+              "Vaswani, A."
+            ],
+            "year": 2017,
+            "venue": "In Advances in Neural Information Processing Systems 30 (pp. 5998-6008)",
+            "source_format": "prose",
+            "raw": "31. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762"
+          },
+          "resolved": {
+            "doi": "10.48550/arxiv.1706.03762",
+            "title": "Attention Is All You Need",
+            "authors": [
+              "Vaswani, Ashish",
+              "Shazeer, Noam",
+              "Parmar, Niki",
+              "Uszkoreit, Jakob",
+              "Jones, Llion",
+              "Gomez, Aidan N.",
+              "Kaiser, Lukasz",
+              "Polosukhin, Illia"
+            ],
+            "year": 2017,
+            "venue": "arXiv",
+            "source": "datacite",
+            "raw_response_hash": "83aed6e2ab6ef32a0add2d25ca2286e52426699ada02aad334305ef104440675"
+          },
+          "cross_check": {
+            "title": {
+              "parsed": "Attention is all you need",
+              "resolved": "Attention Is All You Need",
+              "similarity": 1,
+              "pass": true
+            },
+            "author": {
+              "parsed": "vaswani",
+              "resolved": "vaswani",
+              "pass": true
+            },
+            "year": {
+              "parsed": 2017,
+              "resolved": 2017,
+              "pass": true
+            }
+          },
+          "candidates": [],
+          "abstract_snippet": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more ",
+          "retraction": {
+            "checked": true,
+            "retracted": false
+          },
+          "notes": "duplicate of vaswani-2017-attention-is-all-you-need; verdict mirrored, resolver not re-queried"
+        }
+      },
+      {
+        "reference_id": "wakefield-1998-ileal-lymphoid-nodular-hyperplasia-non-specific",
+        "verdict": "verified",
+        "confidence": 1,
+        "evidence": {
+          "parsed": {
+            "doi": "10.1016/s0140-6736(97)11096-0",
+            "title": "Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children",
+            "authors": [
+              "Wakefield, A. J."
+            ],
+            "year": 1998,
+            "venue": "The Lancet, 351(9103), 637-641",
+            "source_format": "prose",
+            "raw": "32. Wakefield, A. J., Murch, S. H., Anthony, A., Linnell, J., Casson, D. M., Malik, M., Berelowitz, M., Dhillon, A. P., Thomson, M. A., Harvey, P., Valentine, A., Davies, S. E., & Walker-Smith, J. A. (1998). Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children. The Lancet, 351(9103), 637-641. https://doi.org/10.1016/S0140-6736(97)11096-0"
+          },
+          "resolved": {
+            "doi": "10.1016/s0140-6736(97)11096-0",
+            "title": "RETRACTED: Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children",
+            "authors": [
+              "AJ Wakefield",
+              "SH Murch",
+              "A Anthony",
+              "J Linnell",
+              "DM Casson",
+              "M Malik",
+              "M Berelowitz",
+              "AP Dhillon",
+              "MA Thomson",
+              "P Harvey",
+              "A Valentine",
+              "SE Davies",
+              "JA Walker-Smith"
+            ],
+            "year": 1998,
+            "venue": "The Lancet",
+            "source": "crossref",
+            "raw_response_hash": "28ddd26aea4d216a38db3235956879c8bb6e8cfb834de92746a27acda5f73469"
+          },
+          "cross_check": {
+            "title": {
+              "parsed": "Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children",
+              "resolved": "RETRACTED: Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children",
+              "similarity": 1,
+              "pass": true
+            },
+            "author": {
+              "parsed": "wakefield",
+              "resolved": "wakefield",
+              "pass": true
+            },
+            "year": {
+              "parsed": 1998,
+              "resolved": 1998,
+              "pass": true
+            }
+          },
+          "candidates": [],
+          "abstract_snippet": null,
+          "retraction": {
+            "checked": true,
+            "retracted": true
+          },
+          "notes": "RETRACTED: resolvers identify this publication as retracted; do not cite as current evidence; check the retraction notice."
         }
       }
     ],
@@ -1773,5 +1671,96 @@
       "verdicts_complete": "pass"
     }
   },
-  "errors": []
+  "errors": [
+    {
+      "reference_id": "goodfellow-2014-generative-adversarial-nets",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable:503",
+      "raw": "16. Goodfellow, I. J., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., & Bengio, Y. (2014). Generative adversarial nets. In Advances in Neural Information Processing Systems 27."
+    },
+    {
+      "reference_id": "goodfellow-2014-generative-adversarial-nets",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable:429",
+      "raw": "16. Goodfellow, I. J., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., & Bengio, Y. (2014). Generative adversarial nets. In Advances in Neural Information Processing Systems 27."
+    },
+    {
+      "reference_id": "kingma-2014-auto-encoding-variational-bayes",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable:503",
+      "raw": "18. Kingma, D. P., & Welling, M. (2014). Auto-encoding variational Bayes. In 2nd International Conference on Learning Representations."
+    },
+    {
+      "reference_id": "kingma-2014-auto-encoding-variational-bayes",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable:429",
+      "raw": "18. Kingma, D. P., & Welling, M. (2014). Auto-encoding variational Bayes. In 2nd International Conference on Learning Representations."
+    },
+    {
+      "reference_id": "bengio-2003-a-neural-probabilistic-language-model",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable",
+      "raw": "19. Bengio, Y., Ducharme, R., Vincent, P., & Jauvin, C. (2003). A neural probabilistic language model. Journal of Machine Learning Research, 3, 1137-1155."
+    },
+    {
+      "reference_id": "bengio-2003-a-neural-probabilistic-language-model",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable",
+      "raw": "19. Bengio, Y., Ducharme, R., Vincent, P., & Jauvin, C. (2003). A neural probabilistic language model. Journal of Machine Learning Research, 3, 1137-1155."
+    },
+    {
+      "reference_id": "raffel-2020-exploring-the-limits-of-transfer-learning",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable",
+      "raw": "20. Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., & Liu, P. J. (2020). Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research, 21(140), 1-67."
+    },
+    {
+      "reference_id": "raffel-2020-exploring-the-limits-of-transfer-learning",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable",
+      "raw": "20. Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., & Liu, P. J. (2020). Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research, 21(140), 1-67."
+    },
+    {
+      "reference_id": "radford-2019-language-models-are-unsupervised-multitask-learners",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable",
+      "raw": "21. Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Technical Report."
+    },
+    {
+      "reference_id": "radford-2019-language-models-are-unsupervised-multitask-learners",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable",
+      "raw": "21. Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Technical Report."
+    },
+    {
+      "reference_id": "dosovitskiy-2021-an-image-is-worth-16x16-words",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable",
+      "raw": "23. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... & Houlsby, N. (2021). An image is worth 16x16 words: Transformers for image recognition at scale. In 9th International Conference on Learning Representations."
+    },
+    {
+      "reference_id": "dosovitskiy-2021-an-image-is-worth-16x16-words",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable",
+      "raw": "23. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... & Houlsby, N. (2021). An image is worth 16x16 words: Transformers for image recognition at scale. In 9th International Conference on Learning Representations."
+    },
+    {
+      "reference_id": "sutskever-2014-sequence-to-sequence-learning-with-neural",
+      "stage": "resolve",
+      "reason": "openalex_search_unavailable",
+      "raw": "25. Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in Neural Information Processing Systems 27 (pp. 3104-3112)."
+    },
+    {
+      "reference_id": "sutskever-2014-sequence-to-sequence-learning-with-neural",
+      "stage": "resolve",
+      "reason": "semantic_scholar_search_unavailable",
+      "raw": "25. Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in Neural Information Processing Systems 27 (pp. 3104-3112)."
+    },
+    {
+      "reference_id": "vaswani-2017-attention-is-all-you-need-dup2",
+      "stage": "parse",
+      "reason": "duplicate_of:vaswani-2017-attention-is-all-you-need",
+      "raw": "31. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. In Advances in Neural Information Processing Systems 30 (pp. 5998-6008). https://doi.org/10.48550/arXiv.1706.03762"
+    }
+  ]
 }

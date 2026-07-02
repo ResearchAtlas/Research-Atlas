@@ -53,12 +53,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
   lived only in page metadata).
 - Hero subhead and library copy toned down to what the product actually does
   ("citation-disciplined drafts", "curated prompts").
+- **Dropped Gemini CLI** as a supported surface (docs, `/skills` page, home
+  install section, `.gitignore`/eslint ignores). Supported harnesses are now
+  Claude Code + Codex CLI; parity grading requires 2+ envelopes.
+- **`research-verification` resolver hardening** (v2.2.0): DataCite/arXiv
+  tertiary resolver; bounded retry + resolver-outage → `unverifiable` (never
+  `fabricated` on a mere outage); blank-resolver-field → `partially_supported`
+  not a title mismatch; `RETRACTED:` title-prefix detection (and stripped before
+  the title cross-check); the task-section mutual-exclusivity contract is now
+  enforced by the validator (citation tasks reject `claims`, claim tasks reject
+  `verdicts`).
+- **PC6 latency gate** is now a per-reference active-time budget (35 s/ref, so
+  18.7 min for the 32-ref corpus, 5.8 min for a 10-ref list) instead of a flat
+  5 minutes — it scales with corpus size and encodes the real per-reference
+  resolver cost.
+- **Committed v2 acceptance evidence**: `scripts/acceptance/envelopes/` now holds
+  the 32-reference v2 runs on Claude Code + Codex CLI (skill v2.2.0), replacing
+  the v1 (30-item) artifacts. Both grade fully pass — including the per-reference
+  latency budget — with 32/32 cross-agent parity.
 
 ### Known gaps — 2026-07-02 wave
 
-- Corpus v2 acceptance runs are pending on Claude Code and Codex CLI. The saved envelopes under
-  `scripts/acceptance/envelopes/` are v1 (30-item) artifacts and grade only
-  against the v1 ground truth in git history.
 - `verified` prompt status remains reserved: no prompt has been exercised
   against a live model yet.
 
