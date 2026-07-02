@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000107",
+    "timestamp": "2026-07-01T10:35:00Z",
+    "input_count": 1
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_claims",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Fact check\n\n- c1: verified\n",
+    "claims_evaluated": 2,
+    "claims": [
+      {
+        "claim_id": "c1",
+        "claim": "Water boils at 100 degrees Celsius at sea level.",
+        "claim_type": "empirical",
+        "rating": "verified",
+        "confidence": 0.99,
+        "evidence": {
+          "quote": "At standard atmospheric pressure, water boils at 100 C.",
+          "source": "CRC Handbook of Chemistry and Physics",
+          "notes": null
+        }
+      }
+    ]
+  },
+  "errors": []
+}

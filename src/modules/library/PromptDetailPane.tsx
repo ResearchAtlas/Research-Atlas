@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom'
 import { StaticPrompt } from '@/lib/prompts'
 import { WORKFLOWS } from '@/data/workflows'
 
-import { X, Check, Clipboard, Info, Star, ArrowRight, ArrowLeft } from 'lucide-react'
+import { X, Check, Clipboard, FileDown, Info, Star, ArrowRight, ArrowLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useFavorites } from '@/lib/favorites'
+import { Textarea } from '@/components/ui/textarea'
+import { prettifyVariableName, usePersistedVariables, useResolvedVariables } from '@/lib/promptVariables'
+import { buildCopyText, buildPromptMarkdown } from '@/lib/promptMarkdown'
 
 interface PromptDetailPaneProps {
     prompt: StaticPrompt | null
@@ -133,36 +136,41 @@ export function PromptDetailPane({ prompt, onClose }: PromptDetailPaneProps) {
 function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
     const promptText = prompt.content?.instructions || ""
 
-    // Extract variables
-    const variableMatches = useMemo(() => {
-        const regex = /\{\{([^}]+)\}\}/g
-        const matches = new Set<string>()
-        let match
-        while ((match = regex.exec(promptText)) !== null) {
-            matches.add(match[1])
-        }
-        return Array.from(matches)
-    }, [promptText])
+    const resolvedVariables = useResolvedVariables(promptText, prompt.variables)
 
-    const [variables, setVariables] = useState<Record<string, string>>({})
+    const defaultValues = useMemo(() => {
+        const defaults: Record<string, string> = {}
+        resolvedVariables.forEach(v => {
+            if (v.defaultValue) defaults[v.name] = v.defaultValue
+        })
+        return defaults
+    }, [resolvedVariables])
+
+    const [variables, setVariables] = usePersistedVariables(`research-atlas-prompt-vars:${prompt.id}`, defaultValues)
     const [showCopied, setShowCopied] = useState(false)
+    const [showMarkdownCopied, setShowMarkdownCopied] = useState(false)
 
     const handleVarChange = (key: string, value: string) => {
         setVariables(prev => ({ ...prev, [key]: value }))
     }
 
-    const filledPrompt = useMemo(() => {
-        let text = promptText
-        Object.entries(variables).forEach(([key, value]) => {
-            if (value) text = text.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value)
-        })
-        return text
-    }, [promptText, variables])
-
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(filledPrompt)
+        navigator.clipboard.writeText(buildCopyText(prompt.content, variables))
         setShowCopied(true)
         setTimeout(() => setShowCopied(false), 3000)
+    }
+
+    const copyAsMarkdown = () => {
+        const markdown = buildPromptMarkdown({
+            title: prompt.title,
+            description: prompt.description,
+            content: prompt.content,
+            variables: resolvedVariables,
+            values: variables,
+        })
+        navigator.clipboard.writeText(markdown)
+        setShowMarkdownCopied(true)
+        setTimeout(() => setShowMarkdownCopied(false), 3000)
     }
 
     return (
@@ -183,25 +191,38 @@ function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
             )}
 
             {/* Variables Section */}
-            {variableMatches.length > 0 && (
+            {resolvedVariables.length > 0 && (
                 <div className="rounded-xl border border-border bg-secondary/20 p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <Info className="h-4 w-4 text-primary" />
                         <h3 className="text-foreground font-medium text-sm">Variables</h3>
                     </div>
                     <div className="space-y-4">
-                        {variableMatches.map(v => (
-                            <div key={v}>
-                                <label className="block text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">
-                                    {v.replace(/_/g, ' ')}
+                        {resolvedVariables.map(v => (
+                            <div key={v.name}>
+                                <label className="block text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                                    {prettifyVariableName(v.name)}
+                                    {v.required && <span className="text-red-500 ml-0.5">*</span>}
                                 </label>
-                                <input
-                                    value={variables[v] || ''}
-                                    onChange={(e) => handleVarChange(v, e.target.value)}
-                                    className="w-full border border-input rounded-lg py-3 px-4 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary bg-background transition-all font-mono"
-                                    placeholder={`Enter ${v}...`}
-                                    type="text"
-                                />
+                                {v.description && (
+                                    <p className="text-xs text-muted-foreground mb-2">{v.description}</p>
+                                )}
+                                {v.type === 'multiline' ? (
+                                    <Textarea
+                                        value={variables[v.name] || ''}
+                                        onChange={(e) => handleVarChange(v.name, e.target.value)}
+                                        className="bg-background font-mono text-sm min-h-[100px]"
+                                        placeholder={`Enter ${prettifyVariableName(v.name).toLowerCase()}...`}
+                                    />
+                                ) : (
+                                    <input
+                                        value={variables[v.name] || ''}
+                                        onChange={(e) => handleVarChange(v.name, e.target.value)}
+                                        className="w-full border border-input rounded-lg py-3 px-4 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary bg-background transition-all font-mono"
+                                        placeholder={`Enter ${prettifyVariableName(v.name).toLowerCase()}...`}
+                                        type="text"
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
@@ -228,20 +249,35 @@ function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
                         }
                         return <span key={i}>{part}</span>
                     })}
+                    {(prompt.content?.constraints || prompt.content?.outputRequirements) && (
+                        <div className="mt-4 border-t border-border pt-3 font-sans text-xs text-muted-foreground space-y-1">
+                            {prompt.content.constraints && <div>Constraints: {prompt.content.constraints}</div>}
+                            {prompt.content.outputRequirements && <div>Output requirements: {prompt.content.outputRequirements}</div>}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Main Action Button */}
+            {/* Main Action Buttons */}
             <div className="flex flex-col items-center gap-4 mb-4">
-                <button
-                    onClick={copyToClipboard}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
-                >
-                    <Clipboard className="h-4 w-4" />
-                    Copy to Clipboard
-                </button>
+                <div className="flex w-full gap-3">
+                    <button
+                        onClick={copyToClipboard}
+                        className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
+                    >
+                        <Clipboard className="h-4 w-4" />
+                        Copy to Clipboard
+                    </button>
+                    <button
+                        onClick={copyAsMarkdown}
+                        className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                    >
+                        <FileDown className="h-4 w-4" />
+                        Copy as Markdown
+                    </button>
+                </div>
 
-                {/* Success Badge */}
+                {/* Success Badges */}
                 <AnimatePresence>
                     {showCopied && (
                         <motion.div
@@ -252,6 +288,17 @@ function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
                         >
                             <Check className="h-3 w-3" />
                             <span>Copied!</span>
+                        </motion.div>
+                    )}
+                    {showMarkdownCopied && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="bg-green-600 text-white px-3 py-1 rounded-full text-sm inline-flex items-center gap-1.5 font-medium shadow-md"
+                        >
+                            <Check className="h-3 w-3" />
+                            <span>Markdown copied!</span>
                         </motion.div>
                     )}
                 </AnimatePresence>

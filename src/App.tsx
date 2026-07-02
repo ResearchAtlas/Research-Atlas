@@ -8,6 +8,7 @@ import { LibraryPage } from '@/modules/library/LibraryPage'
 import { WorkflowsPage } from '@/modules/workflows/WorkflowsPage'
 import { WorkflowDetailPage } from '@/modules/workflows/WorkflowDetailPage'
 import { GuidesPage } from '@/modules/guides/GuidesPage'
+import { SkillsPage } from '@/modules/skills/SkillsPage'
 import { NotFoundPage } from '@/modules/common/NotFoundPage'
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                     <Route path="workflows/:workflowId" element={<WorkflowDetailPage />} />
                     <Route path="guides" element={<GuidesPage />} />
                     <Route path="guides/:guideId" element={<GuidesPage />} />
+                    <Route path="skills" element={<SkillsPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Route>
             </Routes>
