@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useFavorites } from '@/lib/favorites'
 import { Textarea } from '@/components/ui/textarea'
-import { fillTemplate, prettifyVariableName, usePersistedVariables, useResolvedVariables } from '@/lib/promptVariables'
-import { buildPromptMarkdown } from '@/lib/promptMarkdown'
+import { prettifyVariableName, usePersistedVariables, useResolvedVariables } from '@/lib/promptVariables'
+import { buildCopyText, buildPromptMarkdown } from '@/lib/promptMarkdown'
 
 interface PromptDetailPaneProps {
     prompt: StaticPrompt | null
@@ -154,10 +154,8 @@ function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
         setVariables(prev => ({ ...prev, [key]: value }))
     }
 
-    const filledPrompt = useMemo(() => fillTemplate(promptText, variables), [promptText, variables])
-
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(filledPrompt)
+        navigator.clipboard.writeText(buildCopyText(prompt.content, variables))
         setShowCopied(true)
         setTimeout(() => setShowCopied(false), 3000)
     }
@@ -251,6 +249,12 @@ function PromptSandbox({ prompt }: { prompt: StaticPrompt }) {
                         }
                         return <span key={i}>{part}</span>
                     })}
+                    {(prompt.content?.constraints || prompt.content?.outputRequirements) && (
+                        <div className="mt-4 border-t border-border pt-3 font-sans text-xs text-muted-foreground space-y-1">
+                            {prompt.content.constraints && <div>Constraints: {prompt.content.constraints}</div>}
+                            {prompt.content.outputRequirements && <div>Output requirements: {prompt.content.outputRequirements}</div>}
+                        </div>
+                    )}
                 </div>
             </div>
 

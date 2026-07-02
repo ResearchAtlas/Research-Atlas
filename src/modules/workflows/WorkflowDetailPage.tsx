@@ -11,8 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { workflowPathFromId } from "@/lib/seoRoutes"
 import { usePersistedWorkflowState } from "@/lib/workflowState"
-import { fillTemplate, prettifyVariableName, useResolvedVariables } from "@/lib/promptVariables"
-import { buildPromptMarkdown } from "@/lib/promptMarkdown"
+import { prettifyVariableName, useResolvedVariables } from "@/lib/promptVariables"
+import { buildCopyText, buildPromptMarkdown } from "@/lib/promptMarkdown"
 
 const PROMPT_MAP = new Map(PROMPTS.map((p) => [p.id, p]))
 
@@ -298,13 +298,12 @@ function PromptSandbox({
         onVariablesChange(newVars)
     }
 
-    const filledPrompt = useMemo(() => fillTemplate(promptText, localVars), [promptText, localVars])
-
     const [showCopied, setShowCopied] = useState(false)
     const [showMarkdownCopied, setShowMarkdownCopied] = useState(false)
 
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(filledPrompt)
+        if (!promptData) return
+        navigator.clipboard.writeText(buildCopyText(promptData.content, localVars))
         setShowCopied(true)
         setTimeout(() => setShowCopied(false), 3000)
     }
@@ -447,6 +446,12 @@ function PromptSandbox({
                                     }
                                     return <span key={i}>{part}</span>
                                 })}
+                                {(promptData.content.constraints || promptData.content.outputRequirements) && (
+                                    <div className="mt-4 border-t pt-3 font-sans text-xs text-muted-foreground space-y-1">
+                                        {promptData.content.constraints && <div>Constraints: {promptData.content.constraints}</div>}
+                                        {promptData.content.outputRequirements && <div>Output requirements: {promptData.content.outputRequirements}</div>}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
