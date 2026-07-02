@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Copy, Check, Info, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, Copy, Check, FileDown, Info, CheckCircle2, RotateCcw } from "lucide-react"
 import { WORKFLOWS, Workflow, WorkflowStep } from "@/data/workflows"
 import { PROMPTS } from "@/data/prompts"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { workflowPathFromId } from "@/lib/seoRoutes"
+import { usePersistedWorkflowState } from "@/lib/workflowState"
+import { prettifyVariableName, useResolvedVariables } from "@/lib/promptVariables"
+import { buildCopyText, buildPromptMarkdown } from "@/lib/promptMarkdown"
 
 const PROMPT_MAP = new Map(PROMPTS.map((p) => [p.id, p]))
 
@@ -33,10 +36,14 @@ export function WorkflowDetailPage() {
     const { workflowId } = useParams()
     const workflow = WORKFLOWS.find(w => w.id === workflowId)
 
-    // State
-    const [activeStepId, setActiveStepId] = useState<string>("")
-    const [variables, setVariables] = useState<Record<string, string>>({})
-    const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set())
+    // Persisted progress (completed steps, variable values, active step)
+    const { state, setState, resetProgress } = usePersistedWorkflowState(workflowId ?? "")
+    const activeStepId = state.activeStepId ?? ""
+    const variables = state.variables
+    const completedSteps = useMemo(() => new Set(state.completedSteps), [state.completedSteps])
+
+    const setActiveStepId = (stepId: string) => setState(prev => ({ ...prev, activeStepId: stepId }))
+    const setVariables = (vars: Record<string, string>) => setState(prev => ({ ...prev, variables: vars }))
 
     const flatSteps = useMemo(() => workflow ? flattenSteps(workflow) : [], [workflow])
 
@@ -45,6 +52,7 @@ export function WorkflowDetailPage() {
         if (flatSteps.length > 0 && !activeStepId) {
             setActiveStepId(flatSteps[0].id)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flatSteps, activeStepId])
 
     if (!workflow) {
@@ -96,15 +104,16 @@ export function WorkflowDetailPage() {
     const activeStepIndex = flatSteps.findIndex(s => s.id === activeStepId)
 
     const handleStepComplete = (stepId: string) => {
-        const newCompleted = new Set(completedSteps)
-        newCompleted.add(stepId)
-        setCompletedSteps(newCompleted)
-
-        // Auto-advance
         const currentIndex = flatSteps.findIndex(s => s.id === stepId)
-        if (currentIndex < flatSteps.length - 1) {
-            setActiveStepId(flatSteps[currentIndex + 1].id)
-        }
+        const nextStepId = currentIndex < flatSteps.length - 1 ? flatSteps[currentIndex + 1].id : activeStepId
+
+        setState(prev => ({
+            ...prev,
+            completedSteps: prev.completedSteps.includes(stepId)
+                ? prev.completedSteps
+                : [...prev.completedSteps, stepId],
+            activeStepId: nextStepId,
+        }))
     }
 
     return (
@@ -142,6 +151,15 @@ export function WorkflowDetailPage() {
                             </Badge>
                         </div>
                     </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetProgress}
+                        className="gap-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Reset progress
+                    </Button>
                 </div>
             </div>
 
@@ -269,17 +287,8 @@ function PromptSandbox({
 }) {
     const promptData = step.promptIds?.[0] ? PROMPT_MAP.get(step.promptIds[0]) : null
 
-    // Extract variables from prompt content (assuming {{var}} format)
     const promptText = promptData?.content.instructions || ""
-    const variableMatches = useMemo(() => {
-        const regex = /\{\{([^}]+)\}\}/g
-        const matches = new Set<string>()
-        let match
-        while ((match = regex.exec(promptText)) !== null) {
-            matches.add(match[1])
-        }
-        return Array.from(matches)
-    }, [promptText])
+    const resolvedVariables = useResolvedVariables(promptText, promptData?.variables)
 
     const [localVars, setLocalVars] = useState<Record<string, string>>(initialVariables)
 
@@ -289,20 +298,28 @@ function PromptSandbox({
         onVariablesChange(newVars)
     }
 
-    const filledPrompt = useMemo(() => {
-        let text = promptText
-        Object.entries(localVars).forEach(([key, value]) => {
-            if (value) text = text.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value)
-        })
-        return text
-    }, [promptText, localVars])
-
     const [showCopied, setShowCopied] = useState(false)
+    const [showMarkdownCopied, setShowMarkdownCopied] = useState(false)
 
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(filledPrompt)
+        if (!promptData) return
+        navigator.clipboard.writeText(buildCopyText(promptData.content, localVars))
         setShowCopied(true)
         setTimeout(() => setShowCopied(false), 3000)
+    }
+
+    const copyAsMarkdown = () => {
+        if (!promptData) return
+        const markdown = buildPromptMarkdown({
+            title: promptData.title,
+            description: promptData.description,
+            content: promptData.content,
+            variables: resolvedVariables,
+            values: localVars,
+        })
+        navigator.clipboard.writeText(markdown)
+        setShowMarkdownCopied(true)
+        setTimeout(() => setShowMarkdownCopied(false), 3000)
     }
 
     return (
@@ -337,24 +354,37 @@ function PromptSandbox({
                     </div>
 
                     {/* Variables Section */}
-                    {variableMatches.length > 0 && (
+                    {resolvedVariables.length > 0 && (
                         <div className="space-y-4 rounded-xl border bg-muted/10 p-4">
                             <div className="flex items-center gap-2">
                                 <Info className="h-4 w-4 text-primary" />
                                 <h3 className="font-medium">Variables</h3>
                             </div>
                             <div className="grid gap-4">
-                                {variableMatches.map(v => (
-                                    <div key={v} className="space-y-1.5">
+                                {resolvedVariables.map(v => (
+                                    <div key={v.name} className="space-y-1.5">
                                         <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                                            {v.replace(/_/g, ' ')}
+                                            {prettifyVariableName(v.name)}
+                                            {v.required && <span className="text-red-500 ml-0.5">*</span>}
                                         </Label>
-                                        <Textarea
-                                            placeholder={`Enter ${v}...`}
-                                            value={localVars[v] || ''}
-                                            onChange={(e) => handleVarChange(v, e.target.value)}
-                                            className="resize-none bg-background min-h-[80px]"
-                                        />
+                                        {v.description && (
+                                            <p className="text-xs text-muted-foreground">{v.description}</p>
+                                        )}
+                                        {v.type === 'multiline' ? (
+                                            <Textarea
+                                                placeholder={`Enter ${prettifyVariableName(v.name).toLowerCase()}...`}
+                                                value={localVars[v.name] || ''}
+                                                onChange={(e) => handleVarChange(v.name, e.target.value)}
+                                                className="resize-none bg-background min-h-[80px]"
+                                            />
+                                        ) : (
+                                            <input
+                                                placeholder={`Enter ${prettifyVariableName(v.name).toLowerCase()}...`}
+                                                value={localVars[v.name] || ''}
+                                                onChange={(e) => handleVarChange(v.name, e.target.value)}
+                                                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                            />
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -378,7 +408,21 @@ function PromptSandbox({
                                                 Top-notch! Copied.
                                             </motion.span>
                                         )}
+                                        {showMarkdownCopied && (
+                                            <motion.span
+                                                initial={{ opacity: 0, x: 10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 10 }}
+                                                className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded"
+                                            >
+                                                Markdown copied.
+                                            </motion.span>
+                                        )}
                                     </AnimatePresence>
+                                    <Button variant="outline" size="sm" onClick={copyAsMarkdown} className="gap-2 hover:bg-secondary hover:text-foreground">
+                                        <FileDown className="h-3.5 w-3.5" />
+                                        Copy as Markdown
+                                    </Button>
                                     <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-secondary hover:text-foreground">
                                         <Copy className="h-3.5 w-3.5" />
                                         Copy to Clipboard
@@ -402,6 +446,12 @@ function PromptSandbox({
                                     }
                                     return <span key={i}>{part}</span>
                                 })}
+                                {(promptData.content.constraints || promptData.content.outputRequirements) && (
+                                    <div className="mt-4 border-t pt-3 font-sans text-xs text-muted-foreground space-y-1">
+                                        {promptData.content.constraints && <div>Constraints: {promptData.content.constraints}</div>}
+                                        {promptData.content.outputRequirements && <div>Output requirements: {promptData.content.outputRequirements}</div>}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

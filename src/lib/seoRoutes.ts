@@ -3,7 +3,7 @@ import { WORKFLOWS } from '@/data/workflows'
 
 export const BASE_URL = 'https://researchatlas.info'
 
-const ROOT_ROUTES = ['/', '/library', '/workflows', '/guides'] as const
+const ROOT_ROUTES = ['/', '/library', '/workflows', '/guides', '/skills'] as const
 
 export const workflowPathFromId = (workflowId: string) =>
     `/workflows/${encodeURIComponent(workflowId)}`
