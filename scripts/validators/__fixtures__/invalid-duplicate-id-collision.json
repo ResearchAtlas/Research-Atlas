@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000106",
+    "timestamp": "2026-07-01T10:30:00Z",
+    "input_count": 2
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Verification report\n\n- vaswani-2017-attention: verified (x2, ID COLLISION — the duplicate should carry a -dup2 suffix)\n",
+    "citations_checked": 2,
+    "verdict_summary": {
+      "verified": 2,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention is all you need", "source_format": "prose", "raw": "1. Vaswani..." },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
+        }
+      },
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": "10.48550/arxiv.1706.03762", "title": "Attention is all you need", "source_format": "prose", "raw": "41. Vaswani..." },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": "duplicate of vaswani-2017-attention; verdict mirrored, resolver not re-queried"
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

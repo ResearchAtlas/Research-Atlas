@@ -1,6 +1,6 @@
 ---
 name: research-verification
-version: 2.1.0
+version: 2.2.0
 description: |
   Verify research claims, fact-check citations, audit evidence integrity, and
   validate findings against sources. Use when fact-checking AI-generated content,
@@ -133,7 +133,39 @@ Run for `verify_citations` and `bibliography_audit`. Produces `parsed_references
    - Year: parse 4-digit integer; reject years > current_year + 1 or < 1600 (flag as suspicious instead of failing).
    - Title: trim, collapse internal whitespace.
 4. **Assign `reference_id`.** `<first_author_surname>-<year>-<first-six-title-words-slug>`; if first author or year is missing, fall back to `ref-<ordinal>` where ordinal is the 1-indexed position in the input.
-5. **De-duplicate.** Two references are duplicates when they share a normalized DOI, OR share a URL, OR share the same `reference_id`. Keep the first occurrence; record duplicates in `errors` as `{duplicate_of: <reference_id>, raw: <chunk>}`.
+5. **De-duplicate (governs resolver WORK only — every parsed reference still gets a verdict).**
+   Two references are duplicates when ANY of the following hold against an earlier reference:
+   - same normalized DOI, OR
+   - same URL, OR
+   - same `reference_id`, OR
+   - normalized-title Jaccard similarity ≥ 0.9 AND first-author surname matches
+     (case/accent-insensitive: NFD normalize + strip combining marks, lowercase).
+     Jaccard is over the set of whitespace-split title tokens after lowercasing,
+     collapsing whitespace, and stripping punctuation.
+
+   Duplicates are NOT dropped from output. The pipeline runs once per distinct
+   reference and mirrors the result onto later copies:
+   - **Canonical (first occurrence):** runs the full resolver pipeline normally and
+     produces its verdict.
+   - **Each later duplicate:** gets its own `data.verdicts` entry that MIRRORS the
+     canonical's `verdict` and `confidence`. In that entry:
+     - `evidence.parsed` is populated from the duplicate's OWN raw chunk (its parse
+       is real).
+     - `evidence.resolved`, `evidence.cross_check`, `evidence.candidates` are COPIED
+       from the canonical when the canonical has them, or null-mirrored (`null` / `null`
+       / `[]`) when the canonical's are null/empty.
+     - `evidence.notes` = `"duplicate of <canonical reference_id>; verdict mirrored, resolver not re-queried"`.
+   - **`reference_id` uniqueness:** a duplicate reuses the canonical id with a
+     `-dup2`, `-dup3`, … suffix (the ordinal is its occurrence number, 2 for the first
+     duplicate). `reference_id` MUST be unique within a run.
+   - **Error signal:** each duplicate also gets an `errors[]` entry
+     `{reference_id: <dup id>, stage: "parse", reason: "duplicate_of:<canonical-id>", raw: <chunk>}`.
+     (`reason` is a plain string, as the envelope validator requires.)
+
+   Net effect: `data.verdicts` has one entry per PARSED input reference including
+   duplicates, in input order; `meta.input_count` equals that pre-dedup parsed count
+   (== `data.verdicts.length`); `verdict_summary` counts every `data.verdicts` entry,
+   duplicates included.
 6. **Cap.** IF `len(parsed_references)` > 200 -> FAIL with error: `"Reference list exceeds the 200-entry cap (got <N>). Split into smaller batches or use the literature-review skill for full-corpus audits."` (The cap protects acceptance-test runtime budget.)
 7. **Report parse failures.** Any chunk that cannot be parsed is NOT silently dropped. Emit one entry with `source_format: <detected-or-unknown>`, `raw: <chunk>`, all other fields `null`, `reference_id: ref-<ordinal>`, and a matching entry in `errors` as `{reference_id, stage: "parse", reason: <short-message>}`. Downstream steps treat these as `verdict: unverifiable`.
 
@@ -175,6 +207,18 @@ Every parsed reference flows through this pipeline. Per-reference state accumula
    - On HTTP 404: set `verdict: fabricated_doi` with evidence `"DOI returned 404 from both CrossRef and OpenAlex"` and skip remaining steps for this reference.
    - On error: set `verdict: unverifiable` with evidence `"DOI resolver unavailable (CrossRef <status> / OpenAlex <status>)"`.
 3. **Record provenance.** For each successful lookup, compute `sha256` of the raw JSON response body (first 4 KB is sufficient; truncate before hashing) and store as `raw_response_hash`. Store the resolver name (`crossref` or `openalex`) in `source`. This makes re-runs auditable and lets us prove which resolver returned which metadata.
+4. **Retraction check.** On a successful resolver hit, inspect signals already present in the fetched response — do NOT issue extra network calls:
+   - OpenAlex: `is_retracted: true`.
+   - CrossRef: a `relation` / `update-to` entry whose `type` is `"retraction"`.
+   Set `evidence.retraction = { checked: true, retracted: <bool> }`. (When no resolver
+   hit occurs, either omit the key or set `evidence.retraction = null`.) When
+   `retracted` is true:
+   - Keep the metadata-based verdict (a retracted paper is still a real, resolvable
+     record — the DOI is not fabricated).
+   - `evidence.notes` MUST start with `"RETRACTED: "` followed by guidance (e.g. do not
+     cite as current evidence; check the retraction notice).
+   - The human-readable `content` report MUST list every retracted reference in a
+     dedicated "Retracted references" section.
 
 After DOI resolution, the reference has a `resolved: CanonicalReference` record (same shape as parsed, now backfilled). Proceed to Step 3b.
 
@@ -219,6 +263,11 @@ Depth controls how much additional context is fetched beyond Step 3a-3c, not the
 #### Three-Layer Verification Protocol (claim-level tasks)
 
 The following applies to `verify_claims`, `alignment_audit`, `evidence_check`, `ai_detection` — tasks operating on free-form text rather than a reference list.
+
+**Structured output.** `verify_claims`, `alignment_audit`, and `evidence_check`
+emit their result as `data.claims` (see Output Envelope). `ai_detection` is the
+exception: it stays prose plus per-paragraph `likely_human | uncertain | likely_ai`
+ratings and emits no `data.claims`.
 
 **Layer 1: Quick Verification** (when `verification_depth` == quick):
 1. Verify URLs resolve to the claimed content
@@ -330,13 +379,16 @@ every field:
 ```yaml
 meta:
   skill: research-verification
-  version: 2.1.0
+  version: 2.2.0
   schema_version: 2
   run_id: <UUID v4>                        # REQUIRED; hex digits only (0-9, a-f) in the 8-4-4-4-12 shape. If the
                                            # runtime cannot generate one, use "00000000-0000-4000-8000-000000000000".
   timestamp: <iso8601>                     # REQUIRED; UTC with offset (e.g. "2026-04-19T14:35:00Z")
-  input_count: <integer>                   # OPTIONAL but RECOMMENDED; number of references or claims the user supplied.
-                                           # When present, verdicts.length MUST equal input_count (see self_check.verdicts_complete).
+  input_count: <integer>                   # OPTIONAL but RECOMMENDED; number of parsed references INCLUDING duplicates
+                                           # (equals data.verdicts length on reference-level tasks — duplicates each get a
+                                           # mirrored verdict entry, so they count here); for claim-level tasks, the number
+                                           # of extracted claims. When present, verdicts.length MUST equal input_count
+                                           # (see self_check.verdicts_complete).
 status: success | partial | error          # REQUIRED
 data:
   task: <task_type>                        # REQUIRED; e.g. verify_citations, verify_claims, bibliography_audit
@@ -345,8 +397,21 @@ data:
   content: <string>                        # REQUIRED when status is success or partial; the human-readable report
                                            # matching output_format. May be the empty string only when output_format
                                            # is json AND all machine-readable data lives in verdicts/claims.
-  claims_evaluated: <integer>              # populated for claim-level tasks
+  claims_evaluated: <integer>              # populated for claim-level tasks; equals len(data.claims) when claims present
   citations_checked: <integer>             # populated for reference-level tasks; equals len(data.verdicts)
+  claims:                                  # REQUIRED for claim-level tasks verify_claims, alignment_audit, evidence_check.
+                                           # (ai_detection stays prose + per-paragraph ratings — it emits NO data.claims.)
+                                           # One entry per extracted claim, in text order. When present, verdict_summary
+                                           # and verdicts are NOT required. See "Claim-level worked example" below.
+    - claim_id: <string>                   # unique non-empty id within the run, "c1"-style
+      claim: <string>                      # the claim verbatim or minimally trimmed
+      claim_type: empirical | methodological | theoretical | definitional
+      rating: verified | partially_supported | unsupported | contradicted | unverifiable
+      confidence: <float 0.0-1.0>
+      evidence:
+        quote: <string | null>            # supporting/contradicting passage from a source, or null
+        source: <string | null>           # where the quote came from (path, DOI, URL), or null
+        notes: <string | null>            # free-form reasoning, or null
   verdict_summary:                         # REQUIRED when data.verdicts is present. Closed set of exactly six keys;
                                            # integer value on each. Keys outside this set are invalid.
     verified: <integer>
@@ -359,7 +424,10 @@ data:
                                            # Fine-grained counts live in data.verdicts, not here.
     unverifiable: <integer>
   verdicts:                                # REQUIRED for reference-level tasks (verify_citations, bibliography_audit).
-                                           # One entry per input reference, in input order. See "Worked examples" below.
+                                           # One entry per PARSED input reference INCLUDING duplicates, in input order.
+                                           # A duplicate's entry mirrors its canonical's verdict/confidence (Step 0.5.5)
+                                           # and reuses the canonical reference_id with a "-dup2"/"-dup3" suffix. See
+                                           # "Worked examples" below.
     - reference_id: <string>               # stable id assigned in Step 0.5
       verdict: verified | partially_supported | unsupported | contradicted
              | fabricated | fabricated_doi
@@ -380,6 +448,9 @@ data:
                                            # {source, score, title, authors, year, doi, url}. Empty array [] otherwise.
         abstract_snippet: <string | null>  # populated only when verification_depth == detailed AND verdict == verified.
                                            # null otherwise.
+        retraction: <object | null>        # OPTIONAL key (absent in envelopes emitted before v2.2.0). When present:
+                                           # {checked: boolean, retracted: boolean} or null. Set from Step 3a's
+                                           # retraction check. When retracted is true, notes MUST start with "RETRACTED: ".
         notes: <string | null>             # free-form reason or human-verification guidance. null when no note applies.
                                            # Reserved for context the structural fields cannot express — not a substitute
                                            # for setting resolved/cross_check/candidates.
@@ -396,6 +467,8 @@ data:
                                            # shared envelope validator's independent length assertion.
 errors:                                    # REQUIRED (may be empty array); parse failures, duplicate references,
                                            # resolver outages. A valid run with no errors emits `errors: []`.
+                                           # Duplicates emit {reference_id: <dup id>, stage: "parse",
+                                           # reason: "duplicate_of:<canonical-id>", raw: <chunk>} (reason is a string).
   - reference_id: <string | null>
     stage: parse | resolve | cross_check
     reason: <string>
@@ -534,6 +607,68 @@ that do not apply are explicit `null` or `[]`, never omitted.
     ],
     "abstract_snippet": null,
     "notes": "Top OpenAlex title-search candidate below 0.7 confidence threshold; resolver-only verdict withheld. Human-verifiable via the candidate URL."
+  }
+}
+```
+
+**duplicate** (second occurrence of the verified Vaswani reference; verdict mirrored, resolver not re-queried — Step 0.5.5):
+
+```json
+{
+  "reference_id": "vaswani-2017-attention-is-all-you-need-dup2",
+  "verdict": "verified",
+  "confidence": 1.0,
+  "evidence": {
+    "parsed": {
+      "doi": "10.48550/arXiv.1706.03762",
+      "title": "Attention is all you need",
+      "authors": ["Vaswani, A."],
+      "year": 2017,
+      "venue": "NeurIPS",
+      "source_format": "prose",
+      "raw": "41. Vaswani, A., et al. (2017). Attention is all you need..."
+    },
+    "resolved": {
+      "doi": "10.48550/arxiv.1706.03762",
+      "title": "Attention Is All You Need",
+      "authors": ["Ashish Vaswani", "Noam Shazeer"],
+      "year": 2017,
+      "venue": "NeurIPS",
+      "source": "openalex",
+      "raw_response_hash": "ca23b6db..."
+    },
+    "cross_check": {
+      "title":  { "parsed": "Attention is all you need", "resolved": "Attention Is All You Need", "similarity": 1.0, "pass": true },
+      "author": { "parsed": "Vaswani", "resolved": "Vaswani", "pass": true },
+      "year":   { "parsed": 2017, "resolved": 2017, "pass": true }
+    },
+    "candidates": [],
+    "abstract_snippet": null,
+    "notes": "duplicate of vaswani-2017-attention-is-all-you-need; verdict mirrored, resolver not re-queried"
+  }
+}
+```
+
+The matching `errors[]` entry:
+`{ "reference_id": "vaswani-2017-attention-is-all-you-need-dup2", "stage": "parse", "reason": "duplicate_of:vaswani-2017-attention-is-all-you-need", "raw": "41. Vaswani, A., et al. (2017). Attention is all you need..." }`
+
+### Claim-level worked example
+
+For `verify_claims` / `alignment_audit` / `evidence_check`, the machine payload
+is `data.claims` (not `data.verdicts`). `data.claims_evaluated` equals
+`data.claims.length`; `verdict_summary`/`verdicts`/`self_check` are not required.
+
+```json
+{
+  "claim_id": "c1",
+  "claim": "The transformer architecture removes recurrence entirely and relies solely on attention.",
+  "claim_type": "methodological",
+  "rating": "contradicted",
+  "confidence": 0.9,
+  "evidence": {
+    "quote": "We also use residual connections and a position-wise feed-forward network in each layer.",
+    "source": "Vaswani et al. 2017, Section 3.1",
+    "notes": "Source shows the architecture also depends on feed-forward and positional components, so 'solely on attention' overstates the source."
   }
 }
 ```

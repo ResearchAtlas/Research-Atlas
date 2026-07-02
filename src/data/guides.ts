@@ -1,4 +1,5 @@
 import type { ResearchStage, ResearchType } from "@/data/taxonomy"
+import type { Provenance } from "@/data/provenance"
 
 export type GuideGroup =
   | "Introduction"
@@ -30,9 +31,10 @@ export interface Guide {
   lastUpdated: string
   sources: GuideSource[]
   sourceNote?: string
+  provenance: Provenance
 }
 
-type GuideDraft = Omit<Guide, "lastUpdated" | "sources">
+type GuideDraft = Omit<Guide, "lastUpdated" | "sources" | "provenance">
 
 const RAW_GUIDES: GuideDraft[] = [
   {
@@ -562,19 +564,19 @@ const RAW_GUIDES: GuideDraft[] = [
   },
 ]
 
-const DEFAULT_GUIDE_LAST_UPDATED = "2026-02-06"
+const DEFAULT_GUIDE_ADDED_AT = "2026-02-06"
 
-const GUIDE_LAST_UPDATED: Record<string, string> = {
-  welcome: "2026-02-06",
-  "about-research-atlas": "2026-02-06",
-  "ai-research-overview": "2026-02-05",
-  "prompting-fundamentals": "2026-02-05",
-  "verification-integrity": "2026-02-05",
-  "ethics-policies": "2026-02-05",
-  "focus-guide": "2026-02-04",
-  quickstart: "2026-02-04",
-  glossary: "2026-02-04",
-  "nlm-research-workflow": "2026-02-08",
+const GUIDE_PROVENANCE: Record<string, Provenance> = {
+  welcome: { source: "Research Atlas editorial", owner: "research-atlas", status: "unverified", addedAt: "2026-02-06" },
+  "about-research-atlas": { source: "Research Atlas editorial", owner: "research-atlas", status: "unverified", addedAt: "2026-02-06" },
+  "ai-research-overview": { source: "AI in research report (Executive Summary)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  "prompting-fundamentals": { source: "AI in research report (Prompting Fundamentals)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  "verification-integrity": { source: "AI in research report (Verification)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  "ethics-policies": { source: "AI in research report (Ethics)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  "focus-guide": { source: "Academic Use Toolkit (FOCUS workflow)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  quickstart: { source: "AI in research report (Quickstart)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  glossary: { source: "AI in research report (Glossary)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  "nlm-research-workflow": { source: "NotebookLM Research Workflow Guide", owner: "research-atlas", status: "unverified", addedAt: "2026-02-08" },
 }
 
 export const EDITORIAL_POLICY = [
@@ -616,8 +618,14 @@ const buildGuideSources = (guide: GuideDraft): GuideSource[] => {
   return sources
 }
 
-export const GUIDES: Guide[] = RAW_GUIDES.map((guide) => ({
-  ...guide,
-  lastUpdated: GUIDE_LAST_UPDATED[guide.id] ?? DEFAULT_GUIDE_LAST_UPDATED,
-  sources: buildGuideSources(guide),
-}))
+export const GUIDES: Guide[] = RAW_GUIDES.map((guide) => {
+  const provenance =
+    GUIDE_PROVENANCE[guide.id] ??
+    ({ source: "Research Atlas editorial", owner: "research-atlas", status: "unverified", addedAt: DEFAULT_GUIDE_ADDED_AT } satisfies Provenance)
+  return {
+    ...guide,
+    lastUpdated: provenance.reviewedAt ?? provenance.addedAt,
+    sources: buildGuideSources(guide),
+    provenance,
+  }
+})

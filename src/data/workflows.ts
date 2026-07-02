@@ -1,4 +1,5 @@
 import type { ResearchStage, ResearchType } from "@/data/taxonomy"
+import type { Provenance } from "@/data/provenance"
 
 export interface WorkflowStep {
   id: string
@@ -26,9 +27,10 @@ export interface Workflow {
   steps?: WorkflowStep[]
   lastUpdated: string
   sourceNote?: string
+  provenance: Provenance
 }
 
-type WorkflowDraft = Omit<Workflow, "lastUpdated">
+type WorkflowDraft = Omit<Workflow, "lastUpdated" | "provenance">
 
 const RAW_WORKFLOWS: WorkflowDraft[] = [
   {
@@ -729,29 +731,34 @@ const RAW_WORKFLOWS: WorkflowDraft[] = [
   },
 ]
 
-const DEFAULT_WORKFLOW_LAST_UPDATED = "2026-02-06"
+const DEFAULT_WORKFLOW_ADDED_AT = "2026-02-06"
 
-const WORKFLOW_LAST_UPDATED: Record<string, string> = {
-  focus: "2026-02-06",
-  exhyte: "2026-02-06",
-  autoresearcher: "2026-02-06",
-  "deepresearch-eco": "2026-02-05",
-  scideator: "2026-02-05",
-  "plan-execute-test-fix": "2026-02-05",
-  bioplanner: "2026-02-04",
-  "six-stage-autonomous-scientist": "2026-02-04",
-  "manuscript-review-pipeline": "2026-02-04",
-  w1_ops: "2026-02-04",
-  w2_comp: "2026-02-04",
-  w3_stress: "2026-02-04",
-  w4_cite: "2026-02-04",
-  w5_repro: "2026-02-04",
-  w6_rebut: "2026-02-04",
-  "nlm-research-workflow": "2026-02-08",
+const WORKFLOW_PROVENANCE: Record<string, Provenance> = {
+  focus: { source: "Academic Use Toolkit (FOCUS workflow)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-06" },
+  exhyte: { source: "Academic Use Toolkit (EXHYTE)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-06" },
+  autoresearcher: { source: "Academic Use Toolkit (AutoResearcher)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-06" },
+  "deepresearch-eco": { source: "Academic Use Toolkit (DeepResearchEco)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  scideator: { source: "Academic Use Toolkit (Scideator)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  "plan-execute-test-fix": { source: "Academic Use Toolkit (Plan-Execute-Test-Fix)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-05" },
+  bioplanner: { source: "Academic Use Toolkit (BioPlanner)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  "six-stage-autonomous-scientist": { source: "Academic Use Toolkit (Six-Stage Framework)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  "manuscript-review-pipeline": { source: "Academic Use Toolkit (Sample Workflow)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w1_ops: { source: "Academic Use Toolkit (Workflow 1)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w2_comp: { source: "Academic Use Toolkit (Workflow 2)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w3_stress: { source: "Academic Use Toolkit (Workflow 3)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w4_cite: { source: "Academic Use Toolkit (Workflow 4)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w5_repro: { source: "Academic Use Toolkit (Workflow 5)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  w6_rebut: { source: "Academic Use Toolkit (Workflow 6)", owner: "research-atlas", status: "unverified", addedAt: "2026-02-04" },
+  "nlm-research-workflow": { source: "NotebookLM Research Workflow Guide", owner: "research-atlas", status: "unverified", addedAt: "2026-02-08" },
 }
 
-export const WORKFLOWS: Workflow[] = RAW_WORKFLOWS.map((workflow) => ({
-  ...workflow,
-  lastUpdated:
-    WORKFLOW_LAST_UPDATED[workflow.id] ?? DEFAULT_WORKFLOW_LAST_UPDATED,
-}))
+export const WORKFLOWS: Workflow[] = RAW_WORKFLOWS.map((workflow) => {
+  const provenance =
+    WORKFLOW_PROVENANCE[workflow.id] ??
+    ({ source: "Research Atlas editorial", owner: "research-atlas", status: "unverified", addedAt: DEFAULT_WORKFLOW_ADDED_AT } satisfies Provenance)
+  return {
+    ...workflow,
+    lastUpdated: provenance.reviewedAt ?? provenance.addedAt,
+    provenance,
+  }
+})

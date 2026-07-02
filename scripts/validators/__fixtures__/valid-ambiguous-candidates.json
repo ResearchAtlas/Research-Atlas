@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000104",
+    "timestamp": "2026-07-01T10:20:00Z",
+    "input_count": 1
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Verification report\n\n- goodfellow-2014-gan: **partially_supported** — top candidate scored in the (0.7, 0.9) band; likely the correct paper but metadata disagrees.\n",
+    "citations_checked": 1,
+    "verdict_summary": {
+      "verified": 0,
+      "partially_supported": 1,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "goodfellow-2014-gan",
+        "verdict": "partially_supported",
+        "confidence": 0.8,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Generative adversarial nets", "authors": ["Goodfellow, I."], "year": 2014, "venue": "NeurIPS", "source_format": "prose", "raw": "16. Goodfellow, I., et al. (2014). Generative adversarial nets..." },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [
+            { "source": "openalex", "score": 0.82, "title": "Generative Adversarial Networks", "authors": ["Goodfellow"], "year": 2014, "doi": "10.48550/arxiv.1406.2661", "url": "https://openalex.org/W2964307815" }
+          ],
+          "abstract_snippet": null,
+          "notes": "Top OpenAlex candidate scored 0.82 (title differs: 'nets' vs 'networks'). Likely the correct paper; user judgment required before citing."
+        }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

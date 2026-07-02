@@ -35,6 +35,17 @@
 //     set AND counts must match a rollup of data.verdicts under the skill's
 //     verdict_rollup map (catches drift between summary totals and the
 //     actual verdict list; also flags unknown verdict classes).
+//   - reference_id uniqueness: every data.verdicts[*].reference_id must be
+//     unique within a run (v2.2.0 duplicate contract suffixes copies with
+//     "-dup2"/"-dup3" precisely to keep them distinct).
+//   - retraction (optional evidence key, v2.2.0+): when present on a verdict's
+//     evidence block, must be null or {checked: boolean, retracted: boolean}.
+//   - data.claims (optional, claim-level tasks, v2.2.0+): when present must be
+//     an array; each entry checked for claim_id (non-empty, unique), claim
+//     (non-empty), claim_type enum, rating enum, confidence in [0,1], and an
+//     evidence object with string-or-null quote/source/notes. When both
+//     data.claims and data.claims_evaluated are present, lengths must match.
+//     verdict_summary/verdicts are NOT required when only claims are present.
 //
 // It does NOT enforce the verdict enum, task whitelist, or evidence
 // contents beyond structural presence — deeper semantic contracts belong
@@ -126,6 +137,23 @@ const SKILL_RULES = {
       abstract_snippet: { shape: 'string-or-null' },
       notes: { shape: 'string-or-null' },
     },
+    // Claim-level contract (verify_claims, alignment_audit, evidence_check).
+    // data.claims is optional at the envelope level (absent on reference-level
+    // and ai_detection runs), but when present each entry is checked against
+    // these enums/shapes. See validateClaims below.
+    claim_type_enum: new Set([
+      'empirical',
+      'methodological',
+      'theoretical',
+      'definitional',
+    ]),
+    claim_rating_enum: new Set([
+      'verified',
+      'partially_supported',
+      'unsupported',
+      'contradicted',
+      'unverifiable',
+    ]),
   },
 };
 
@@ -203,6 +231,7 @@ function validateData(obj, push) {
 
   const hasVerdicts = data.verdicts !== undefined;
   validateVerdictSummary(meta, data.verdict_summary, hasVerdicts, push);
+  validateClaims(meta, data, push);
 
   if (!hasVerdicts) return;
 
@@ -249,7 +278,90 @@ function validateData(obj, push) {
 
   const skillRules = SKILL_RULES[meta?.skill];
   data.verdicts.forEach((v, i) => validateVerdict(v, i, skillRules, push));
+  validateReferenceIdUniqueness(data.verdicts, push);
   validateVerdictSummaryCounts(meta, data, push);
+}
+
+// reference_id must be unique within a run. Under the v2.2.0 duplicate
+// contract, later occurrences of a reference carry a "-dup2"/"-dup3"
+// suffix specifically so their ids stay distinct; a collision means two
+// verdicts share an id and downstream indexing (grader, dashboards)
+// would silently drop one.
+function validateReferenceIdUniqueness(verdicts, push) {
+  const seen = new Set();
+  verdicts.forEach((v, i) => {
+    const id = v?.reference_id;
+    if (typeof id !== 'string' || id.length === 0) return; // already flagged
+    if (seen.has(id)) {
+      push(`data.verdicts[${i}].reference_id`, `duplicate reference_id "${id}"; must be unique within a run`);
+    }
+    seen.add(id);
+  });
+}
+
+// Claim-level contract (v2.2.0+). data.claims is optional at the envelope
+// level — absent on reference-level runs and ai_detection. When present it
+// must be an array; each entry is checked for the claim_id/claim/claim_type/
+// rating/confidence/evidence shape. When both data.claims and
+// data.claims_evaluated are present their lengths must match. verdict_summary
+// and verdicts are NOT required alongside claims (they gate on data.verdicts,
+// not data.claims).
+function validateClaims(meta, data, push) {
+  if (data.claims === undefined) return;
+  if (!Array.isArray(data.claims)) {
+    push('data.claims', 'must be an array when present');
+    return;
+  }
+  const rules = SKILL_RULES[meta?.skill];
+  const seenIds = new Set();
+  data.claims.forEach((c, i) => validateClaim(c, i, rules, seenIds, push));
+
+  if (Number.isInteger(data.claims_evaluated) && data.claims_evaluated !== data.claims.length) {
+    push(
+      'data.claims_evaluated',
+      `must equal data.claims length; got ${data.claims_evaluated} vs ${data.claims.length}`,
+    );
+  }
+}
+
+function validateClaim(c, i, rules, seenIds, push) {
+  const at = (field) => `data.claims[${i}].${field}`;
+  if (!c || typeof c !== 'object' || Array.isArray(c)) {
+    push(`data.claims[${i}]`, 'must be an object');
+    return;
+  }
+  if (typeof c.claim_id !== 'string' || c.claim_id.length === 0) {
+    push(at('claim_id'), 'must be a non-empty string');
+  } else if (seenIds.has(c.claim_id)) {
+    push(at('claim_id'), `duplicate claim_id "${c.claim_id}"; must be unique within a run`);
+  } else {
+    seenIds.add(c.claim_id);
+  }
+  if (typeof c.claim !== 'string' || c.claim.length === 0) {
+    push(at('claim'), 'must be a non-empty string');
+  }
+  if (typeof c.claim_type !== 'string' || (rules?.claim_type_enum && !rules.claim_type_enum.has(c.claim_type))) {
+    const allowed = rules?.claim_type_enum ? ` (allowed: ${[...rules.claim_type_enum].join(', ')})` : '';
+    push(at('claim_type'), `must be a valid claim_type${allowed}`);
+  }
+  if (typeof c.rating !== 'string' || (rules?.claim_rating_enum && !rules.claim_rating_enum.has(c.rating))) {
+    const allowed = rules?.claim_rating_enum ? ` (allowed: ${[...rules.claim_rating_enum].join(', ')})` : '';
+    push(at('rating'), `must be a valid rating${allowed}`);
+  }
+  if (typeof c.confidence !== 'number' || c.confidence < 0 || c.confidence > 1) {
+    push(at('confidence'), 'must be a number in [0, 1]');
+  }
+  if (!c.evidence || typeof c.evidence !== 'object' || Array.isArray(c.evidence)) {
+    push(at('evidence'), 'missing or not an object');
+    return;
+  }
+  for (const key of ['quote', 'source', 'notes']) {
+    if (!(key in c.evidence)) {
+      push(at(`evidence.${key}`), 'key is structurally required (use null when not populated)');
+    } else if (c.evidence[key] !== null && typeof c.evidence[key] !== 'string') {
+      push(at(`evidence.${key}`), 'must be a string or null');
+    }
+  }
 }
 
 function validateVerdictSummaryCounts(meta, data, push) {
@@ -377,6 +489,24 @@ function validateVerdict(v, i, skillRules, push) {
     } else if (spec.shape === 'string-or-null') {
       if (value !== null && typeof value !== 'string') {
         push(at(`evidence.${key}`), 'must be a string or null');
+      }
+    }
+  }
+
+  // Optional `retraction` evidence key (v2.2.0+). Absent in older envelopes;
+  // when present it must be null or {checked: boolean, retracted: boolean}.
+  if ('retraction' in v.evidence) {
+    const r = v.evidence.retraction;
+    if (r !== null) {
+      if (typeof r !== 'object' || Array.isArray(r)) {
+        push(at('evidence.retraction'), 'must be null or an object {checked, retracted}');
+      } else {
+        if (typeof r.checked !== 'boolean') {
+          push(at('evidence.retraction.checked'), 'must be a boolean');
+        }
+        if (typeof r.retracted !== 'boolean') {
+          push(at('evidence.retraction.retracted'), 'must be a boolean');
+        }
       }
     }
   }
