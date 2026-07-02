@@ -196,6 +196,21 @@ Flag citations matching any VERIFY heuristic:
 
 Every parsed reference flows through this pipeline. Per-reference state accumulates into a `verdict_record` consumed by the output envelope (see Output Envelope -> `data.verdicts`).
 
+**Latency budget:** Keep resolver retries bounded. For any resolver HTTP 429/5xx,
+retry at most once after a 2s delay, then record a resolver outage in `errors[]`
+and continue. Do not use exponential backoff or wait out rate limits inside an
+acceptance run; a temporarily unavailable resolver is evidence for
+`unverifiable`, not permission to exceed the 5-minute gate.
+
+For batches larger than 10 references, run the resolver phase with a single
+script or batched tool call using bounded concurrency (8 concurrent requests is
+a safe default). Do not make one separate agent/tool turn per reference. Memoize
+DOI lookups and duplicate normalized title searches. Use a run-level circuit
+breaker for title-search outages: after two HTTP 429/5xx responses from the same
+search resolver (`openalex_search` or `semantic_scholar_search`), stop querying
+that resolver for the remaining no-DOI references in the batch, record
+`<resolver>_unavailable` in each affected verdict, and continue.
+
 ##### Step 3a: DOI Resolver Layer (fires when `doi` is present)
 
 1. **Primary lookup — CrossRef** (`https://api.crossref.org/works/<doi>`, WebFetch):
@@ -204,12 +219,19 @@ Every parsed reference flows through this pipeline. Per-reference state accumula
    - On HTTP 429 / 5xx: retry once with a 2s delay. If still failing, mark `doi_resolver: crossref_unavailable` and continue to fallback.
 2. **Fallback — OpenAlex** (`https://api.openalex.org/works/doi:<doi>`, WebFetch):
    - On HTTP 200: extract the same fields (`title`, `authorships[].author.display_name`, `publication_year`, `primary_location.source.display_name`, `type`).
-   - On HTTP 404: set `verdict: fabricated_doi` with evidence `"DOI returned 404 from both CrossRef and OpenAlex"` and skip remaining steps for this reference.
-   - On error: set `verdict: unverifiable` with evidence `"DOI resolver unavailable (CrossRef <status> / OpenAlex <status>)"`.
-3. **Record provenance.** For each successful lookup, compute `sha256` of the raw JSON response body (first 4 KB is sufficient; truncate before hashing) and store as `raw_response_hash`. Store the resolver name (`crossref` or `openalex`) in `source`. This makes re-runs auditable and lets us prove which resolver returned which metadata.
-4. **Retraction check.** On a successful resolver hit, inspect signals already present in the fetched response — do NOT issue extra network calls:
+   - On HTTP 404: mark `doi_resolver: not_found_openalex`. **If the DOI is an arXiv DOI** (starts with `10.48550/arXiv.`), continue to the DataCite fallback (Step 3a.3) before declaring fabrication. **Otherwise** (non-arXiv DOI), when CrossRef also returned a definitive 404, set `verdict: fabricated_doi` with evidence `"DOI returned 404 from both CrossRef and OpenAlex"` and skip remaining steps for this reference. (DataCite indexes only DataCite-registered DOIs — chiefly arXiv here — so it is not a fallback for non-arXiv publisher DOIs; a CrossRef+OpenAlex double-404 on a non-arXiv DOI is already conclusive.)
+   - On HTTP 429 / 5xx: retry once with a 2s delay. If still failing, mark `doi_resolver: openalex_unavailable` and continue to the DataCite fallback when the DOI is an arXiv DOI; otherwise set `verdict: unverifiable` with evidence `"DOI resolver unavailable (CrossRef <status> / OpenAlex <status>)"` (never `fabricated_doi` when a resolver was merely unavailable rather than a definitive 404).
+3. **Tertiary lookup — DataCite for arXiv DOIs** (`https://api.datacite.org/dois/<doi>`, WebFetch):
+   - Required when the DOI starts with `10.48550/arXiv.` or when a no-DOI reference contains an `arXiv:<id>` identifier that can be normalized to `10.48550/arXiv.<id>`.
+   - On HTTP 200: extract `titles[0].title`, `creators[].name`, publication year from `dates`/`publicationYear`, publisher/container when present, and URL.
+   - On HTTP 404: if CrossRef and OpenAlex also returned 404, set `verdict: fabricated_doi` with evidence `"DOI returned 404 from CrossRef, OpenAlex, and DataCite"`.
+   - On HTTP 429 / 5xx: retry once with a 2s delay. If still failing and CrossRef/OpenAlex were unavailable rather than definitive 404s, set `verdict: unverifiable`; if CrossRef/OpenAlex were both definitive 404s and DataCite is unavailable, use `unverifiable`, not `fabricated_doi`.
+4. **Record provenance.** For each successful lookup, compute `sha256` of the raw JSON response body (first 4 KB is sufficient; truncate before hashing) and store as `raw_response_hash`. Store the resolver name (`crossref`, `openalex`, or `datacite`) in `source`. This makes re-runs auditable and lets us prove which resolver returned which metadata.
+5. **Retraction check.** On a successful resolver hit, inspect signals already present in the fetched response — do NOT issue extra network calls:
    - OpenAlex: `is_retracted: true`.
    - CrossRef: a `relation` / `update-to` entry whose `type` is `"retraction"`.
+   - Either resolver: a title/display name that begins with `"RETRACTED:"` or
+     `"Retracted:"`.
    Set `evidence.retraction = { checked: true, retracted: <bool> }`. (When no resolver
    hit occurs, either omit the key or set `evidence.retraction = null`.) When
    `retracted` is true:
@@ -228,11 +250,16 @@ Compare `parsed` vs `resolved` (or, for no-DOI references, `parsed` vs the best 
 
 | Check | Pass condition | Failure verdict |
 |---|---|---|
-| Title match | Normalized Levenshtein similarity ≥ 0.85 after lowercasing, collapsing whitespace, and stripping punctuation. Use Python-style `difflib.SequenceMatcher` ratio as the reference implementation. | `metadata_mismatch_title` |
+| Title match | Normalized Levenshtein similarity ≥ 0.85 after lowercasing, collapsing whitespace, stripping punctuation, and stripping any leading `RETRACTED:` prefix from the resolved title. Use Python-style `difflib.SequenceMatcher` ratio as the reference implementation. | `metadata_mismatch_title` |
 | First-author surname | Case-insensitive exact match after trimming accents (NFD normalize + strip combining marks) | `metadata_mismatch_author` |
 | Year | Parsed year within ±1 of resolved year (accounts for online-ahead-of-print / print delays) | `metadata_mismatch_year` |
 
 - If `parsed` is DOI-only / URL-only, title/author/year come entirely from the resolver — skip this step and set `verdict: verified` directly, with `evidence.cross_check: "resolver_only"`.
+- If a resolver returns a blank or missing field, do not count that missing field
+  as a mismatch. Record the missing field in `evidence.notes` and set
+  `verdict: partially_supported` when all non-missing fields pass. A blank
+  resolver title is resolver-incomplete metadata, not
+  `metadata_mismatch_title`.
 - If ≥ 2 checks fail, set `verdict: fabricated` rather than `metadata_mismatch_*` — the reference looks deliberately manufactured.
 - Always record the exact pair compared in `evidence.cross_check.<field>`: `{parsed, resolved, pass}`.
 
@@ -240,14 +267,23 @@ Compare `parsed` vs `resolved` (or, for no-DOI references, `parsed` vs the best 
 
 Fires when `doi` is null after parsing AND (`title` OR `authors`) is present. If neither is present, skip to `verdict: unverifiable` with reason `"insufficient_metadata"`.
 
-1. **Primary candidate search — OpenAlex** (`https://api.openalex.org/works?search=<title>&filter=...`):
+1. **Deterministic arXiv shortcut.** If the raw reference contains `arXiv:<id>`
+   or `arXiv preprint arXiv:<id>`, normalize it to `10.48550/arXiv.<id>` and
+   query DataCite first. Treat a DataCite hit as the top candidate and run Step
+   3b against it. This is required for common ML preprints where title search
+   can be rate-limited but the arXiv identifier is already present in the input.
+2. **Primary candidate search — OpenAlex** (`https://api.openalex.org/works?search=<title>&filter=...`):
    - Search by title. If `authors` has at least one surname, add `filter=authorships.author.display_name.search:<surname>`. If `year` is present, add `filter=publication_year:<year>-1|<year>|<year>+1`.
    - Take the top 5 hits.
-2. **Fallback candidate search — Semantic Scholar** (via `mcp-server-semantic-scholar` if available; else WebFetch `https://api.semanticscholar.org/graph/v1/paper/search?query=<title>`):
+   - On HTTP 429 / 5xx, retry once after 2s, then record the outage and continue
+     to the fallback. Do not back off longer inside the run.
+3. **Fallback candidate search — Semantic Scholar** (via `mcp-server-semantic-scholar` if available; else WebFetch `https://api.semanticscholar.org/graph/v1/paper/search?query=<title>`):
    - Only queried when OpenAlex returns 0 hits or all 5 score ≤ 0.7 on cross-check.
-3. **Score each candidate** by running Step 3b (title + first-author + year) against the parsed reference. The score is `(title_similarity + author_match + year_match) / 3` where author_match and year_match are 1 or 0.
-4. **Select top 3** candidates with score > 0.7. Store them in `evidence.candidates: [{source, score, title, authors, year, doi, url}, ...]`.
-5. **Decide verdict:**
+   - On HTTP 429 / 5xx, retry once after 2s, then record the outage and continue
+     with any candidates already found.
+4. **Score each candidate** by running Step 3b (title + first-author + year) against the parsed reference. The score is `(title_similarity + author_match + year_match) / 3` where author_match and year_match are 1 or 0.
+5. **Select top 3** candidates with score > 0.7. Store them in `evidence.candidates: [{source, score, title, authors, year, doi, url}, ...]`.
+6. **Decide verdict:**
    - Exactly one candidate with score ≥ 0.9 and Step 3b fully passes -> `verdict: verified`, record the candidate's DOI (if any) in `resolved.doi`.
    - Top candidate score in (0.7, 0.9) -> `verdict: partially_supported` — likely the correct paper but metadata disagrees; user judgment required.
    - All candidates ≤ 0.7 (or Semantic Scholar also returned nothing) -> `verdict: unverifiable` with reason `"no_confident_match"`. Do NOT guess.
@@ -257,7 +293,12 @@ Fires when `doi` is null after parsing AND (`title` OR `authors`) is present. If
 Depth controls how much additional context is fetched beyond Step 3a-3c, not the core verdict.
 
 - `quick`: Steps 3a-3c only. Skip abstract/full-text fetches. Skip suggestion of human-verification resources.
-- `detailed` (default): Steps 3a-3c, plus — for each `verified` reference — fetch the abstract (OpenAlex `abstract_inverted_index` reconstruction or CrossRef `abstract` field when present). Store under `evidence.abstract_snippet` (first 500 chars). Used for alignment-audit follow-ups.
+- `detailed` (default): Steps 3a-3c, plus — for each `verified` reference — use an
+  abstract already present in the resolver response (OpenAlex
+  `abstract_inverted_index` reconstruction or CrossRef `abstract` field when
+  present). Store under `evidence.abstract_snippet` (first 500 chars). Do not
+  issue separate abstract-only network calls in acceptance runs; if the current
+  resolver response has no abstract, set `abstract_snippet: null`.
 - `expert`: All of detailed, plus — for each `unverifiable` reference — surface human-verification guidance: suggest direct search in Web of Science, recommend contacting the first author, flag if the venue is predatory (check against Beall's list / DOAJ).
 
 #### Three-Layer Verification Protocol (claim-level tasks)
@@ -365,12 +406,17 @@ CHECK verdicts_complete:  (reference-level tasks only) data.verdicts has one ent
 The envelope is the machine-readable contract. Two invariants govern
 every field:
 
-- **Structural presence over prose.** Keys listed below are present
-  on every run, never omitted. When a field does not apply, emit it
-  with an explicit null (for scalar/object fields) or `[]` (for array
-  fields). Do not push "we tried X but got 404" into `notes` and drop
-  the matching `resolved` key — set `resolved: null` instead, so
-  downstream validators and graders see the structural signal.
+- **Structural presence over prose.** Keys required for the selected task are
+  present and correctly typed. Task-scoped sections are mutually exclusive:
+  reference-level tasks emit `citations_checked`, `verdict_summary`, `verdicts`,
+  and `self_check`, and they OMIT `claims_evaluated` and `claims` entirely;
+  claim-level tasks emit `claims_evaluated` and `claims`, and they OMIT
+  `citations_checked`, `verdict_summary`, `verdicts`, and `self_check`.
+  Inside a verdict's `evidence`, required structural keys are always present;
+  when a field does not apply, emit `null` for scalar/object fields or `[]` for
+  array fields. Do not push "we tried X but got 404" into `notes` and drop the
+  matching `resolved` key — set `resolved: null` instead, so downstream
+  validators and graders see the structural signal.
 - **Machine over human.** When the human-readable `content` string
   disagrees with the machine fields (`verdicts`, `verdict_summary`,
   `self_check`), the machine fields are authoritative. Consumers of
@@ -397,9 +443,12 @@ data:
   content: <string>                        # REQUIRED when status is success or partial; the human-readable report
                                            # matching output_format. May be the empty string only when output_format
                                            # is json AND all machine-readable data lives in verdicts/claims.
-  claims_evaluated: <integer>              # populated for claim-level tasks; equals len(data.claims) when claims present
-  citations_checked: <integer>             # populated for reference-level tasks; equals len(data.verdicts)
+  claims_evaluated: <integer>              # CLAIM-LEVEL ONLY. Omit on verify_citations/bibliography_audit.
+                                           # When present, it must be a non-negative integer, never null, and equal
+                                           # len(data.claims).
+  citations_checked: <integer>             # REFERENCE-LEVEL ONLY. Omit on claim-level tasks. Equals len(data.verdicts).
   claims:                                  # REQUIRED for claim-level tasks verify_claims, alignment_audit, evidence_check.
+                                           # Omit entirely on verify_citations/bibliography_audit; do not set null.
                                            # (ai_detection stays prose + per-paragraph ratings — it emits NO data.claims.)
                                            # One entry per extracted claim, in text order. When present, verdict_summary
                                            # and verdicts are NOT required. See "Claim-level worked example" below.
@@ -474,6 +523,13 @@ errors:                                    # REQUIRED (may be empty array); pars
     reason: <string>
     raw: <string | null>
 ```
+
+**Pre-write schema check for reference-level tasks:** before writing the final
+envelope, verify these exact facts: `data.claims_evaluated` is absent,
+`data.claims` is absent, `data.citations_checked` is an integer,
+`data.verdicts` is an array, `data.verdicts.length == data.citations_checked`,
+and `meta.input_count == data.verdicts.length` when `meta.input_count` is set.
+If any check fails, fix the JSON before returning.
 
 ### Worked examples — one per verdict class
 

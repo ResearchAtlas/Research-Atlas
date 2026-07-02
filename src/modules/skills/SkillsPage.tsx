@@ -14,7 +14,7 @@ const WHAT_IT_DOES = [
 
 export function SkillsPage() {
     const canonical = 'https://researchatlas.info/skills'
-    const description = 'Research Atlas ships one flagship agent skill: research-verification. See what it does and how to install it on Claude Code, Codex CLI, or Gemini CLI.'
+    const description = 'Research Atlas ships one flagship agent skill: research-verification. See what it does and how to install it on Claude Code or Codex CLI.'
     const socialTitle = 'Skills | Research Atlas'
 
     return (
@@ -41,8 +41,8 @@ export function SkillsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Agent Skills</h1>
                     <p className="mt-2 max-w-2xl text-muted-foreground">
-                        Research Atlas ships one flagship Agent Skill, usable from Claude Code, Codex CLI,
-                        and Gemini CLI. It lives in the same repo as this site.
+                        Research Atlas ships one flagship Agent Skill, usable from Claude Code and Codex CLI.
+                        It lives in the same repo as this site.
                     </p>
                 </div>
 
@@ -55,7 +55,7 @@ export function SkillsPage() {
                             <Badge variant="secondary">Skill v2.2.0</Badge>
                         </div>
                         <CardDescription>
-                            End-to-end reference verification across Claude Code, Codex CLI, and Gemini CLI.
+                            End-to-end reference verification across Claude Code and Codex CLI.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -82,10 +82,9 @@ export function SkillsPage() {
                 <div>
                     <h2 className="text-xl font-semibold tracking-tight mb-4">Install on your agent</h2>
                     <Tabs defaultValue="claude" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
+                        <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="claude">Claude Code</TabsTrigger>
                             <TabsTrigger value="codex">Codex CLI</TabsTrigger>
-                            <TabsTrigger value="gemini">Gemini CLI</TabsTrigger>
                         </TabsList>
                         <TabsContent value="claude" className="mt-4">
                             <Card>
@@ -124,26 +123,6 @@ codex`}
                                     <p className="mt-3 text-sm text-muted-foreground">
                                         Then ask: <span className="font-mono">&ldquo;verify these references&rdquo;</span>, or invoke it directly with{' '}
                                         <span className="font-mono">$research-verification</span>.
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                        <TabsContent value="gemini" className="mt-4">
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-base">Via <span className="font-mono">gemini skills install</span></CardTitle>
-                                    <CardDescription>
-                                        Gemini activates the skill by prompt match and asks for consent before loading the skill body.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">
-{`gemini skills install https://github.com/ResearchAtlas/Research-Atlas \\
-  --path .agents/skills/research-verification
-gemini skills list`}
-                                    </pre>
-                                    <p className="mt-3 text-sm text-muted-foreground">
-                                        Then ask: <span className="font-mono">&ldquo;verify these references&rdquo;</span>.
                                     </p>
                                 </CardContent>
                             </Card>

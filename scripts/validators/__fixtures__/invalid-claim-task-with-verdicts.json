@@ -1,0 +1,58 @@
+{
+  "_comment": "Claim-level task (alignment_audit) carrying a stray reference-level section. Must FAIL the v2.2.0 task-section mutual-exclusivity check: data.verdicts, data.verdict_summary, and data.citations_checked belong to reference-level tasks only.",
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000202",
+    "timestamp": "2026-07-02T15:35:00Z",
+    "input_count": 1
+  },
+  "status": "success",
+  "data": {
+    "task": "alignment_audit",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Alignment audit\n\n- c1: **verified**\n",
+    "claims_evaluated": 1,
+    "citations_checked": 1,
+    "verdict_summary": {
+      "verified": 1,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
+          "resolved": null,
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
+        }
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c1",
+        "claim": "Self-attention connects all positions with a constant number of sequential operations.",
+        "claim_type": "theoretical",
+        "rating": "verified",
+        "confidence": 0.95,
+        "evidence": {
+          "quote": "a self-attention layer connects all positions with a constant number of sequentially executed operations",
+          "source": "Vaswani et al. 2017, Table 1",
+          "notes": null
+        }
+      }
+    ]
+  },
+  "errors": []
+}

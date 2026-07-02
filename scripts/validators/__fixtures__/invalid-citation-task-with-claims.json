@@ -1,0 +1,63 @@
+{
+  "_comment": "Reference-level task (verify_citations) carrying a stray claim-level section. Must FAIL the v2.2.0 task-section mutual-exclusivity check: data.claims and data.claims_evaluated belong to claim-level tasks only.",
+  "meta": {
+    "skill": "research-verification",
+    "version": "2.2.0",
+    "schema_version": 2,
+    "run_id": "4b8c2e41-0000-4000-8000-000000000201",
+    "timestamp": "2026-07-02T15:30:00Z",
+    "input_count": 1
+  },
+  "status": "success",
+  "data": {
+    "task": "verify_citations",
+    "verification_depth": "detailed",
+    "output_format": "markdown",
+    "content": "## Verification report\n\n- vaswani-2017-attention: **verified**\n",
+    "citations_checked": 1,
+    "claims_evaluated": 1,
+    "verdict_summary": {
+      "verified": 1,
+      "partially_supported": 0,
+      "unsupported": 0,
+      "contradicted": 0,
+      "fabricated": 0,
+      "unverifiable": 0
+    },
+    "verdicts": [
+      {
+        "reference_id": "vaswani-2017-attention",
+        "verdict": "verified",
+        "confidence": 1.0,
+        "evidence": {
+          "parsed": { "doi": null, "title": "Attention is all you need", "year": 2017 },
+          "resolved": { "doi": "10.48550/arxiv.1706.03762", "source": "openalex" },
+          "cross_check": null,
+          "candidates": [],
+          "abstract_snippet": null,
+          "notes": null
+        }
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c1",
+        "claim": "This claim section does not belong on a citation-verification envelope.",
+        "claim_type": "methodological",
+        "rating": "verified",
+        "confidence": 0.9,
+        "evidence": { "quote": null, "source": null, "notes": null }
+      }
+    ],
+    "self_check": {
+      "all_evaluated": "pass",
+      "no_false_verified": "pass",
+      "contradictions": "pass",
+      "unverifiable_noted": "pass",
+      "format_match": "pass",
+      "verify_framework": "pass",
+      "verdicts_complete": "pass"
+    }
+  },
+  "errors": []
+}

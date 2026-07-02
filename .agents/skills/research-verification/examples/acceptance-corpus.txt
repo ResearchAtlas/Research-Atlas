@@ -6,11 +6,12 @@
 #
 # NOTE ON VERSIONS: envelopes produced against corpus v1 (30 items) grade only
 # against the v1 ground truth (see git history). The saved artifacts under
-# scripts/acceptance/envelopes/ are v1 runs; a fresh v2 acceptance run per
-# agent is pending and gates the next skill release.
+# scripts/acceptance/envelopes/ are v1 runs; fresh v2 acceptance runs on
+# Claude Code and Codex CLI gate the next skill release.
 #
 # PASS CONDITIONS (all eight must hold for the run to be accepted):
-#   1. Every entry receives a verdict (len(data.verdicts) == 32).
+#   1. The envelope validates against schema_version 2 and every entry receives
+#      a verdict (len(data.verdicts) == 32).
 #   2. All 3 fabricated-DOI entries (26, 27, 28) are caught as `fabricated_doi`.
 #      None are allowed to pass through as `verified` or `unverifiable`.
 #   3. Entry 29 is caught as `metadata_mismatch_author` (author wrong on a real DOI).
@@ -19,7 +20,7 @@
 #      Real references may be `verified`, `partially_supported`, or `unverifiable`
 #      (e.g. old papers whose DOI CrossRef/OpenAlex cannot resolve), but never
 #      fabricated.
-#   6. Wall-clock runtime <= 5 minutes on a single Claude Code session at
+#   6. Wall-clock runtime <= 5 minutes on a single fresh agent session at
 #      verification_depth=detailed. A run that hangs or needs manual prompting
 #      to finish does not count.
 #   7. Entry 31 is an exact duplicate of entry 1. It must still receive its own
@@ -32,7 +33,6 @@
 #      dedicated retracted-references section in the report.
 #
 # Additional non-blocking expectations (tracked but not gating):
-#   - schema_version == 2 on the output envelope.
 #   - verify_framework self-check == pass.
 #   - The VERIFY pre-scan flags all 5 traps as suspicious BEFORE the resolver
 #     runs (catches them at Step 2, not just Step 3).

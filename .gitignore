@@ -24,7 +24,6 @@ docs/
 !.claude/skills/research-verification/
 .codex/
 .cursor/
-.gemini/
 .shared/
 
 # Local planning and scratch artifacts
