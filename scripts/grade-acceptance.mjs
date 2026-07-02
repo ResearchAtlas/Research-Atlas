@@ -87,12 +87,12 @@ export function grade(envelope, groundTruth, opts = {}) {
     const approvalSeconds = typeof opts.approval_seconds === 'number' ? opts.approval_seconds : 0;
     conditions.push(checkLatency(opts.elapsed_minutes, approvalSeconds, groundTruth));
   } else {
-    const threshold = findThreshold(groundTruth, 'latency', 'threshold_minutes');
+    const threshold = latencyThresholdMinutes(groundTruth);
     conditions.push({
       name: 'latency',
       pass: null,
       actual: 'not measured (pass --elapsed-minutes=N; add --approval-seconds=N to exclude human approval wait)',
-      expected: threshold != null ? `<= ${threshold} min active agent time` : 'unspecified',
+      expected: `<= ${threshold.toFixed(1)} min active agent time`,
     });
   }
 
@@ -306,17 +306,35 @@ function checkEnvelopeConforms(envelope, groundTruth) {
   };
 }
 
+// Effective latency budget in minutes. Prefer a PER-REFERENCE budget
+// (per_ref_seconds x total_items) so the gate scales with corpus size — the
+// real invariant is per-reference resolver cost, not a corpus-total constant.
+// Fall back to a flat threshold_minutes (mini/legacy ground truths), then 5.
+function latencyThresholdMinutes(groundTruth) {
+  const c = (groundTruth?.pass_conditions ?? []).find((x) => x.id === 'latency');
+  const perRef = c && typeof c.per_ref_seconds === 'number' ? c.per_ref_seconds : null;
+  const n = Number.isInteger(groundTruth?.total_items) ? groundTruth.total_items : null;
+  if (perRef != null && n != null) return (perRef * n) / 60;
+  const flat = findThreshold(groundTruth, 'latency', 'threshold_minutes');
+  return typeof flat === 'number' ? flat : 5;
+}
+
 function checkLatency(elapsedMinutes, approvalSeconds, groundTruth) {
-  const threshold = findThreshold(groundTruth, 'latency', 'threshold_minutes') ?? 5;
+  const threshold = latencyThresholdMinutes(groundTruth);
+  const c = (groundTruth?.pass_conditions ?? []).find((x) => x.id === 'latency');
+  const perRef = c && typeof c.per_ref_seconds === 'number' ? c.per_ref_seconds : null;
   const activeMinutes = Math.max(0, elapsedMinutes - approvalSeconds / 60);
   const actual = approvalSeconds > 0
     ? `${activeMinutes.toFixed(1)} min active (${elapsedMinutes} min wall-clock minus ${approvalSeconds}s human approval wait)`
     : `${elapsedMinutes} min elapsed (no approval wait reported — treated as 100% active time; pass --approval-seconds=N if applicable)`;
+  const expected = perRef != null
+    ? `<= ${threshold.toFixed(1)} min active agent time (${perRef}s/ref x ${groundTruth.total_items} refs)`
+    : `<= ${threshold} min active agent time`;
   return {
     name: 'latency',
     pass: activeMinutes <= threshold,
     actual,
-    expected: `<= ${threshold} min active agent time`,
+    expected,
   };
 }
 

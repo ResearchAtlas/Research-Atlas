@@ -20,9 +20,11 @@
 #      Real references may be `verified`, `partially_supported`, or `unverifiable`
 #      (e.g. old papers whose DOI CrossRef/OpenAlex cannot resolve), but never
 #      fabricated.
-#   6. Wall-clock runtime <= 5 minutes on a single fresh agent session at
-#      verification_depth=detailed. A run that hangs or needs manual prompting
-#      to finish does not count.
+#   6. Active agent time <= 35 seconds per reference (budget = 35 * N, so 18.7 min
+#      for this 32-ref corpus; it scales down with the list — 5.8 min for a 10-ref
+#      list) at verification_depth=detailed. Active time is wall-clock minus time
+#      spent waiting on tool-approval prompts. A run that hangs or needs manual
+#      prompting to finish does not count.
 #   7. Entry 31 is an exact duplicate of entry 1. It must still receive its own
 #      verdict entry (mirroring entry 1's verdict) with a "-dup2" reference_id
 #      suffix and a duplicate_of parse error — never silently dropped

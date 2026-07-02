@@ -20,12 +20,13 @@ const fixtures = join(repoRoot, 'scripts', '__fixtures__', 'grade-acceptance');
 const groundTruth = join(fixtures, 'mini-ground-truth.json');
 const groundTruthDup = join(fixtures, 'mini-ground-truth-dup.json');
 const groundTruthRetraction = join(fixtures, 'mini-ground-truth-retraction.json');
+const groundTruthPerRef = join(fixtures, 'mini-ground-truth-perref.json');
 
-function runGrader(envelope, gt = groundTruth) {
+function runGrader(envelope, gt = groundTruth, elapsedMinutes = 1) {
   return new Promise((res, rej) => {
     const child = spawn(
       process.execPath,
-      [grader, envelope, gt, '--elapsed-minutes=1'],
+      [grader, envelope, gt, `--elapsed-minutes=${elapsedMinutes}`],
       { stdio: ['ignore', 'pipe', 'pipe'] },
     );
     let stdout = '';
@@ -77,12 +78,28 @@ const cases = [
     expectCode: 1,
     expectStdoutMatch: /FAIL\s+retraction_flagged/,
   },
+  {
+    name: 'per-ref latency budget: 1 min <= 35s*2=1.167 min -> PASS',
+    fixture: 'mini-envelope-passing.json',
+    groundTruth: groundTruthPerRef,
+    elapsed: 1,
+    expectCode: 0,
+    expectStdoutMatch: /PASS\s+latency/,
+  },
+  {
+    name: 'per-ref latency budget: 2 min > 35s*2=1.167 min -> FAIL',
+    fixture: 'mini-envelope-passing.json',
+    groundTruth: groundTruthPerRef,
+    elapsed: 2,
+    expectCode: 1,
+    expectStdoutMatch: /FAIL\s+latency/,
+  },
 ];
 
 async function main() {
   const failures = [];
   for (const c of cases) {
-    const { code, stdout, stderr } = await runGrader(join(fixtures, c.fixture), c.groundTruth ?? groundTruth);
+    const { code, stdout, stderr } = await runGrader(join(fixtures, c.fixture), c.groundTruth ?? groundTruth, c.elapsed ?? 1);
     const problems = [];
     if (code !== c.expectCode) problems.push(`exit ${code}, expected ${c.expectCode}`);
     if (c.expectStdoutMatch && !c.expectStdoutMatch.test(stdout)) {
